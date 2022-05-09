@@ -90,36 +90,10 @@ def parse_args():
     ),
   )
 
-def remove_alignment_subst(ref_align, seq_align, mid_align):
-  seq_align_new = ''
-  mid_align_new = ''
-  for i in range(len(ref_align)):
-    if (
-      (ref_align[i] != seq_align[i]) and
-      (ref_align[i] != '-') and
-      (seq_align[i] != '-')
-    ):
-      seq_align_new += ref_align[i]
-      mid_align_new += '|'
-    else:
-      seq_align_new += seq_align[i]
-      mid_align_new += mid_align[i]
-  return seq_align_new, mid_align_new
-
-def get_0mut_file(data_set):
-  return (
-    os.path.splitext(data_set['input_file']['tsv'])[0] +
-    '_0mut' +
-    os.extsep + 'tsv'
-  )
-
 def is_freq_column(name):
   return name.endswith('_freq') or (name == 'Frequency')
 
-def make_main_full_repeats_unfiltered(data_set):
-  if data_set['format'] != 'individual':
-    raise Exception('Need individual data set')
-  
+def make_alignments(data_set):
   out_file_name = common.get_main_file_name(
     window_type = 'full',
     repeat_type = 'repeats',
