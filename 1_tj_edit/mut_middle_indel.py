@@ -2,13 +2,17 @@
 
 import argparse
 import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
+
 from collections import defaultdict
 import sam_utils
 import cigar_utils
 
 # get reference sequence
 def get_ref(fasta_file):
-  fasta_file.readline()
+  fasta_file.readline() # Skip seq id (sholuld be only one)
   ref = ''
   for line in fasta_file:
     assert line[0] != '>', f'There should be only one sequence in reference Fasta file {fasta_file.name}!'
@@ -149,7 +153,7 @@ def main():
   print(f'Total output reads: {total_output_count}')
 
 if __name__ == '__main__':
-  sys.argv += ['1DSB_ref.fa', 'test3.sam', '-o', 'output2.tsv', '-dsb', '67']
+  sys.argv += ['../ref_seq/1DSB_R1_sense.fa', 'test3.sam', '-o', 'output2.tsv', '-dsb', '67']
   main()
 
 
