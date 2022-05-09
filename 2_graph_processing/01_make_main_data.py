@@ -1,285 +1,94 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
+
+
 import pandas as pd
 import numpy as np
 import common
 import re
-import os
+import argparse
 
-REF_SEQ = {
-  '1DSB': {
-    'R1': {
-      'sense':  'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCTGCAGGTATGTTAATATGGACTAAAGGAGGCTTTTCTCAGGTCGACTCTAGACGCGTAGGATCCCCCGGGTACCGAGCTCGAATTTTTACTAACAAATGGTATTATTTATCCACAGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-      'cmv':    'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCTGCAGGTATGTTAATATGGACTAAAGGAGGCTTTTCTCAGGTCGACTCTAGACGCGTAGGATCCCCCGGGTACCGAGCTCGAATTTTTACTAACAAATGGTATTATTTATCCACAGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-      'branch': 'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCTGCAGGTATGTTAATATGGACTAAAGGAGGCTTTTCTCAGGTCGACTCTAGTTATCCACAGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-    },
-    'R2': {
-      'sense':  'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCCTGTGGATAAATAATACCATTTGTTAGTAAAAATTCGAGCTCGGTACCCGGGGGATCCTACGCGTCTAGAGTCGACCTGAGAAAAGCCTCCTTTAGTCCATATTAACATACCTGCAGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA',
-      'cmv':    'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCCTGTGGATAAATAATACCATTTGTTAGTAAAAATTCGAGCTCGGTACCCGGGGGATCCTACGCGTCTAGAGTCGACCTGAGAAAAGCCTCCTTTAGTCCATATTAACATACCTGCAGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA',
-      'branch': 'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCCTGTGGATAACTAGAGTCGACCTGAGAAAAGCCTCCTTTAGTCCATATTAACATACCTGCAGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA',
-    },
-  },
-  '2DSB': {
-    'R1': {
-      'sense':  'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-      'cmv':    'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-      'branch': 'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-    },
-    'R2': {
-      'sense':  'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA',
-      'cmv':    'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA',
-      'branch': 'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA',
-    },
-  },
-
-  '2DSBanti': {
-    'R1': {
-      'splicing':  'TGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-      'antisense': 'TGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC',
-    },
-    'R2': {
-      'splicing':  'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCCGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCA',
-      'antisense': 'GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCCGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCA',
-    },
-  },
-}
-
-# 0 based coords!
-CUT_POS = {
-  '1DSB': {
-    'sgA': {
-      'R1': [66, 67],
-      'R2': [161, 162],
-    },
-    'sgB': {
-      'R1': [182, 183],
-      'R2': [45, 46],
-    }
-  },
-  '2DSB': {
-    'sgAB': {
-      'R1': [66, 67],
-      'R2': [45, 46],
-    }
-  },
-  '2DSBanti': {
-    'sgAB': {
-      'R1': [49, 50],
-      'R2': [46, 47],
-    }
-  },
-}
-
-WINDOW_RADIUS = 10
-WINDOW_ANCHOR_SIZE = 20
-
-# 0 based coords!
-WINDOW_CUT_POS = {
-  '1DSB': {
-    'sgA': {
-      'R1': [
-        CUT_POS['1DSB']['sgA']['R1'][0] - WINDOW_RADIUS + 1,
-        CUT_POS['1DSB']['sgA']['R1'][1] + WINDOW_RADIUS - 1,
-      ],
-      'R2': [
-        CUT_POS['1DSB']['sgA']['R2'][0] - WINDOW_RADIUS + 1,
-        CUT_POS['1DSB']['sgA']['R2'][1] + WINDOW_RADIUS - 1,
-      ],
-    },
-    'sgB': {
-      'R1': [
-        CUT_POS['1DSB']['sgB']['R1'][0] - WINDOW_RADIUS + 1,
-        CUT_POS['1DSB']['sgB']['R1'][1] + WINDOW_RADIUS - 1,
-      ],
-      'R2': [
-        CUT_POS['1DSB']['sgB']['R2'][0] - WINDOW_RADIUS + 1,
-        CUT_POS['1DSB']['sgB']['R2'][1] + WINDOW_RADIUS - 1,
-      ],
-    }
-  },
-  '2DSB': {
-    'R1': [
-      CUT_POS['2DSB']['sgAB']['R1'][0] - WINDOW_RADIUS + 1,
-      CUT_POS['2DSB']['sgAB']['R1'][1] + WINDOW_RADIUS - 1,
-    ],
-    'R2': [
-      CUT_POS['2DSB']['sgAB']['R2'][0] - WINDOW_RADIUS + 1,
-      CUT_POS['2DSB']['sgAB']['R2'][1] + WINDOW_RADIUS - 1,
-    ],
-  },
-  '2DSBanti': {
-    'R1': [
-      CUT_POS['2DSBanti']['sgAB']['R1'][0] - WINDOW_RADIUS + 1,
-      CUT_POS['2DSBanti']['sgAB']['R1'][1] + WINDOW_RADIUS - 1,
-    ],
-    'R2': [
-      CUT_POS['2DSBanti']['sgAB']['R2'][0] - WINDOW_RADIUS + 1,
-      CUT_POS['2DSBanti']['sgAB']['R2'][1] + WINDOW_RADIUS - 1,
-    ],
-  },
-}
-
-# 0 based coords!
-WINDOW_30_BP_DOWN_CONTROL = {
-  '1DSB': {
-    'R1': [98, 117],
-    'R2': [77, 96],
-  },
-  '2DSB': {
-    'R1': [98, 117],
-    'R2': [77, 96],
-  },
-}
-
-FREQ_THRESHOLD = 1e-5
-
-def get_window_range(data_set):
-  if data_set['control'] == '30bpDown':
-    return WINDOW_30_BP_DOWN_CONTROL[data_set['DSB']][data_set['strand']]
-  else:
-    return WINDOW_CUT_POS[data_set['DSB']][data_set['strand']]
-
-def get_alignment(ref, seq_align_orig, cigar):
-  if ('I' in cigar) and ('D' in cigar):
-    cigar_pattern = r'^(\d+)(M)(\d+)(I)(\d+)(M)(\d+)(D)(\d+)(M)$'
-    seq = seq_align_orig.replace('-', '')
-  elif 'I' in cigar:
-    variation_type = 'I'
-    cigar_pattern = r'^(\d+)(M)(\d+)(I)(\d+)(M)$'
-    seq = seq_align_orig
-  elif 'D' in cigar:
-    variation_type = 'D'
-    cigar_pattern = r'^(\d+)(M)(\d+)(D)(\d+)(M)$'
-    left_matches = seq_align_orig.find('-')
-    if left_matches == -1:
-      cigar = f'{len(seq_align_orig)}M'
-      seq = seq_align_orig
-    else:
-      deletions = seq_align_orig.rfind('-') - left_matches + 1
-      right_matches = len(seq_align_orig) - left_matches - deletions
-      cigar = f'{left_matches}M{deletions}D{right_matches}M'
-      seq = seq_align_orig.replace('-', '')
-  else:
-    variation_type = 'M'
-    cigar_pattern = r'^(\d+)(M)$'
-    seq = seq_align_orig
-
-  cigar_parsed = re.search(cigar_pattern, cigar)
-  if not cigar_parsed:
-    print('Warning: unexpected CIGAR string: ' + str(cigar))
-    return None
-
-
-  variation_info_list = [
-    {'number': int(cigar_parsed.group(i + 1)), 'type': cigar_parsed.group(i + 2)}
-    for i in range(0, len(cigar_parsed.groups()), 2)
-  ]
-
-  ref_align = ''
-  mid_align = ''
-  seq_align = ''
-  ref_i = 0
-  seq_i = 0
-  for variation_info in variation_info_list:
-    variation_type = variation_info['type']
-    num_variations = variation_info['number']
-    if variation_type == 'M':
-      for _ in range(num_variations):
-        if ref[ref_i] != seq[seq_i]:
-          mid_align += '.'
-        else:
-          mid_align += '|'
-        ref_align += ref[ref_i]
-        seq_align += seq[seq_i]
-        ref_i += 1
-        seq_i += 1
-    elif variation_type == 'I':
-      for _ in range(num_variations):
-        mid_align += '-'
-        ref_align += '-'
-        seq_align += seq[seq_i]
-        seq_i += 1
-    elif variation_type == 'D':
-      for _ in range(num_variations):
-        mid_align += '-'
-        ref_align += ref[ref_i]
-        seq_align += '-'
-        ref_i += 1
-  if seq_align != seq_align_orig:
-    raise Exception('Alignments don''t match: ' + seq_align_orig + ' ' + seq_align)
-  return {
-    'ref_align': ref_align,
-    'seq_align': seq_align,
-    'mid_align': mid_align,
-  }
-
-def get_alignment_window(
-  ref_align,
-  seq_align,
-  mid_align,
-  scheme,
-  window_start,
-  window_end,
-  anchor_type,
-):
-  ref_i = 0
-  seq_i = 0
-
-  ref_align_window = ''
-  seq_align_window = ''
-  mid_align_window = ''
-  scheme_window = ''
-
-  if anchor_type == 'withAnchor':
-    window_anchor_size = WINDOW_ANCHOR_SIZE
-  elif anchor_type == 'withoutAnchor':
-    window_anchor_size = 0
-  else:
-    raise Exception('Unknown anchor type: ' + str(anchor_type))
-
-  left_anchor_mismatches = 0
-  right_anchor_mismatches = 0
-  for i in range(len(ref_align)):
-    if (window_start - window_anchor_size <= ref_i) and (ref_i <= window_start - 1):
-      if mid_align[i] == '.':
-        left_anchor_mismatches += 1
-      elif mid_align[i] == '-':
-        left_anchor_mismatches = np.inf
-    elif (window_end + 1 <= ref_i) and (ref_i <= window_end + window_anchor_size):
-      if mid_align[i] == '.':
-        right_anchor_mismatches += 1
-      elif mid_align[i] == '-':
-        right_anchor_mismatches = np.inf
-    elif (window_start <= ref_i) and (ref_i <= window_end):
-      ref_align_window += ref_align[i]
-      seq_align_window += seq_align[i]
-      mid_align_window += mid_align[i]
-      scheme_window += scheme[i]
-    
-    if ref_align[i] != '-':
-      ref_i += 1
-    if seq_align[i] != '-':
-      seq_i += 1
-
-  if ref_i <= window_end + window_anchor_size:
-    print(
-      'Warning: read did not align across window and anchor:\n' +
-      ref_align + '\n' +
-      seq_align + '\n' +
-      mid_align
-    )
-    return None
-
-  if (left_anchor_mismatches > 1) or (right_anchor_mismatches > 1):
-    return None
-
-  if '.' in ref_align:
-    raise Exception()
-
-  return {
-    'ref_align': ref_align_window,
-    'seq_align': seq_align_window,
-    'mid_align': mid_align_window,
-    'scheme': scheme_window,
-  }
+def parse_args():
+  parser = argparse.ArgumentParser(description = 'Filter sequences having mutations near DSB site')
+  parser.add_argument(
+    'input_table',
+    type = argparse.FileType(mode='r', encoding='utf-8'),
+    help = (
+      'Table of sequences produced with stage 1.\n'
+      'Column format: Sequence, CIGAR, freq_1, freq_2, etc.,\n'
+      'All the columns after CIGAR should be repeat frequencies.'
+    ),
+  )
+  parser.add_argument(
+    'ref_fasta',
+    type = argparse.FileType(mode='r', encoding='utf-8'),
+    help = 'Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.',
+  )
+  parser.add_argument(
+    '-o',
+    '--output',
+    type = argparse.FileType(mode='w', encoding='utf-8'),
+    default = sys.stdout,
+    help = 'Output file. Defaults to standard output.'
+  )
+  parser.add_argument(
+    '-dsb',
+    type = int,
+    default = 50,
+    metavar = 'DSB_POS',
+    help = (
+      'Position on reference sequence immediately upstream of DSB site.\n'
+      'The DSB is between position DSB_POS and DSB_POS + 1.'
+    ),
+  )
+  parser.add_argument(
+    '-f',
+    '--filter_threshold',
+    type = float,
+    default = 1e-5,
+    metavar = 'FILTER_THRESHOLD',
+    help = (
+      'Minimum frequency to allow in output.\n'
+      'Alignments with frequences <= this are discarded.'
+    ),
+  )
+  parser.add_argument(
+    '-ws',
+    '--window_size',
+    type = int,
+    default = 10,
+    metavar = 'window_size',
+    help = (
+      'Size of window around DSB site to extract.\n'
+      'The nucleotides in the range [DSB_POS - WINDOW_SIZE + 1, DSB_POS + WINDOW_SIZE]\n'
+      'are extracted (2 * WINDOW_SIZE in all).'
+    ),
+  )
+  parser.add_argument(
+    '-as',
+    '--anchor_size',
+    type = int,
+    default = 20,
+    metavar = 'ANCHOR_SIZE',
+    help = (
+      'Size of anchor on left/right of the window to check for mismatches.\n'
+      'Reads with more than the allowed number of mismatches on the left/right anchor\n'
+      'will be discarded. The mismatches on the left/right are counded '
+    ),
+  )
+  parser.add_argument(
+    '-am',
+    '--anchor_mismatch',
+    type = int,
+    default = 1,
+    metavar = 'ANCHOR_MISMATCH',
+    help = (
+      'Maximum number of mismatches allowed on the left/right anchor sequences.\n'
+      'Reads with more than the allowed number of mismatches on the left/right anchor\n'
+      'will be discarded. This limit is applied to the left/right anchors separately.'
+    ),
+  )
 
 def remove_alignment_subst(ref_align, seq_align, mid_align):
   seq_align_new = ''
@@ -689,7 +498,3 @@ if __name__ == '__main__':
     else:
       raise Exception('Unknown data set format: ' + str(data_set['format']))
     print('')
-
-# R1: TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCTGCAGGTATGTTAATATGGACTAAAGGAGGCTTTTCTCAGGTCGACTCTAGACGCGTAGGATCCCCCGGGTACCGAGCTCGAATTTTTACTAACAAATGGTATTATTTATCCACAGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC
-# R2: GGAAGTTCACGCCGATGAACTTCACCTTGTAGATGAAGCAGCCGTCCTGTGGATAAATAATACCATTTGTTAGTAAAAATTCGAGCTCGGTACCCGGGGGATCCTACGCGTCTAGAGTCGACCTGAGAAAAGCCTCCTTTAGTCCATATTAACATACCTGCAGGGAGGAGTCCTGGGTCACGGTCGCCACGCCGCCGTCCTCGAAGTTCATCACGCGCTCCCACTTGAA
-# And, the position of DSB is between the 67th and the 68th bp (1 based, R1)
