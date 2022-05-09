@@ -1,3 +1,6 @@
+# Some common functions.
+# FIXME: This needs to be heavily reduced.
+
 import functools
 import os
 from pathlib import Path
@@ -11,6 +14,41 @@ import Bio.Align
 import Levenshtein
 import re
 import datetime
+
+
+def get_window_range(dsb_pos, window_size):
+  """
+    Get the start and end points of the window around the DSB site.
+
+    Parameters
+    ----------
+    dsb_pos : position to immediate left (upstream) of cut (1-based)
+    window_size : number of nucleotides left and right of dsb to include in range.
+      The total number of nucleotides will be 2 * window_radius.
+    
+    Returns
+    -------
+    (start, end) : the start and end coordinates of the window to extract.
+      Both endpoints are inclusive, 1-based.
+  """
+  return (
+    dsb_pos - window_size - 1,
+    dsb_pos + window_size,
+  )
+
+def get_window_range_30bpdown(window_range):
+  """
+    Get the start and end points of the window for the 30bpDown control.
+
+    Parameters
+    ----------
+    window_range : start and end coordinates of the window around the dsb (1-based, inclusive).
+    
+    Returns
+    -------
+    (start, end) : the start and end coordinates of the 30bpDown window (1-based, inclusive).
+  """
+  return window_range[0] + 30, window_range[1] + 30
 
 def first_letter_upper(str):
   return str[0].upper() + str[1:]
