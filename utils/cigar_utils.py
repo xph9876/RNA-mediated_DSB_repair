@@ -1,5 +1,7 @@
 import re
 
+# TODO: rename this file to just cigar.py
+
 def parse_cigar(cigar):
   """
     Parse a CIGAR string into runs of variations.
