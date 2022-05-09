@@ -9,15 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 from collections import defaultdict
 import sam_utils
 import cigar_utils
-
-# get reference sequence
-def get_ref(fasta_file):
-  fasta_file.readline() # Skip seq id (sholuld be only one)
-  ref = ''
-  for line in fasta_file:
-    assert line[0] != '>', f'There should be only one sequence in reference Fasta file {fasta_file.name}!'
-    ref += line.rstrip()
-  return ref
+import fasta_utils
 
 # Get the in/del positions on the reference. Assumes that the read is aligned starting at position 1 on the reference.
 # return a list of ranges of consecutive indels
@@ -99,7 +91,7 @@ def main():
   args = parser.parse_args()
 
   # read reference sequence from fasta file
-  ref = get_ref(args.fasta)
+  ref = fasta_utils.read_fasta_seq(args.fasta)
   
   # categorize
   seq_counts = defaultdict(int)
