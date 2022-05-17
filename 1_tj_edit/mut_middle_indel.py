@@ -172,11 +172,13 @@ def main():
   ref_seq = fasta_utils.read_fasta_seq(args.fasta)
   
   # categorize
-  seq_counts = defaultdict(int)
+  read_counts = defaultdict(int)
   seq_cigar = {}
-  seq_num_subst = {}
+  read_num_subst = {}
   total_count = 0
   for line in args.sam:
+    if total_count % 10000 == 0:
+      print(f'Line: {total_count}')
     log_utils.log('-' * 100)
     total_count += 1 # must be computed here since some reads are discarded
 
@@ -254,35 +256,35 @@ def main():
       
     # all checks passed, count the read
     cigar = alignment_utils.get_cigar(ref_align, read_align) # the alignment may have changed so recompute the CIGAR
-    if read_seq in seq_cigar:
-      # If the read is the same, the alignment and CIGAR should be the same
-      assert cigar == seq_cigar[read_seq], \
-          f'CIGAR strings for read are different\n{read_seq}\norig: {seq_cigar[read_seq]}\nnew: {cigar}'
+    # if read_seq in seq_cigar:
+    #   # If the read is the same, the alignment and CIGAR should be the same
+    #   assert cigar == seq_cigar[read_seq], \
+    #       f'CIGAR strings for read are different\n{read_seq}\norig: {seq_cigar[read_seq]}\nnew: {cigar}'
     _, _, num_subst = alignment_utils.count_variations(ref_align, read_align)
     log_utils.log(f'{total_count} : Accepted')
-    seq_counts[read_seq] += 1
-    seq_cigar[read_seq] = cigar
-    seq_num_subst[read_seq] = num_subst
+    read_counts[read_seq, cigar] += 1
+    # seq_cigar[read_seq, cigar] = cigar
+    read_num_subst[read_seq, cigar] = num_subst
 
-  assert len(seq_counts) > 0, 'No sequences captured'
+  assert len(read_counts) > 0, 'No sequences captured'
 
   output_file = args.output
-  seqs = sorted(seq_counts.keys(), key = lambda x: -seq_counts[x])
+  read_seq_and_cigars = sorted(read_counts.keys(), key = lambda x: -read_counts[x])
   output_file.write('Sequence\tCIGAR\tCount\tFrequency\tNum_Subst\n')
-  for s in seqs:
-    count = seq_counts[s]
+  for read_seq, cigar in read_seq_and_cigars:
+    count = read_counts[read_seq, cigar]
     freq = count / total_count
-    cigar = seq_cigar[s]
-    num_subst = seq_num_subst[s]
-    output_file.write(f'{s}\t{cigar}\t{count}\t{freq}\t{num_subst}\n')
+    # cigar = seq_cigar[s]
+    num_subst = read_num_subst[read_seq, cigar]
+    output_file.write(f'{read_seq}\t{cigar}\t{count}\t{freq}\t{num_subst}\n')
   
   log_utils.log(f'Total reads: {total_count}')
-  total_output_count = sum(seq_counts.values())
+  total_output_count = sum(read_counts.values())
   log_utils.log(f'Total output reads: {total_output_count}')
 
 if __name__ == '__main__':
   log_utils.set_log_file('log.txt')
-  sys.argv += ['../ref_seq/1DSB_R1_sense.fa', 'test.sam', '-o', 'output.tsv', '-dsb', '67']
+  sys.argv += ['../ref_seq/1DSB_R1_sense.fa', 'test5.sam', '-o', 'output.tsv', '-dsb', '67']
   main()
 
 
