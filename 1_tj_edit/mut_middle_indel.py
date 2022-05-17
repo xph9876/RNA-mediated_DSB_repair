@@ -8,71 +8,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 
 from collections import defaultdict
 import sam_utils
-import cigar_utils
 import fasta_utils
 import alignment_utils
-
-# Get the variations positions on the reference.
-# Assumes that the read is aligned starting at position 1 on the reference.
-# Return a list of ranges of consecutive indels
-def get_variation_info(cigar_parsed, ref_seq, read_seq, ref_pos):
-  """
-    Get a list of positions and counts of the variations described by the CIGAR string.
-
-    Parameters
-    ----------
-    cigar_parsed : the CIGAR string from a Bowtie2 alignment.
-    ref_seq : the reference sequence.
-    read_seq : the read sequence.
-    ref_pos : the position on the reference where the alignment starts (1-based).
-
-    Returns
-    -------
-    A tuple (positions, var_types, ins_nuc, num_ins, num_del, num_subst) :
-      positions : a list of positions of the variations on the reference sequence
-      var_types : a list where each element is a "I", "D", or "S", indicating the type of variation.
-      var_nucs : a list where each element is either "-" for a deletion, the new nucleotide for a substitution,
-        or the inserted nucleotide for an insertion.
-      num_ins : the number of insertions.
-      num_del : the number of deletions.
-      num_subst : the number of substitutions.
-  """
-  # Get the list of individual positions
-  positions = []
-  var_types = []
-  var_nucs = []
-  num_ins = 0
-  num_del = 0
-  num_subst = 0
-  read_pos = 1
-  for var_info in cigar_parsed:
-    type = var_info['type']
-    count = var_info['count']
-    for _ in range(count):
-      if type == 'I':
-        positions.append(ref_pos) 
-        var_types.append('I')
-        var_nucs.append(read_seq[read_pos - 1])
-        read_pos += 1
-        num_ins += 1
-      elif type == 'D':
-        positions.append(ref_pos) 
-        var_types.append('D')
-        var_nucs.append('-')
-        ref_pos += 1
-        num_del += 1
-      elif type == 'M':
-        if ref_seq[ref_pos - 1] != read_seq[read_pos - 1]:
-          positions.append(ref_pos)
-          var_types.append('S')
-          var_nucs.append(read_seq[read_pos - 1])
-          num_subst += 1
-        ref_pos += 1
-        read_pos += 1
-  return positions, var_types, var_nucs, num_ins, num_del, num_subst
+import log_utils
 
 def is_consecutive(positions):
-  return positions == list(range(min(positions), max(positions) + 1))
+  return (len(positions) == 0) or \
+    (positions == list(range(min(positions), max(positions) + 1)))
 
 def count_mismatch(ref_seq, read_seq, ref_pos):
   num_mismatch = 0
@@ -82,49 +24,107 @@ def count_mismatch(ref_seq, read_seq, ref_pos):
   return num_mismatch
 
 def check_insertion_special_case(
-  ref_seq,
-  read_seq,
+  ref_align,
+  read_align,
   dsb_pos,
-  ref_pos,
-  ref_var_pos,
-  var_types,
-  var_nucs,
-  expected_num_subst,
 ):
-  assert ref_pos < dsb_pos, 'Alignment start position must be < than DSB position'
+  """
+    Check if all the insertions can be put at the DSB position.
+    Take all the insertions in the alignment and place them
+    at the DSB position and check if the read sequence is the same.
+    If so, return the new alignment, otherwise return None.
 
-  # for the special case we must have only insertions and substitutions 
-  if not all(var_types[i] in ['S', 'I'] for i in range(len(var_types))):
+    Parameters
+    ----------
+    ref_align  : the alignment string for the reference sequence.
+    read_align : the alignment string for the read sequence.
+    dsb_pos    : the position of the DSB on the reference sequence (1-based).
+
+    Returns
+    -------
+    None if the insertions cannot be shifted to the DSB positions
+  """
+
+  read_seq = alignment_utils.get_orig_seq(read_align)
+  _, _, num_subst = alignment_utils.count_variations(ref_align, read_align)
+  new_ref_align = ''
+  new_read_align = ''
+  insertion_str = ''
+
+  # remove insertions from the alignments and collection them into the insertion string
+  for i in range(len(read_align)):
+    if ref_align[i] == '-':
+      # insertion
+      insertion_str += read_align[i]
+    else:
+      # non-insertion
+      new_ref_align += ref_align[i]
+      new_read_align += read_align[i]
+
+  # since there are no insertions remaining, the alignment indices should correspond to
+  # reference indices (except for dsb_pos being 1-based instead of 0-based)
+  ref_align = new_ref_align[:dsb_pos] + ('-' * len(insertion_str)) + new_ref_align[dsb_pos:]
+  read_align = new_read_align[:dsb_pos] + insertion_str + new_read_align[dsb_pos:]
+
+  # check that the read sequence has not changed by shifting the insertions 
+  new_read_seq = alignment_utils.get_orig_seq(read_seq)
+  if new_read_seq != read_seq:
+    return None, None
+
+  # check that the number of substitutions has not increased
+  _, _, new_num_subst = alignment_utils.count_variations(ref_align, read_align)
+  if new_num_subst > num_subst:
+    return None, None
+
+  return ref_align, read_align
+
+def check_deletion_special_case(
+  ref_align,
+  read_align,
+  dsb_pos,
+):
+  """
+    Check if all the deletions can be made to touch the DSB position.
+    Take all the deletions in the alignment and place them
+    in all possible ways to touch the DSB position and check if the number of substitutions remains the same.
+    If so, return the new alignment, otherwise return None.
+    We also require the alignment contain no insertions, otherwise None is returned.
+  
+    Parameters
+    ----------
+    ref_align  : the alignment string for the reference sequence.
+    read_align : the alignment string for the read sequence.
+    dsb_pos    : the position of the DSB on the reference sequence (1-based).
+
+    Returns
+    -------
+    None if the deletions cannot be shifted to the DSB positions.
+    Otherwise a string new_read_align containing the new read alignment.
+    The reference alignment string is unchanged so is not returned.
+    The returned read alignment string may be the same as the original.
+  """
+
+  # check if there are insertions
+  if any(x == '-' for x in ref_align):
     return None
 
-  # join all the insertions nucleotides
-  inserted_str = ''.join(var_nucs[i] for i in range(len(var_nucs)) if var_types[i] == 'I')
+  _, num_del, num_subst = alignment_utils.count_variations(ref_align, read_align)
+  read_seq = alignment_utils.get_orig_seq(read_align)
 
-  # check if inserting at the DSB position results in the same # of mismatches
-  ref_seq_with_ins = ref_seq[:dsb_pos] + inserted_str + ref_seq[dsb_pos:]
-  if count_mismatch(ref_seq_with_ins, read_seq, ref_pos) != expected_num_subst:
+  new_read_align = None
+  found_new = False
+  # go through all possible ways of placing the deletions
+  for del_start in range(dsb_pos - num_del, dsb_pos + 1):
+    new_read_align = read_seq[:del_start] + ('-' * num_del) + read_seq[del_start:]
+    _, _, new_num_subst = alignment_utils.count_variations(ref_align, new_read_align)
+    if new_num_subst <= num_subst: # make sure that the number of substutitions has not increased
+      found_new = True
+      break
+
+  if not found_new:
     return None
-  
-  # create a new list of variations with the insertions at the DSB pos
-  new_ref_var_pos = []
-  new_var_types = []
-  new_var_nucs = []
-  ref_pos_2 = ref_pos
-  read_pos = 1
-  while (ref_pos_2 <= len(ref_seq)) and (read_pos <= len(read_seq)):
-    if (ref_pos_2 
-  for ins_nuc in inserted_str:
-    new_ref_var_pos.append(dsb_pos)
-    new_var_types.append('I')
-    new_var_nucs.append(ins_nuc)
-  while (i < len(ref_var_pos)):
-    if var_types[i] == 'S':
-      new_ref_var_pos.append(ref_var_pos[i])
-      new_var_types.append(var_types[i])
-      new_var_nucs.append(var_nucs[i])
-    i += 1
-  
 
+  return new_read_align
 
 def main():
   parser = argparse.ArgumentParser(description = 'Filter sequences having mutations near DSB site')
@@ -174,74 +174,135 @@ def main():
   # categorize
   seq_counts = defaultdict(int)
   seq_cigar = {}
+  seq_num_subst = {}
   total_count = 0
   for line in args.sam:
-    total_count += 1
+    log_utils.log('-' * 100)
+    total_count += 1 # must be computed here since some reads are discarded
+
     fields = line.rstrip().split('\t')
     mandatory, optional = sam_utils.parse_sam_fields(fields)
 
     if int(mandatory['FLAG']) & 4: # the read did not align at all
+      log_utils.log(f'{total_count} : Reject : FLAG & 4 != 0')
       continue
 
     if int(mandatory['POS']) != 1: # the read did not align with position 1
+      log_utils.log(f'{total_count} : Reject : POS != 0')
       continue
 
     read_seq = mandatory['SEQ']
-    num_indel = int(optional['XG']['VALUE']) # number of gap-extends (aka in/dels), should always be present for aligned reads
-    num_mismatch = int(optional['XM']['VALUE']) # number of mismatches, should always be present for aligned reads
+    num_indel_sam = int(optional['XG']['VALUE']) # number of gap-extends (aka in/dels), should always be present for aligned reads
+    # num_subst_sam = int(optional['XM']['VALUE']) # number of mismatches, should always be present for aligned reads
 
-    # if indel == 0: # no in/dels (indel == 0 handled by 0 mut script)
-    #   continue
+    if len(read_seq) < args.min_length:
+      log_utils.log('Reject : read too short')
+      continue
 
     cigar = mandatory['CIGAR']
-    cigar_parsed = cigar_utils.parse_cigar(cigar)
-    ref_var_pos, var_types, var_nucs, num_ins, num_del, num_subst  = get_variation_info(
-      cigar_parsed,
-      ref_seq,
-      read_seq,
-      1 # We already filtered reads that align to a position other than 1
-    )
+    ref_align, read_align = alignment_utils.get_alignment(ref_seq, read_seq, 1, cigar)
 
-    assert num_indel == num_ins + num_del, 'Incorrect count of insertions and/or deletions'
+    num_ins, num_del, num_subst = alignment_utils.count_variations(ref_align, read_align)
+    assert num_indel_sam == num_ins + num_del, 'Incorrect count of insertions and/or deletions'
 
-    if not is_consecutive(ref_var_pos): # the variations must be consective
-      continue
-
-    if num_ins > 0 and num_del == 0:
-      insertion_str = ''.join(var_nucs[i] for i in range(len(var_nucs)) if var_types[i] == 'I')
-      check_insertion_special_case(insertion_str)
+    if num_ins > 0:
+      # insertions case
+      new_ref_align, new_read_align = check_insertion_special_case(ref_align, read_align, args.dsb)
+      if new_ref_align is not None:
+        # logging
+        if (new_ref_align != ref_align) or (new_read_align != read_align):
+          log_utils.log(f'{total_count} : orig ref  : ' + ref_align)
+          log_utils.log(f'{total_count} : orig read : ' + read_align)
+          log_utils.log(f'{total_count} : new ref   : ' + new_ref_align)
+          log_utils.log(f'{total_count} : new read  : ' + new_read_align)
+        ref_align = new_ref_align
+        read_align = new_read_align
     elif num_del > 0 and num_ins == 0:
-      # only deletions
-      pass
+      # deletions and no insertions case
+      new_read_align = check_deletion_special_case(ref_align, read_align, args.dsb)
+      if new_read_align is not None:
+        if new_read_align != read_align:
+          log_utils.log(f'{total_count} : orig ref  : ' + ref_align)
+          log_utils.log(f'{total_count} : orig read : ' + read_align)
+          log_utils.log(f'{total_count} : new read  : ' + new_read_align)
+        read_align = new_read_align
 
-    if args.dsb not in ref_var_pos: # The dsb does not touch the in/dels
+    indel_pos = alignment_utils.get_indel_pos(ref_align, read_align)
+    if not is_consecutive(indel_pos): # the in/dels must be consective
+      log_utils.log(f'{total_count} : Reject : not consecutive')
       continue
 
-    seq_counts[ref_seq] += 1
-    seq_cigar[ref_seq] = cigar
+    # check if the DSB position touches the in/dels
+    dsb_touches = False
+    ref_positions = alignment_utils.get_ref_positions(ref_align, read_align, 1)
+    for pos in indel_pos:
+      if ref_align[pos] == '-':
+        # insertion
+        if args.dsb == ref_positions[pos]: # the insertion must be exactly at the DSB
+          dsb_touches = True
+          break
+      elif read_align[pos] == '-':
+        # deletion
+        if args.dsb in range(ref_positions[pos] - 1, ref_positions[pos] + 1): # the deletion can be on the left or right of the DSB
+          dsb_touches = True
+          break
+      else:
+        assert False, 'Impossible' # must be either an insertion or deletion
+    if (len(indel_pos) > 0) and (not dsb_touches):
+      log_utils.log(f'{total_count} : Reject : in/dels not touching DSB')
+      continue
+      
+    # all checks passed, count the read
+    cigar = alignment_utils.get_cigar(ref_align, read_align) # the alignment may have changed so recompute the CIGAR
+    if read_seq in seq_cigar:
+      # If the read is the same, the alignment and CIGAR should be the same
+      assert cigar == seq_cigar[read_seq], \
+          f'CIGAR strings for read are different\n{read_seq}\norig: {seq_cigar[read_seq]}\nnew: {cigar}'
+    _, _, num_subst = alignment_utils.count_variations(ref_align, read_align)
+    log_utils.log(f'{total_count} : Accepted')
+    seq_counts[read_seq] += 1
+    seq_cigar[read_seq] = cigar
+    seq_num_subst[read_seq] = num_subst
 
   assert len(seq_counts) > 0, 'No sequences captured'
 
   output_file = args.output
   seqs = sorted(seq_counts.keys(), key = lambda x: -seq_counts[x])
-  output_file.write('Sequence\tCIGAR\tCount\tFrequency\n')
+  output_file.write('Sequence\tCIGAR\tCount\tFrequency\tNum_Subst\n')
   for s in seqs:
     count = seq_counts[s]
     freq = count / total_count
     cigar = seq_cigar[s]
-    output_file.write(f'{s}\t{cigar}\t{count}\t{freq}\n')
+    num_subst = seq_num_subst[s]
+    output_file.write(f'{s}\t{cigar}\t{count}\t{freq}\t{num_subst}\n')
   
-  print(f'Total reads: {total_count}')
+  log_utils.log(f'Total reads: {total_count}')
   total_output_count = sum(seq_counts.values())
-  print(f'Total output reads: {total_output_count}')
+  log_utils.log(f'Total output reads: {total_output_count}')
 
 if __name__ == '__main__':
-  sys.argv += ['../ref_seq/1DSB_R1_sense.fa', 'test3.sam', '-o', 'output2.tsv', '-dsb', '67']
+  log_utils.set_log_file('log.txt')
+  sys.argv += ['../ref_seq/1DSB_R1_sense.fa', 'test.sam', '-o', 'output.tsv', '-dsb', '67']
   main()
 
 
+def test():
+  ref_align  = 'AAAAATATAAAAA'
+  read_align = 'AAAAAT--AAAAA'
+  dsb_pos = 6
 
+  print('BEFORE')
+  print('ref_align  : ' + ref_align)
+  print('read_align : ' + read_align)
+  print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
+  print()
 
+  print('AFTER')
+  ref_align, read_align = check_deletion_special_case(ref_align, read_align, dsb_pos)
+  print('ref_align  : ' + str(ref_align))
+  print('read_align : ' + str(read_align))
+  print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
+  print()
 
-
-# Note: in the original script it seems that only the indels must be consecutive, not counting the substitutions
+# if __name__ == '__main__':
+#   test()
