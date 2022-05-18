@@ -107,6 +107,63 @@ def get_variation_pos(ref_align, read_align):
       ref_pos += 1
   return ins_pos, del_pos, subst_pos
 
+
+def get_indel_pos(ref_align, read_align):
+  """
+    Get the insertion and deletion positions of the alignment.
+    The returned list of positions are 0-based indices that index ref_align and seq_align.
+
+    Parameters
+    ----------
+    ref_align  : the alignment string for the reference sequence.
+    read_align : the alignment string for the read sequence.
+
+    Returns
+    -------
+    positions : a list of 0-based indices, with respect to the input alignment strings,
+      which give the positions of the insertions, deletions, and substitions.
+  """
+  assert len(ref_align) == len(read_align), "Alignment strings must be the same length"
+  positions = []
+  for i in range(len(ref_align)):
+    if (ref_align[i] == '-') or (read_align[i] == '-'):
+      positions.append(i)
+  return positions
+
+def get_ref_positions(ref_align, read_align, ref_pos):
+  """
+    Get the map from alignment indices to reference indices.
+
+    Example:
+      input:
+        ref_pos    = 1
+        ref_align  = A C G - - T C A
+        read_align = - - G G T - - C
+      output:
+        pos_map    = 1 2 3 3 3 4 5 6
+
+    Parameters
+    ----------
+    ref_align  : the alignment string for the reference sequence.
+    read_align : the alignment string for the read sequence.
+    ref_pos    : left-most position on the reference sequence that the read aligns with.
+
+    Returns
+    -------
+    pos_map : a list with same length as ref_align.
+      pos_map[i] gives the 1-based position on reference sequence corresponding
+      with ref_align[i] and seq_align[i].
+  """
+  assert len(ref_align) == len(read_align), "Alignment strings must be the same length"
+  pos_map = []
+  for i in range(len(ref_align)):
+    if ref_align[i] == '-':
+      pos_map.append(ref_pos - 1) # insertions are mapped to the previous reference positition
+    else:
+      pos_map.append(ref_pos)
+      ref_pos += 1
+  return pos_map
+
 def get_orig_seq(align_str):
   """
     Get the original sequence of the alignment string.
@@ -114,7 +171,6 @@ def get_orig_seq(align_str):
   """
   return ''.join(x for x in align_str if x != '-')
 
-# TODO: MAKE THIS FASTER, NO NEED FOR REGEX
 def get_cigar(ref_align, read_align):
   """
     Construct a CIGAR string from an alignment.

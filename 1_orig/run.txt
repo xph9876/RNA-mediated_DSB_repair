@@ -1,0 +1,10 @@
+nohup python3 -u mut_middle_indel.py -o output_indel.tsv --min_length 140 -dsb 67 1DSB_ref.fa test5.sam 2>&1 &
+nohup python3 -u 0_mut.py -o output_0mut.tsv --min_length 140 test5.sam 2>&1 &
+
+nohup python3 -u mut_middle_indel_edited.py -o output_indel.tsv --min_length 140 -dsb 67 1DSB_ref.fa test5.sam 2>&1 &
+nohup python3 -u 0_mut_edited.py -o output_0mut.tsv --min_length 140 test5.sam 2>&1 &
+
+
+Windows
+--------
+python -u mut_middle_indel_edited.py -o output_indel.tsv --min_length 140 -dsb 67 1DSB_ref.fa test.sam 
