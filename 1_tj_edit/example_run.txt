@@ -1,1 +1,1 @@
-python .\mut_middle_indel.py -fa 1DSB_ref.fa -sam test.sam -o output.tsv -dsb "67" --min_length "140"
+python mut_middle_indel.py -fa 1DSB_ref.fa -sam test.sam -o output.tsv -dsb "67" --min_length "140"

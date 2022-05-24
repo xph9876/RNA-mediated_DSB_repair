@@ -74,7 +74,7 @@ def parse_args():
     help = (
       'Size of anchor on left/right of the window to check for mismatches.\n'
       'Reads with more than the allowed number of mismatches on the left/right anchor\n'
-      'will be discarded. The mismatches on the left/right are counded '
+      'will be discarded. The mismatches on the left/right are counted separately.'
     ),
   )
   parser.add_argument(

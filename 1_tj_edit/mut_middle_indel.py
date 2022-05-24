@@ -164,6 +164,7 @@ def main():
     '--fasta',
     type = argparse.FileType(mode='r', encoding='utf-8'),
     help = 'Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.',
+    required = True,
   )
   parser.add_argument(
     '-sam',
@@ -173,6 +174,7 @@ def main():
       'Must be created with Bowtie2 (specific flags from Bowtie2 are used).\n'
       'Every read must be aligned with exactly the same reference sequence.'
     ),
+    required = True,
   )
   parser.add_argument(
     '-o',
@@ -311,46 +313,45 @@ def main():
 
 if __name__ == '__main__':
   # log_utils.set_log_file('log.txt')
-  # sys.argv += ['../ref_seq/1DSB_R1_sense.fa', 'test.sam', '-o', 'output.tsv', '-dsb', '67']
   main()
 
+# DELETE THIS EVENTUALLY
+# def test():
+#   ref_align  = 'AAAAATATAAAAA'
+#   read_align = 'AAAAAT--AAATA'
+#   ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
+#   dsb_pos = 6
 
-def test():
-  ref_align  = 'AAAAATATAAAAA'
-  read_align = 'AAAAAT--AAATA'
-  ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
-  dsb_pos = 6
+#   print('BEFORE')
+#   print('ref_align  : ' + ref_align)
+#   print('read_align : ' + read_align)
+#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
+#   print()
 
-  print('BEFORE')
-  print('ref_align  : ' + ref_align)
-  print('read_align : ' + read_align)
-  print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-  print()
+#   print('AFTER')
+#   read_align = check_deletion_special_case(ref_align, read_align, dsb_pos, len(del_pos), len(subst_pos))
+#   print('ref_align  : ' + str(ref_align))
+#   print('read_align : ' + str(read_align))
+#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
+#   print()
 
-  print('AFTER')
-  read_align = check_deletion_special_case(ref_align, read_align, dsb_pos, len(del_pos), len(subst_pos))
-  print('ref_align  : ' + str(ref_align))
-  print('read_align : ' + str(read_align))
-  print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-  print()
+#   ref_align  = '--AAAAAAAAAAA'
+#   read_align = 'AAAAAAA--AAT-'
+#   ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
+#   dsb_pos = 6
 
-  ref_align  = '--AAAAAAAAAAA'
-  read_align = 'AAAAAAA--AAT-'
-  ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
-  dsb_pos = 6
+#   print('BEFORE')
+#   print('ref_align  : ' + ref_align)
+#   print('read_align : ' + read_align)
+#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
+#   print()
 
-  print('BEFORE')
-  print('ref_align  : ' + ref_align)
-  print('read_align : ' + read_align)
-  print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-  print()
-
-  print('AFTER')
-  ref_align, read_align = check_insertion_special_case(ref_align, read_align, dsb_pos, len(subst_pos))
-  print('ref_align  : ' + str(ref_align))
-  print('read_align : ' + str(read_align))
-  print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-  print()
+#   print('AFTER')
+#   ref_align, read_align = check_insertion_special_case(ref_align, read_align, dsb_pos, len(subst_pos))
+#   print('ref_align  : ' + str(ref_align))
+#   print('read_align : ' + str(read_align))
+#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
+#   print()
 
 # if __name__ == '__main__':
 #   test()

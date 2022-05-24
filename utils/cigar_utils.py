@@ -1,5 +1,3 @@
-import re
-
 def parse_cigar(cigar):
   """
     Parse a CIGAR string into runs of variations.
@@ -27,9 +25,16 @@ def parse_cigar(cigar):
       {"type": "D", "count": 3},
     ]
   """
-  variations = re.findall(r'(\d+)([IMD])', cigar)
-  variations = [
-    {'type': x[1], 'count': int(x[0])}
-    for x in variations
-  ]
+  count_str = ''
+  variations = []
+  for x in cigar:
+    if x.isnumeric():
+      count_str += x
+    elif x in 'IDM':
+      variations.append(
+        {'type': x, 'count': int(count_str)}
+      )
+      count_str = ''
+    else:
+      assert False, 'Malformed CIGAR: ' + str(cigar)
   return variations

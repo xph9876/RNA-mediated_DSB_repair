@@ -82,7 +82,7 @@ def count_variations(ref_align, read_align):
       elif read_align[i] == '-':
         num_del += 1
       else:
-        # both are nucleotides but not equal
+        # both ref and read are nucleotides but not equal
         num_subst += 1
   return num_ins, num_del, num_subst
       
@@ -114,7 +114,6 @@ def get_orig_seq(align_str):
   """
   return ''.join(x for x in align_str if x != '-')
 
-# TODO: MAKE THIS FASTER, NO NEED FOR REGEX
 def get_cigar(ref_align, read_align):
   """
     Construct a CIGAR string from an alignment.
@@ -136,15 +135,26 @@ def get_cigar(ref_align, read_align):
 
     Note: substitutions and matches are both converted to "M".
   """
-  cigar_long = ''
-  for i in range(len(ref_align)):
-    if ref_align[i] == '-': # insertion
-      cigar_long += 'I'
-    elif read_align[i] == '-': # deletion
-      cigar_long += 'D'
-    else: # substitution or match
-      cigar_long += 'M'
+  assert len(ref_align) > 0, 'Empty alignment string'
+  assert len(ref_align) == len(read_align), 'Unequal lengths alignment strings'
+
   cigar = ''
-  for match in re.findall(r'I+|D+|M+', cigar_long):
-    cigar += str(int(len(match))) + match[0]
+  last_type = None
+  curr_count = None
+  for i in range(len(ref_align)):
+    curr_type = None
+    if ref_align[i] == '-': # insertion
+      curr_type = 'I'
+    elif read_align[i] == '-': # deletion
+      curr_type = 'D'
+    else: # substitution or match
+      curr_type = 'M'
+    if curr_type != last_type:
+      if last_type is not None:
+        cigar += str(curr_count) + last_type
+      last_type = curr_type
+      curr_count = 1
+    else:
+      curr_count += 1
+  cigar += str(curr_count) + last_type
   return cigar
