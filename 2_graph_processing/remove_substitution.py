@@ -6,6 +6,7 @@ def remove_alignment_substitutions(ref_align, read_align):
     ----------
     ref_align : the reference sequence alignment string
     read_align : the read sequence alignment string
+
     The above strings should be in "alignment matrix" format.
     That is, string over the alphabet ["A", "C", "G", "T", "-"].
 

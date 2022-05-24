@@ -12,8 +12,9 @@ import argparse
 def parse_args():
   parser = argparse.ArgumentParser(description = 'Filter sequences having mutations near DSB site')
   parser.add_argument(
-    'input_table',
-    type = argparse.FileType(mode='r', encoding='utf-8'),
+    '-in',
+    '--input_table',
+    type = argparse.FileType(mode = 'r'),
     help = (
       'Table of sequences produced with stage 1.\n'
       'Column format: Sequence, CIGAR, freq_1, freq_2, etc.,\n'
@@ -21,14 +22,14 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    'ref_fasta',
-    type = argparse.FileType(mode='r', encoding='utf-8'),
+    '-ref',
+    type = argparse.FileType(mode = 'r'),
     help = 'Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.',
   )
   parser.add_argument(
     '-o',
     '--output',
-    type = argparse.FileType(mode='w', encoding='utf-8'),
+    type = argparse.FileType(mode = 'w'),
     default = sys.stdout,
     help = 'Output file. Defaults to standard output.'
   )
