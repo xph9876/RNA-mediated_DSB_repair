@@ -2,11 +2,10 @@ The example file is at:
   knot.math.usf.edu:/home/public/www_safe/jeon/SCMB/Scripts/yjl255_NHEJ_R1_aligned.sam
   https://knot.math.usf.edu/safe/users/jeon/SCMB/Scripts/yjl255_NHEJ_R1_aligned.sam
 
-* Instead of NM - XM to compute in/dels in Bowtie2 alignment, I used XG since they are the same
-* I parsed the optional tags in the Bowtie2 output since according to the spec the order is not specified.
-* I checked the (FLAG & 4) to filter out reads that did not align.
-* I filtered out reads that did not align with position 1 of reference.
-* I checked that the min length was achieved before all the other processing
+Example commands to run scripts:
+python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output1.tsv -dsb "67" --min_length "130"
+python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output2.tsv -dsb "67" --min_length "130"
+python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output3.tsv -dsb "67" --min_length "130"
+python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output4.tsv -dsb "67" --min_length "130"
 
-Example of running script:
-python mut_middle_indel.py -fa 1DSB_ref.fa -sam test.sam -o output.tsv -dsb "67" --min_length "140"
+python combine_repeats.py output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 100 100 100 100 -o output_combined.tsv
