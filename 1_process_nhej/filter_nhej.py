@@ -186,7 +186,7 @@ def main():
   parser.add_argument(
     '--min_length',
     type = int,
-    default = 140,
+    default = 130,
     help = 'minimum length of reads',
   )
   parser.add_argument(
