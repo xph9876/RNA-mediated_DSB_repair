@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-# import sys
+import sys
 import os
 import pandas as pd
 
@@ -42,7 +42,7 @@ def main():
   args = parser.parse_args()
 
   data = [
-    pd.read_csv(args.files[i], sep='\t')
+    pd.read_csv(args.files[i], sep='\t').set_index('Sequence')
     for i in range(NUM_REPEATS)
   ]
   names = [
@@ -51,19 +51,23 @@ def main():
   ]
 
   data = pd.concat(data, axis='columns', join='inner', keys=names)
-  data.columns = data.columns.map('_'.join)
+  data.columns = data.columns.map(lambda x: '_'.join(reversed(x)))
   
-  data_out = pd.DataFrame({
-    'Sequence': list(data.index),
-    'Num_Subst': list(data[names[0] + '_Num_Subst']),
-    'CIGAR': list(data[names[0] + '_CIGAR'])
-  })
+  data_out = pd.DataFrame(
+    {
+      'Sequence': list(data.index),
+      'Num_Subst': list(data['Num_Subst_' + names[0]]),
+      'CIGAR': list(data['CIGAR_' + names[0]])
+    },
+    index = data.index,
+  )
 
   for i in range(NUM_REPEATS):
-    data_out['Freq_' + names[i]] = data[names[i] + '_Count'] / args.total_reads[i]
+    data_out['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
   
   data_out.to_csv(args.output, sep='\t', index=False)
   
 
 if __name__ == '__main__':
+  sys.argv += "output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 100 100 100 100 -o output_combined.tsv".split(' ')
   main()

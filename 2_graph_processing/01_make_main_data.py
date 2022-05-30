@@ -92,7 +92,7 @@ def parse_args():
   )
 
 def is_freq_column(name):
-  return name.endswith('_freq') or (name == 'Frequency')
+  return name.startwith('Freq')
 
 def make_alignments(data_set):
   out_file_name = common.get_main_file_name(
