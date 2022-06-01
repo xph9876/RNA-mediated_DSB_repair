@@ -8,4 +8,4 @@ python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output2.tsv -dsb "67" --m
 python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output3.tsv -dsb "67" --min_length "130"
 python filter_nhej.py -fa 1DSB_ref.fa -sam test.sam -o output4.tsv -dsb "67" --min_length "130"
 
-python combine_repeats.py output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 100 100 100 100 -o output_combined.tsv
+python combine_repeats.py output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 10000 10000 10000 10000 -o output_combined.tsv

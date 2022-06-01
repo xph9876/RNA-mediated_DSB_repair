@@ -69,5 +69,5 @@ def main():
   
 
 if __name__ == '__main__':
-  sys.argv += "output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 100 100 100 100 -o output_combined.tsv".split(' ')
+  # sys.argv += "output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 100 100 100 100 -o output_combined.tsv".split(' ')
   main()
