@@ -5,7 +5,12 @@ import sys
 import os
 import pandas as pd
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
+
+import log_utils
+
 NUM_REPEATS = 4
+
 
 def main():
   parser = argparse.ArgumentParser(
@@ -50,10 +55,13 @@ def main():
     for i in range(NUM_REPEATS)
   ]
 
+  for i in range(NUM_REPEATS):
+    log_utils.log(f"Original sequences: {data[i].shape[0]}")
+
   data = pd.concat(data, axis='columns', join='inner', keys=names)
-  data.columns = data.columns.map(lambda x: '_'.join(reversed(x)))
+  data.columns = data.columns.map(lambda x: '_'.join([x[1], x[0]]))
   
-  data_out = pd.DataFrame(
+  data_combined = pd.DataFrame(
     {
       'Sequence': list(data.index),
       'Num_Subst': list(data['Num_Subst_' + names[0]]),
@@ -63,9 +71,10 @@ def main():
   )
 
   for i in range(NUM_REPEATS):
-    data_out['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
+    data_combined['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
   
-  data_out.to_csv(args.output, sep='\t', index=False)
+  log_utils.log(f"Combined sequences: {data_combined.shape[0]}")
+  data_combined.to_csv(args.output, sep='\t', index=False)
   
 
 if __name__ == '__main__':

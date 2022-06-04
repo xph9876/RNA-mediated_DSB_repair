@@ -6,7 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
-from collections import defaultdict
+import collections
+import file_utils
 import sam_utils
 import fasta_utils
 import alignment_utils
@@ -160,15 +161,14 @@ def check_dsb_touches_indel(dsb_pos, ins_pos, del_pos):
 def main():
   parser = argparse.ArgumentParser(description = 'Filter sequences having mutations near DSB site')
   parser.add_argument(
-    '-fa',
-    '--fasta',
-    type = argparse.FileType(mode='r', encoding='utf-8'),
+    '-ref',
+    type = argparse.FileType(mode='r'),
     help = 'Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.',
     required = True,
   )
   parser.add_argument(
     '-sam',
-    type = argparse.FileType(mode='r', encoding='utf-8'),
+    type = argparse.FileType(mode='r'),
     help = (
       'Aligned SAM file.\n'
       'Must be created with Bowtie2 (specific flags from Bowtie2 are used).\n'
@@ -179,52 +179,69 @@ def main():
   parser.add_argument(
     '-o',
     '--output',
-    type = argparse.FileType(mode='w', encoding='utf-8'),
+    type = argparse.FileType(mode='w'),
     default = sys.stdout,
     help = 'output file. Defaults to standard output.'
   )
   parser.add_argument(
     '--min_length',
     type = int,
-    default = 130,
+    required = True,
     help = 'minimum length of reads',
   )
   parser.add_argument(
     '-dsb',
     type = int,
-    default = 50,
-    metavar = 'DSB_POS',
+    required = True,
+    help = (
+      'position on reference sequence immediately upstream of DSB site.\n'
+      'Ie. the DSB is between position DSB_POS and DSB_POS + 1.'
+    ),
+  )
+  parser.add_argument(
+    '-q',
+    '--quiet',
     help = (
       'position on reference sequence immediately upstream of DSB site.\n'
       'Ie. the DSB is between position DSB_POS and DSB_POS + 1.'
     ),
   )
 
+  # parse command line arguments
   args = parser.parse_args()
 
+  if args.quiet is not None:
+    log_utils.set_log_file(None)
+
   # read reference sequence from fasta file
-  ref_seq = fasta_utils.read_fasta_seq(args.fasta)
+  ref_seq = fasta_utils.read_fasta_seq(args.ref)
   
+  # For logging
+  rejected_no_alignment = 0
+  rejected_pos_not_1 = 0
+  rejected_not_consecutive = 0
+  rejected_too_short = 0
+  rejected_dsb_not_touch = 0
+  accepted_deletion_special = 0
+  accepted_insertion_special = 0
+
   # categorize
-  read_counts = defaultdict(int)
-  seq_cigar = {}
+  read_counts = collections.defaultdict(int)
   read_num_subst = {}
-  total_count = 0
-  for line in args.sam:
-    # if total_count % 10000 == 0:
-    #   print(f'Line: {total_count}')
-    # log_utils.log('-' * 100)
-    total_count += 1 # must be computed here since some reads are discarded
+  total_lines = file_utils.count_lines(args.sam.name)
+  for line_num, line in enumerate(args.sam):
+    if (line_num % 100000) == 0:
+      log_utils.log(f"{line_num} / {total_lines}")
 
     fields = line.rstrip().split('\t')
     mandatory, optional = sam_utils.parse_sam_fields(fields)
 
     if int(mandatory['FLAG']) & 4: # the read did not align at all
-      # log_utils.log(f'{total_count} : Reject : FLAG & 4 != 0')
+      rejected_no_alignment += 1
       continue
 
-    if int(mandatory['POS']) != 1: # the read did not align with position 1
-      # log_utils.log(f'{total_count} : Reject : POS != 0')
+    if int(mandatory['POS']) != 1:
+      rejected_pos_not_1 += 1
       continue
 
     read_seq = mandatory['SEQ']
@@ -232,7 +249,7 @@ def main():
     num_subst_sam = int(optional['XM']['VALUE']) # number of mismatches, should always be present for aligned reads
 
     if len(read_seq) < args.min_length:
-      # log_utils.log('Reject : read too short')
+      rejected_too_short += 1
       continue
 
     cigar = mandatory['CIGAR']
@@ -252,12 +269,6 @@ def main():
         new_ref_align, new_read_align = \
           check_insertion_special_case(ref_align, read_align, args.dsb, num_subst = num_subst)
         if new_ref_align is not None:
-          # logging
-          # if (new_ref_align != ref_align) or (new_read_align != read_align):
-          #   log_utils.log(f'{total_count} : orig ref  : ' + ref_align)
-          #   log_utils.log(f'{total_count} : orig read : ' + read_align)
-          #   log_utils.log(f'{total_count} : new ref   : ' + new_ref_align)
-          #   log_utils.log(f'{total_count} : new read  : ' + new_read_align)
           ref_align = new_ref_align
           read_align = new_read_align
           cigar = alignment_utils.get_cigar(ref_align, read_align)
@@ -266,15 +277,12 @@ def main():
           num_del = len(del_pos)
           num_subst = len(subst_pos)
           dsb_touches = True
+          accepted_insertion_special += 1
       elif num_del > 0 and num_ins == 0:
         # deletions and no insertions special case
         new_read_align = \
           check_deletion_special_case(ref_align, read_align, args.dsb, num_del = num_del, num_subst = num_subst)
         if new_read_align is not None:
-          # if new_read_align != read_align:
-          #   log_utils.log(f'{total_count} : orig ref  : ' + ref_align)
-          #   log_utils.log(f'{total_count} : orig read : ' + read_align)
-          #   log_utils.log(f'{total_count} : new read  : ' + new_read_align)
           read_align = new_read_align
           cigar = alignment_utils.get_cigar(ref_align, read_align)
           ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
@@ -282,17 +290,16 @@ def main():
           num_del = len(del_pos)
           num_subst = len(subst_pos)
           dsb_touches = True
+          accepted_deletion_special += 1
 
     if (num_ins + num_del > 0) and (not dsb_touches):
-      # log_utils.log(f'{total_count} : Reject : in/dels not touching DSB')
+      rejected_dsb_not_touch += 1
       continue
     
-    if not is_consecutive(ins_pos, del_pos): # the in/dels must be consective
-      # log_utils.log(f'{total_count} : Reject : not consecutive')
+    if not is_consecutive(ins_pos, del_pos):
+      rejected_not_consecutive += 1
       continue
 
-    # all checks passed, count the read
-    # log_utils.log(f'{total_count} : Accepted')
     read_counts[read_seq, cigar] += 1
     read_num_subst[read_seq, cigar] = num_subst
 
@@ -303,55 +310,29 @@ def main():
   output_file.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
   for read_seq, cigar in read_seq_and_cigars:
     count = read_counts[read_seq, cigar]
-    # cigar = seq_cigar[s]
     num_subst = read_num_subst[read_seq, cigar]
     output_file.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
   
-  log_utils.log(f'Total reads: {total_count}')
-  total_output_count = sum(read_counts.values())
-  log_utils.log(f'Total output reads: {total_output_count}')
+  total_accepted = sum(read_counts.values())
+  total_rejected = (
+    rejected_no_alignment + 
+    rejected_pos_not_1 +
+    rejected_too_short +
+    rejected_dsb_not_touch +
+    rejected_not_consecutive
+  )
+  assert total_rejected == (total_lines - total_accepted)
+  log_utils.log(f'Total lines: {total_lines}')
+  log_utils.log(f'  Accepted: {total_accepted}')
+  log_utils.log(f'    Insertion special case: {accepted_insertion_special}')
+  log_utils.log(f'    Deletion special case: {accepted_deletion_special}')
+  log_utils.log(f'  Rejected: {total_rejected}')
+  log_utils.log(f'   No alignment: {rejected_no_alignment}')
+  log_utils.log(f'   POS != 1: {rejected_pos_not_1}')
+  log_utils.log(f'   Too short: {rejected_too_short}')
+  log_utils.log(f'   DSB not touch: {rejected_dsb_not_touch}')
+  log_utils.log(f'   Not consecutive: {rejected_not_consecutive}')
 
 if __name__ == '__main__':
-  # log_utils.set_log_file('log.txt')
+  sys.argv += ""
   main()
-
-# DELETE THIS EVENTUALLY
-# def test():
-#   ref_align  = 'AAAAATATAAAAA'
-#   read_align = 'AAAAAT--AAATA'
-#   ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
-#   dsb_pos = 6
-
-#   print('BEFORE')
-#   print('ref_align  : ' + ref_align)
-#   print('read_align : ' + read_align)
-#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-#   print()
-
-#   print('AFTER')
-#   read_align = check_deletion_special_case(ref_align, read_align, dsb_pos, len(del_pos), len(subst_pos))
-#   print('ref_align  : ' + str(ref_align))
-#   print('read_align : ' + str(read_align))
-#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-#   print()
-
-#   ref_align  = '--AAAAAAAAAAA'
-#   read_align = 'AAAAAAA--AAT-'
-#   ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
-#   dsb_pos = 6
-
-#   print('BEFORE')
-#   print('ref_align  : ' + ref_align)
-#   print('read_align : ' + read_align)
-#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-#   print()
-
-#   print('AFTER')
-#   ref_align, read_align = check_insertion_special_case(ref_align, read_align, dsb_pos, len(subst_pos))
-#   print('ref_align  : ' + str(ref_align))
-#   print('read_align : ' + str(read_align))
-#   print('dsb        : ' + (' ' * (dsb_pos - 1)) + '^')
-#   print()
-
-# if __name__ == '__main__':
-#   test()

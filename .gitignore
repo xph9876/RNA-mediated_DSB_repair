@@ -133,3 +133,12 @@ dmypy.json
 
 # log files
 log*.txt
+
+# SAM files
+*.sam
+
+# Library files
+libraries*
+
+# Temp files
+*~*
