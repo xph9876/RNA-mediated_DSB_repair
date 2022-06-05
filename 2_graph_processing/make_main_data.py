@@ -110,25 +110,16 @@ def parse_args():
     help = 'Whether to keep or ignore substitutions.',
   )
   parser.add_argument(
-    '--format',
-    type = str,
-    choices = ['individual', 'combined'],
-    help = 'Whether this data is for a single experiment or two.',
-  )
-  parser.add_argument(
-    '--treatments',
+    '--treatment',
     type = str,
     choices = [
       constants.TREATMENT_SENSE,
       constants.TREATMENT_BRANCH,
       constants.TREATMENT_CMV,
       constants.TREATMENT_ANTISENSE,
-      constants.TREATMENT_SPLICING,
-      ','.join(constants.TREATMENT_SENSE_BRANCH),
-      ','.join(constants.TREATMENT_SENSE_CMV),
-      ','.join(constants.TREATMENT_ANTISENSE_SPLICING),
+      constants.TREATMENT_SPLICING
     ],
-    help = 'Whether this data is for a single experiment or two.',
+    help = 'Name of treatment.',
   )
   parser.add_argument(
     '--control',
@@ -340,6 +331,7 @@ def main():
   #   '--treatments', 'sense',
   # ]
   args = parse_args()
+
   ref_seq = fasta_utils.read_fasta_seq(args.ref)
   make_alignment_windows(
     args.input, 
@@ -354,7 +346,7 @@ def main():
   )
   make_data_info(
     args.output,
-    args.format,
+    constants.DATA_INDIVIDUAL,
     args.cell,
     args.dsb_type,
     args.hguide,
