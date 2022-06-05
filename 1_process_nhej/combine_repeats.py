@@ -11,7 +11,6 @@ import log_utils
 
 NUM_REPEATS = 4
 
-
 def main():
   parser = argparse.ArgumentParser(
     description = (
@@ -22,13 +21,15 @@ def main():
     )
   )
   parser.add_argument(
-    'files',
+    '-in',
+    '--input',
     type = argparse.FileType('r'),
     help = (
       '4 TSV files output from script "filter_nhej.py".' +
       ' Must have columns: Sequence, CIGAR, Count, Num_Subst.'
     ),
     nargs = NUM_REPEATS,
+    required = True,
   )
   parser.add_argument(
     '--total_reads',
@@ -47,16 +48,16 @@ def main():
   args = parser.parse_args()
 
   data = [
-    pd.read_csv(args.files[i], sep='\t').set_index('Sequence')
+    pd.read_csv(args.input[i], sep='\t').set_index('Sequence')
     for i in range(NUM_REPEATS)
   ]
   names = [
-    os.path.splitext(os.path.basename(args.files[i].name))[0].split('_')[0]
+    os.path.splitext(os.path.basename(args.input[i].name))[0].split('_')[0]
     for i in range(NUM_REPEATS)
   ]
 
   for i in range(NUM_REPEATS):
-    log_utils.log(f"Original sequences: {data[i].shape[0]}")
+    log_utils.log(f"Num sequences {i}: {data[i].shape[0]}")
 
   data = pd.concat(data, axis='columns', join='inner', keys=names)
   data.columns = data.columns.map(lambda x: '_'.join([x[1], x[0]]))
@@ -73,10 +74,8 @@ def main():
   for i in range(NUM_REPEATS):
     data_combined['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
   
-  log_utils.log(f"Combined sequences: {data_combined.shape[0]}")
+  log_utils.log(f"Num sequences combined: {data_combined.shape[0]}")
   data_combined.to_csv(args.output, sep='\t', index=False)
   
-
 if __name__ == '__main__':
-  # sys.argv += "output1.tsv output2.tsv output3.tsv output4.tsv --total_reads 100 100 100 100 -o output_combined.tsv".split(' ')
   main()

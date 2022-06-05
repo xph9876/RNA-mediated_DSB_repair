@@ -30,7 +30,7 @@ VARIATION_POSITION_LAYOUT_POSITION_LABEL = {
 
 
 def get_ref_variation_pos_labels(data_info):
-  if data_info['control'] == constants.CONTROL_30BPDOWN:
+  if data_info['control'] == CONTROL_30BPDOWN:
     return (
       'ref_pos',
       dict(zip(

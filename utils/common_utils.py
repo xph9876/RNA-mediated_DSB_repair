@@ -2,8 +2,6 @@ import pandas as pd
 import os
 import shutil
 
-import constants as constants
-
 def check_dir(string):
   if os.path.isdir(string):
     return string

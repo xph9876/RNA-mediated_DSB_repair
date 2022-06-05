@@ -231,7 +231,7 @@ def main():
   total_lines = file_utils.count_lines(args.sam.name)
   for line_num, line in enumerate(args.sam):
     if (line_num % 100000) == 0:
-      log_utils.log(f"{line_num} / {total_lines}")
+      log_utils.log(f"Progress: {line_num} / {total_lines}")
 
     fields = line.rstrip().split('\t')
     mandatory, optional = sam_utils.parse_sam_fields(fields)
@@ -323,15 +323,15 @@ def main():
   )
   assert total_rejected == (total_lines - total_accepted)
   log_utils.log(f'Total lines: {total_lines}')
-  log_utils.log(f'  Accepted: {total_accepted}')
-  log_utils.log(f'    Insertion special case: {accepted_insertion_special}')
-  log_utils.log(f'    Deletion special case: {accepted_deletion_special}')
-  log_utils.log(f'  Rejected: {total_rejected}')
-  log_utils.log(f'   No alignment: {rejected_no_alignment}')
-  log_utils.log(f'   POS != 1: {rejected_pos_not_1}')
-  log_utils.log(f'   Too short: {rejected_too_short}')
-  log_utils.log(f'   DSB not touch: {rejected_dsb_not_touch}')
-  log_utils.log(f'   Not consecutive: {rejected_not_consecutive}')
+  log_utils.log(f'    Accepted: {total_accepted}')
+  log_utils.log(f'        Insertion special case: {accepted_insertion_special}')
+  log_utils.log(f'        Deletion special case: {accepted_deletion_special}')
+  log_utils.log(f'    Rejected: {total_rejected}')
+  log_utils.log(f'        No alignment: {rejected_no_alignment}')
+  log_utils.log(f'        POS != 1: {rejected_pos_not_1}')
+  log_utils.log(f'        Too short: {rejected_too_short}')
+  log_utils.log(f'        DSB not touch: {rejected_dsb_not_touch}')
+  log_utils.log(f'        Not consecutive: {rejected_not_consecutive}')
 
 if __name__ == '__main__':
   sys.argv += ""

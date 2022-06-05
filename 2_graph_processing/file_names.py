@@ -40,5 +40,4 @@ def data_info(dir):
   return make_file_name(dir, 'data_info', ext='.tsv')
 
 def ref(dir):
-  constants.check_subst_type(subst_type)
   return make_file_name(dir, 'ref', ext='.fa')

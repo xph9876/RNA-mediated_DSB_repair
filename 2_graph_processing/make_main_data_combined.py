@@ -2,9 +2,11 @@
 import pandas as pd
 import argparse
 
-import common
-import constants as constants
-import file_names as file_names
+import common_utils
+import constants
+import file_names
+import file_utils
+import log_utils
 
 def parse_args():
   parser = argparse.ArgumentParser(
@@ -16,7 +18,7 @@ def parse_args():
   parser.add_argument(
     '-i',
     '--input',
-    type = file_names.check_dirs,
+    type = common_utils.check_dir_output,
     help = (
       'Table of sequences produced with stage 1.\n'
       'Column format: Sequence, CIGAR, Freq_1, Freq_2, etc.,\n'
@@ -88,13 +90,13 @@ def make_combined_data(
   output_dir,
   subst_type,
 ):
-  common.log(output_dir + ' ' + subst_type)
+  log_utils.log(output_dir + ' ' + subst_type)
 
   input_file_1 = file_names.main(input_dir_1, subst_type)
   input_file_2 = file_names.main(input_dir_2, subst_type)
 
-  data_1 = common.read_tsv(input_file_1)
-  data_2 = common.read_tsv(input_file_2)
+  data_1 = log_utils.read_tsv(input_file_1)
+  data_2 = log_utils.read_tsv(input_file_2)
 
   data = get_combined_data(
     data_1,
@@ -104,7 +106,7 @@ def make_combined_data(
     ['freq_mean'],
   )
   output_file = file_names.main(output_dir, subst_type)
-  common.write_tsv(data, output_file)
+  file_utils.write_tsv(data, output_file)
 
 if __name__ == '__main__':
   args = parse_args()

@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './utils/'))) # allow importing the utils dir
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 import shutil
 
 import common_utils
@@ -43,7 +43,7 @@ def parse_args():
   parser.add_argument(
     '-o',
     '--output',
-    type = common_utils.check_dir,
+    type = common_utils.check_dir_output,
     help = 'Output directory.',
     required = True,
   )
@@ -327,18 +327,18 @@ def make_data_info(
   file_utils.write_tsv(data_info, file_out)
 
 def main():
-  sys.argv += [
-    '-in', 'files_input/output_combined.tsv',
-    '-o', 'files_data/output_combined',
-    '-ref', 'ref_seq/1DSB_R1_sense.fa',
-    '-dsb', '67',
-    '--dsb_type', '1',
-    '--format', 'individual',
-    '--strand', 'R1',
-    '--hguide', 'A',
-    '--cell', 'WT',
-    '--treatments', 'sense',
-  ]
+  # sys.argv += [
+  #   '-in', 'files_input/output_combined.tsv',
+  #   '-o', 'files_data/output_combined',
+  #   '-ref', 'ref_seq/1DSB_R1_sense.fa',
+  #   '-dsb', '67',
+  #   '--dsb_type', '1',
+  #   '--format', 'individual',
+  #   '--strand', 'R1',
+  #   '--hguide', 'A',
+  #   '--cell', 'WT',
+  #   '--treatments', 'sense',
+  # ]
   args = parse_args()
   ref_seq = fasta_utils.read_fasta_seq(args.ref)
   make_alignment_windows(
