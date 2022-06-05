@@ -18,7 +18,7 @@ def read_mh(fr):
 
 # read needed libinfo
 def read_info(fr, mhname):
-    refs = {'wt':'wt', 'dcmv':'wt', 'db':'db', 'd5':'d5'}
+    refs = {'wt':'wt', 'dcmv':'wt', 'db':'db', 'd5':'d5', 'awt':'awt'}
     data = {}
     for l in fr:
         ws = l.rstrip('\n').split('\t')

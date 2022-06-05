@@ -14,7 +14,7 @@ def draw(data, output, annotated=False):
         return
     # parameters
     palette = {'Sense':'#CF191B', 'BranchΔ':'#33A02C', 'pCMVΔ':'#FFE669',\
-        'Antisense':'#CF191B', '5\' SplicingΔ':'#33A02C'}
+        'Antisense':'#CF191B', '5\'SplicingΔ':'#33A02C'}
     fig, ax = plt.subplots(figsize=(5,5))
     plt.subplots_adjust(left=0.15, top=0.9, bottom=0.2, right=1)
     sns.barplot(x='Label', y='Frequency', data=data, palette=palette, \
@@ -32,9 +32,9 @@ def draw(data, output, annotated=False):
             annotator.configure(test='Mann-Whitney', text_format='star')
             annotator.verbose = False
             annotator.apply_and_annotate()
-        elif '5\' SplicingΔ' in data.Label.unique():
-            annotator = Annotator(ax, [('Antisense', '5\' SplicingΔ')],\
-                data=data, x='Label', y='Frequency', order=['Antisense', '5\' SplicingΔ'])
+        elif '5\'SplicingΔ' in data.Label.unique():
+            annotator = Annotator(ax, [('Antisense', '5\'SplicingΔ')],\
+                data=data, x='Label', y='Frequency', order=['Antisense', '5\'SplicingΔ'])
             annotator.configure(test='Mann-Whitney', text_format='star')
             annotator.verbose = False
             annotator.apply_and_annotate()
@@ -58,7 +58,7 @@ def main():
     celllines = df.Cell_line.unique()
     breaks = df.Breaks.unique()
     orders = {'wt':1, 'db':2, 'dcmv':3, 'awt':4, 'd5':5}
-    labels = {'wt':'Sense', 'db':'BranchΔ', 'dcmv':'pCMVΔ', 'awt':'Antisense', 'd5':'5\' SplicingΔ'}
+    labels = {'wt':'Sense', 'db':'BranchΔ', 'dcmv':'pCMVΔ', 'awt':'Antisense', 'd5':'5\'SplicingΔ'}
     df['Label'] = df.Genotype.map(labels)
     df['Genotype_order'] = df.Genotype.map(orders)
     df = df.sort_values(by='Genotype_order')
