@@ -24,20 +24,20 @@ def get_alignment_window(
     
     Returns
     -------
-    A dictionary with elements:
-    {
-      'ref_align' : the part of the reference alignment in the window.
-      'read_align' : the part of the read alignment in the window.
-    }
+    A tuple (ref_align, read_align):
+      ref_align: the part of the reference alignment in the window.
+      read_align: the part of the read alignment in the window.
+    If the extraction fails due to too many anchor mismatches or the read
+    is too short to cross dsb_pos, the tuple (None, None) is returned.
   """
 
   ref_i = 1 # index on the original reference sequence
-  read_i = 1 # index on the original read sequence
 
   ref_align_window = ''
   read_align_window = ''
 
-  window_start, window_end = common.get_window_range(dsb_pos, window_size)
+  window_start = dsb_pos - window_size + 1
+  window_end = dsb_pos + window_size
   left_anchor_start = window_start - anchor_size
   left_anchor_end = window_start - 1
   right_anchor_start = window_end + 1
@@ -45,19 +45,19 @@ def get_alignment_window(
 
   left_anchor_mismatches = 0
   right_anchor_mismatches = 0
-  for i in range(min(len(ref_align))):
+  for i in range(min(len(ref_align), len(read_align))):
     if ref_i in range(left_anchor_start, left_anchor_end + 1):
       # Check the mismatches/in/dels on the left anchor
-      if ref_align[i] != read_align[i]:
-        left_anchor_mismatches += 1
-      elif (ref_align[i] == '-') or (read_align[i] == '-'):
+      if (ref_align[i] == '-') or (read_align[i] == '-'):
         left_anchor_mismatches = np.inf
+      elif ref_align[i] != read_align[i]:
+        left_anchor_mismatches += 1
     elif ref_i in range(right_anchor_start, right_anchor_end + 1):
       # Check the anchor/in/dels on the right anchor
-      if ref_align[i] != read_align[i]:
-        right_anchor_mismatches += 1
-      elif (ref_align[i] == '-') or (read_align[i] == '-'):
+      if (ref_align[i] == '-') or (read_align[i] == '-'):
         right_anchor_mismatches = np.inf
+      elif ref_align[i] != read_align[i]:
+        right_anchor_mismatches += 1
     elif ref_i in range(window_start, window_end + 1):
       # extract the window around the DSB
       ref_align_window += ref_align[i]
@@ -66,8 +66,6 @@ def get_alignment_window(
     # increment counters
     if ref_align[i] != '-':
       ref_i += 1
-    if read_align[i] != '-':
-      read_i += 1
 
     if ref_i > right_anchor_end:
       break
@@ -78,15 +76,12 @@ def get_alignment_window(
       ref_align + '\n' +
       read_align + '\n'
     )
-    return None
+    return None, None
 
   if (
     (left_anchor_mismatches > anchor_mismatch_limit) or
     (right_anchor_mismatches > anchor_mismatch_limit)
   ):
-    return None
+    return None, None
 
-  return {
-    'ref_align': ref_align_window,
-    'read_align': read_align_window,
-  }
+  return ref_align_window, read_align_window

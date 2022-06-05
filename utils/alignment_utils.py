@@ -158,3 +158,36 @@ def get_cigar(ref_align, read_align):
       curr_count += 1
   cigar += str(curr_count) + last_type
   return cigar
+
+
+# This assigns insertions to the left flanking position.
+def get_variation_info(ref_align, read_align):
+  """
+    Get a list describing each variation in the alignment.
+    The list contains tuples of the form
+      (ref_pos, var_type, var_nucleotide)
+    where ref_pos is the position of the variation on the reference (1-based);
+    var_type is one of "insertion", "deletion", "substitution"; var_nucleotide
+    is the corresponding nucleotide in read_align. The reference position
+    assigned to insertions will be the one on the left of the insertion (upstream).
+  """
+  ref_i = 1
+  variation_info = []
+  for i in range(len(ref_align)):
+    if ref_align[i] != read_align[i]:
+      if (ref_align[i] != '-') and (read_align[i] != '-'):
+        variation_info.append((ref_i, 'substitution', read_align[i]))
+      elif ref_align[i] == '-':
+        variation_info.append((ref_i - 1, 'insertion', read_align[i]))
+      elif read_align[i] == '-':
+        variation_info.append((ref_i, 'deletion', read_align[i]))
+      else:
+        raise Exception(
+          'Overlapping dashes in alignment: ' +
+          ref_align + ' ' + read_align
+        )
+    if ref_align[i] != '-':
+      ref_i += 1
+  return variation_info
+
+# NOTE: CHANGES REF_I TO BE 1-BASED, FIX EVERYTHING ELSE!
