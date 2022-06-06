@@ -1,21 +1,22 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors
 
-
+import file_utils
+import file_names
 import constants
 
+# CONTINUE FIXING HERE!!!
 
 def get_variation_data(data_info, variation_type):
   ref_pos_type, ref_pos_labels = constants.get_ref_variation_pos_labels(data_info)
 
-  data = constants.load_data(
-    data_info,
-    constants.get_data_file_name(
-      'variation_grouped',
-      subst_type = 'withSubst',
-      anchor_type = 'withAnchor',
-    ),
+  data = file_utils.read_tsv(
+    file_names.variation_grouped(data_info['dir'], constants.SUBST_WITH)
   )
         
   data_sub_long = data.loc[data['variation_type'] == variation_type]
