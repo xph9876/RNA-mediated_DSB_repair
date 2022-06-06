@@ -41,11 +41,22 @@ def main():
   parser.add_argument(
     '-o',
     '--output',
-    default = 'output_combined.tsv',
+    type = argparse.FileType('w'),
     help = 'Output file name',
     required = True,
   )
+  parser.add_argument(
+    '-q',
+    '--quiet',
+    help = 'Do not output log messages.',
+    action = 'store_true',
+  )
   args = parser.parse_args()
+
+  log_utils.log('\n' + '\n'.join(x.name for x in args.input) + '\n---->\n' + args.output.name)
+
+  if args.quiet:
+    log_utils.set_log_file(None)
 
   data = [
     pd.read_csv(args.input[i], sep='\t').set_index('Sequence')

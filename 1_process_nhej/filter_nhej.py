@@ -208,7 +208,7 @@ def main():
   # parse command line arguments
   args = parser.parse_args()
 
-  print(args.sam.name)
+  log_utils.log(args.sam.name + ' -> ' + args.output.name)
 
   if args.quiet:
     log_utils.set_log_file(None)
