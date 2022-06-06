@@ -201,22 +201,23 @@ def main():
   parser.add_argument(
     '-q',
     '--quiet',
-    help = (
-      'position on reference sequence immediately upstream of DSB site.\n'
-      'Ie. the DSB is between position DSB_POS and DSB_POS + 1.'
-    ),
+    help = 'Do not output log messages.',
+    action = 'store_true',
   )
 
   # parse command line arguments
   args = parser.parse_args()
 
-  if args.quiet is not None:
+  print(args.sam.name)
+
+  if args.quiet:
     log_utils.set_log_file(None)
 
   # read reference sequence from fasta file
   ref_seq = fasta_utils.read_fasta_seq(args.ref)
   
   # For logging
+  rejected_header = 0
   rejected_no_alignment = 0
   rejected_pos_not_1 = 0
   rejected_not_consecutive = 0
@@ -232,6 +233,10 @@ def main():
   for line_num, line in enumerate(args.sam):
     if (line_num % 100000) == 0:
       log_utils.log(f"Progress: {line_num} / {total_lines}")
+
+    if line.startswith('@'): # header line of SAM
+      rejected_header += 1
+      continue
 
     fields = line.rstrip().split('\t')
     mandatory, optional = sam_utils.parse_sam_fields(fields)
@@ -262,39 +267,41 @@ def main():
     assert num_indel_sam == num_ins + num_del, 'Incorrect count of insertions and/or deletions'
     assert num_subst_sam == num_subst, 'Incorrect count of substitutions'
 
-    dsb_touches = check_dsb_touches_indel(args.dsb, ins_pos, del_pos)
-    if not dsb_touches:
-      if num_ins > 0:
-        # insertions special case
-        new_ref_align, new_read_align = \
-          check_insertion_special_case(ref_align, read_align, args.dsb, num_subst = num_subst)
-        if new_ref_align is not None:
-          ref_align = new_ref_align
-          read_align = new_read_align
-          cigar = alignment_utils.get_cigar(ref_align, read_align)
-          ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
-          num_ins = len(ins_pos)
-          num_del = len(del_pos)
-          num_subst = len(subst_pos)
-          dsb_touches = True
-          accepted_insertion_special += 1
-      elif num_del > 0 and num_ins == 0:
-        # deletions and no insertions special case
-        new_read_align = \
-          check_deletion_special_case(ref_align, read_align, args.dsb, num_del = num_del, num_subst = num_subst)
-        if new_read_align is not None:
-          read_align = new_read_align
-          cigar = alignment_utils.get_cigar(ref_align, read_align)
-          ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
-          num_ins = len(ins_pos)
-          num_del = len(del_pos)
-          num_subst = len(subst_pos)
-          dsb_touches = True
-          accepted_deletion_special += 1
+    if num_ins + num_del > 0:
+      dsb_touches = check_dsb_touches_indel(args.dsb, ins_pos, del_pos)
+      if not dsb_touches:
+        if num_ins > 0:
+          # insertions special case
+          new_ref_align, new_read_align = \
+            check_insertion_special_case(ref_align, read_align, args.dsb, num_subst = num_subst)
+          if new_ref_align is not None:
+            ref_align = new_ref_align
+            read_align = new_read_align
+            cigar = alignment_utils.get_cigar(ref_align, read_align)
+            ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
+            num_ins = len(ins_pos)
+            num_del = len(del_pos)
+            num_subst = len(subst_pos)
+            dsb_touches = True
+            accepted_insertion_special += 1
+        elif num_del > 0:
+          # deletions and no insertions special case
+          new_read_align = \
+            check_deletion_special_case(ref_align, read_align, args.dsb, num_del = num_del, num_subst = num_subst)
+          if new_read_align is not None:
+            read_align = new_read_align
+            cigar = alignment_utils.get_cigar(ref_align, read_align)
+            ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
+            num_ins = len(ins_pos)
+            num_del = len(del_pos)
+            num_subst = len(subst_pos)
+            dsb_touches = True
+            accepted_deletion_special += 1
 
-    if (num_ins + num_del > 0) and (not dsb_touches):
-      rejected_dsb_not_touch += 1
-      continue
+      # If still DSB does not touch after special case check, reject
+      if not dsb_touches:
+        rejected_dsb_not_touch += 1
+        continue
     
     if not is_consecutive(ins_pos, del_pos):
       rejected_not_consecutive += 1
@@ -315,18 +322,21 @@ def main():
   
   total_accepted = sum(read_counts.values())
   total_rejected = (
+    rejected_header +
     rejected_no_alignment + 
     rejected_pos_not_1 +
     rejected_too_short +
     rejected_dsb_not_touch +
     rejected_not_consecutive
   )
-  assert total_rejected == (total_lines - total_accepted)
+  assert total_rejected == (total_lines - total_accepted), "Line counts do not match"
+
   log_utils.log(f'Total lines: {total_lines}')
   log_utils.log(f'    Accepted: {total_accepted}')
   log_utils.log(f'        Insertion special case: {accepted_insertion_special}')
   log_utils.log(f'        Deletion special case: {accepted_deletion_special}')
   log_utils.log(f'    Rejected: {total_rejected}')
+  log_utils.log(f'        Header: {rejected_header}')
   log_utils.log(f'        No alignment: {rejected_no_alignment}')
   log_utils.log(f'        POS != 1: {rejected_pos_not_1}')
   log_utils.log(f'        Too short: {rejected_too_short}')
@@ -334,5 +344,5 @@ def main():
   log_utils.log(f'        Not consecutive: {rejected_not_consecutive}')
 
 if __name__ == '__main__':
-  sys.argv += ""
+  # sys.argv += "-sam libraries_1/yjl217_R1_2DSBs.sam -ref ref_seq/2DSB_R1_sense.fa -o libraries_2/yjl217_WT_sgAB_R1_sense.tsv --min_length 50 -dsb 67".split(" ")
   main()
