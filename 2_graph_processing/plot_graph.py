@@ -19,8 +19,8 @@ import common_utils
 import graph_utils
 import file_utils
 import file_names
-import plot_graph_helpers_new
-import make_common_layouts_new
+import plot_graph_helpers
+import make_common_layouts
 # import make_figures
 
 import circlify
@@ -585,7 +585,7 @@ def make_graph_layout(
     separate_components = False
     node_groups = None
     layout_list = [
-      make_common_layouts_new.get_common_layout(
+      make_common_layouts.get_common_layout(
         common_layout_dir,
         node_data = pd.DataFrame.from_dict(
           dict(graph.nodes(data=True)),
@@ -1434,7 +1434,7 @@ def make_graph_single_panel(
   ### Make graph layout ###
   extra_layout_args = {}
   if graph_layout_type == 'variation_position_layout_circle_pack':
-    extra_layout_args['node_size_px_dict'] = plot_graph_helpers_new.get_node_size(
+    extra_layout_args['node_size_px_dict'] = plot_graph_helpers.get_node_size(
       data_info = data_info,
       node_data = node_data,
       node_type = node_type,
@@ -1472,7 +1472,7 @@ def make_graph_single_panel(
   ### Plot edges and nodes ###
   edge_traces = []
   if edge_show:
-    edge_traces = plot_graph_helpers_new.make_edges_traces(
+    edge_traces = plot_graph_helpers.make_edges_traces(
       data_info = data_info,
       graph = graph,
       layout = graph_layout,
@@ -1481,7 +1481,7 @@ def make_graph_single_panel(
       edge_width_scale = edge_width_scale,
     )
 
-  node_traces = plot_graph_helpers_new.make_point_traces(
+  node_traces = plot_graph_helpers.make_point_traces(
     data_info = data_info,
     node_data = node_data,
     graph_layout = graph_layout,

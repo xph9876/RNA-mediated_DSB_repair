@@ -35,4 +35,3 @@ def count_lines(file):
   """Get the number of lines in the file."""
   with open(file) as input:
     return sum(1 for _ in input)
-

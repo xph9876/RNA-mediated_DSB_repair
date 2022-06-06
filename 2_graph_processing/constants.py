@@ -271,3 +271,11 @@ LABELS = {
   'insertion': 'Insertion',
   'deletion': 'Deletion',
 }
+
+
+### Font size constants for figures ###
+HISTOGRAM_3D_TITLE_FONT_SIZE = 16
+HISTOGRAM_3D_AXIS_LABEL_FONT_SIZE = 12
+HISTOGRAM_3D_AXIS_TICK_FONT_SIZE = 8
+HITOGRAM_3D_FONT_SIZE_SCALE = 2
+BASE_FIG_SIZE = 12

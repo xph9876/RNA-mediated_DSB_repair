@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
-import plot_graph_new
+import plot_graph
 import numpy as np
 
 cell_line = 'WT'
@@ -10,7 +10,7 @@ data_format = 'individual'
 data_dir_grid = np.array([['files_data/output_combined', 'files_data/output_combined']])
 # data_set_grid = data_set_grid[:1, :2]
 
-figure = plot_graph_new.make_graph_figure(
+figure = plot_graph.make_graph_figure(
   data_dir_grid = data_dir_grid,
   graph_layout_type = 'radial_layout',
   graph_layout_common_dir = 'files_data/output_combined_common',

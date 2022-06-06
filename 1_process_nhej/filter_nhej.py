@@ -209,6 +209,8 @@ def main():
   # parse command line arguments
   args = parser.parse_args()
 
+  # TODO: ALLOW THE LOGGING TO GO TO A SEPARATE LOG FILE DEPENDING ON THE
+  # OUTPUT NAME!
   log_utils.log(args.sam.name + ' -> ' + args.output.name)
 
   if args.quiet:

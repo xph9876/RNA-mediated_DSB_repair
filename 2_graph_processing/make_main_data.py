@@ -291,6 +291,7 @@ def make_data_info(
   strand,
   treatments,
   control,
+  ref_seq_window,
 ):
   data_info = {
     'dir': dir,
@@ -300,6 +301,7 @@ def make_data_info(
     'hguide': hguide,
     'strand': strand,
     'control': control,
+    'ref_seq': ref_seq_window,
   }
   if (format == constants.DATA_INDIVIDUAL) and (len(treatments) == 1):
     data_info['treatment'] = treatments[0]
@@ -315,6 +317,23 @@ def make_data_info(
   file_out = file_names.data_info(dir)
   log_utils.log(file_out)
   file_utils.write_tsv(data_info, file_out)
+
+def get_ref_seq_window(ref_seq, dsb_pos, window_size):
+  """
+    Get the window of the reference sequence around the DSB.
+  """
+  # Extract the window of a perfect alignment.
+  # Do it this way so that it is always consistent
+  # with how alignment windows are extracted.
+  ref_seq_window, _ = alignment_window.get_alignment_window(
+    ref_seq,
+    ref_seq,
+    dsb_pos,
+    window_size,
+    0,
+    0,
+  )
+  return ref_seq_window
 
 def main():
   # sys.argv += [
@@ -350,8 +369,9 @@ def main():
     args.dsb_type,
     args.hguide,
     args.strand,
-    args.treatment,
+    [args.treatment],
     args.control,
+    get_ref_seq_window(ref_seq, args.dsb, args.window_size),
   )
 
   ref_file_out = file_names.ref(args.output)
