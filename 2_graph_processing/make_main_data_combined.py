@@ -13,6 +13,8 @@ import file_names
 import file_utils
 import log_utils
 
+import make_main_data
+
 def parse_args():
   parser = argparse.ArgumentParser(
     description = (
@@ -124,6 +126,17 @@ if __name__ == '__main__':
     args.input[1],
     args.output,
     args.subst_type,
+  )
+
+  # Make the combined info
+  make_main_data.make_data_info(
+    args.output,
+    constants.DATA_COMBINED,
+    data_info_1['cell_line'],
+    data_info_1['hguide'],
+    data_info_1['strand'],
+    [data_info_1['treatment'], data_info_2['treatment']],
+    data_info_1['control'],
   )
 
   # Copy over the reference sequence

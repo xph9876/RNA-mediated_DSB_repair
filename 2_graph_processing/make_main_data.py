@@ -157,7 +157,6 @@ def parse_args():
     required = True,
   )
   args = parser.parse_args()
-  args.treatments = args.treatments.split(',')
   args.subst_type += 'Subst'
   args.dsb_type = args.dsb_type + 'DSB'
   args.hguide = 'sg' + args.hguide
@@ -351,7 +350,7 @@ def main():
     args.dsb_type,
     args.hguide,
     args.strand,
-    args.treatments,
+    args.treatment,
     args.control,
   )
 
