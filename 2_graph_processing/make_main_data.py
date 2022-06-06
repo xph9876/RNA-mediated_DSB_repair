@@ -153,7 +153,7 @@ def parse_args():
     '--cell',
     type = str,
     choices = [constants.CELL_WT, constants.CELL_KO],
-    help = 'Strand of the reads in this library.',
+    help = 'Cell in this library.',
     required = True,
   )
   args = parser.parse_args()

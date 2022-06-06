@@ -29,9 +29,9 @@ def parse_args():
     '--input',
     type = common_utils.check_dir_output,
     help = (
-      'Table of sequences produced with stage 1.\n'
-      'Column format: Sequence, CIGAR, Freq_1, Freq_2, etc.,\n'
-      'All the columns after CIGAR should be repeat frequencies.'
+      'Tables of sequences produced with stage 1.'
+      ' Column format: Sequence, CIGAR, Freq_1, Freq_2, etc.'
+      ' All the columns after CIGAR should be repeat frequencies.'
     ),
     nargs = 2,
   )
@@ -100,11 +100,11 @@ def make_combined_data(
   file_utils.write_tsv(data, output_file)
 
 if __name__ == '__main__':
-  sys.argv += [
-    '--input', 'libraries_4/WT_2DSB_R1_sense', 'libraries_4/WT_2DSB_R1_branch',
-    '--output', 'libraries_4/WT_2DSB_R1_sense_branch',
-    '--subst_type', 'without'
-  ]
+  # sys.argv += [
+  #   '--input', 'libraries_4/WT_2DSB_R1_sense', 'libraries_4/WT_2DSB_R1_branch',
+  #   '--output', 'libraries_4/WT_2DSB_R1_sense_branch',
+  #   '--subst_type', 'without'
+  # ]
 
   # Parse args
   args = parse_args()
@@ -133,6 +133,7 @@ if __name__ == '__main__':
     args.output,
     constants.DATA_COMBINED,
     data_info_1['cell_line'],
+    data_info_1['dsb_type'],
     data_info_1['hguide'],
     data_info_1['strand'],
     [data_info_1['treatment'], data_info_2['treatment']],
@@ -140,7 +141,6 @@ if __name__ == '__main__':
   )
 
   # Copy over the reference sequence
-  shutil.copy(
-    file_names.ref(args.input[0]), 
-    file_names.ref(args.output)
-  )
+  ref_file_out = file_names.ref(args.output)
+  log_utils.log(ref_file_out)
+  shutil.copy(file_names.ref(args.input[0]), ref_file_out)
