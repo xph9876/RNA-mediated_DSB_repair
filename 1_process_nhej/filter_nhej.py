@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 
 import collections
 import file_utils
+import common_utils
 import sam_utils
 import fasta_utils
 import alignment_utils
@@ -179,7 +180,7 @@ def main():
   parser.add_argument(
     '-o',
     '--output',
-    type = argparse.FileType(mode='w'),
+    type = common_utils.check_file_output,
     default = sys.stdout,
     help = 'output file. Defaults to standard output.'
   )

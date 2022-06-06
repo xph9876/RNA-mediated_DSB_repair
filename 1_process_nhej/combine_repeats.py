@@ -7,6 +7,7 @@ import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
+import common_utils
 import log_utils
 
 NUM_REPEATS = 4
@@ -41,7 +42,7 @@ def main():
   parser.add_argument(
     '-o',
     '--output',
-    type = argparse.FileType('w'),
+    type = common_utils.check_file_output,
     help = 'Output file name',
     required = True,
   )
