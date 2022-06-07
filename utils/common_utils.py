@@ -16,7 +16,7 @@ def check_file_output(file_name):
   os.makedirs(os.path.dirname(file_name), exist_ok=True)
   return open(file_name, 'w')
 
-def check_common_separated_values(string):
+def check_comma_separated_values(string):
   if isinstance(string, str):
     string.split(',')
   else:

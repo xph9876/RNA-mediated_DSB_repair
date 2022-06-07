@@ -3,9 +3,10 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
+import argparse
+
 import networkx as nx
 
-import plotly.graph_objects as go
 import plotly.subplots as ps
 
 import pandas as pd
@@ -14,15 +15,17 @@ import numpy as np
 import sklearn.decomposition
 import sklearn.manifold
 
+import circlify
+
 import constants
 import common_utils
+import log_utils
 import graph_utils
 import file_utils
 import file_names
 import plot_graph_helpers
 import make_common_layouts
 
-import circlify
 
 PLOT_ARGS = dict(
   SUBPLOT_WIDTH_PX = 1600,
@@ -2018,13 +2021,18 @@ def make_graph_figure(
 def get_plot_args(
   data_info,
   plot_type,
-  format,
-  image_format,
-  title_show,
-  node_size_min_freq,
-  node_size_max_freq,
-  node_filter_variation_type,
+  title_show = False,
+  node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
+  node_size_min_px = constants.GRAPH_NODE_SIZE_MIN_PX,
+  node_filter_variation_types = constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
+  graph_width_px = constants.GRAPH_WIDTH_PX,
+  graph_height_px = constants.GRAPH_HEIGHT_PX,
   graph_layout_common_dir = None,
+  line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
+  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
   **args,
 ):
   if plot_type not in ['kamada_layout', 'radial_layout' 'mds_layout']:
@@ -2093,16 +2101,14 @@ def get_plot_args(
 #   axis_font_size_scale = 1,
 #   axis_tick_modulo = 1,
 
-  plot_args = dict(
-    data_set_grid = np.array([[data_info['dir']]]),
-    # node_size_min_freq = 1e-5,
-    # node_size_max_freq = 1,
-    node_size_min_freq = node_size_min_freq,
-    node_size_max_freq = node_size_max_freq,
-    node_filter_variation_types = ['insertion', 'deletion', 'none'],
-    legend_common = True,
-    graph_stats_show = False,
-  )
+  plot_args = {
+    'data_set_grid': np.array([[data_info['dir']]]),
+    'node_size_min_freq': node_size_min_freq,
+    'node_size_max_freq': node_size_max_freq,
+    'node_filter_variation_types': node_filter_variation_types,
+    'legend_common': True,
+    'graph_stats_show': False,
+  }
 
   plot_args['node_type'] = 'sequence_data'
   plot_args['graph_layout_type'] = plot_type
@@ -2117,15 +2123,15 @@ def get_plot_args(
     }[plot_type]
     plot_args['title'] = plot_title
   
-  plot_args['node_size_min_px'] = 10
-  plot_args['node_size_max_px'] = 200
-  plot_args['content_col_widths_px'] = [3200]
-  plot_args['content_row_heights_px'] = [2400]
+  plot_args['node_size_min_px'] = node_size_min_px
+  plot_args['node_size_max_px'] = node_size_max_px
+  plot_args['content_col_widths_px'] = [graph_width_px]
+  plot_args['content_row_heights_px'] = [graph_height_px]
   plot_args['show_subplot_titles'] = False
   plot_args['show_margin_labels'] = False
   plot_args['show_custom_legend'] = False
-  plot_args['line_width_scale'] = 8
-  plot_args['font_size_scale'] = 8
+  plot_args['line_width_scale'] = line_width_scale
+  plot_args['font_size_scale'] = font_size_scale
   plot_args['col_space_px'] = 0
   plot_args['row_space_px'] = 0
   plot_args['margin_top_min_px'] = 0
@@ -2133,62 +2139,168 @@ def get_plot_args(
   plot_args['margin_left_min_px'] = 0
   plot_args['margin_right_min_px'] = 0
 
-  if format == 'combined':
+  if data_info['format'] == 'combined':
     plot_args['node_color_type'] = 'freq_ratio'
-    if image_format == 'tiny':
-      plot_args['legend_colorbar_scale'] = 8
-    else:
-      raise Exception('Unknown image format: ' + str(image_format))
-  elif format == 'individual':
+    plot_args['legend_colorbar_scale'] = legend_colorbar_scale
+  elif data_info['format'] == 'individual':
     plot_args['node_color_type'] = 'variation_type'
   else:
-    raise Exception('Unknown data format: ' + str(format))
+    raise Exception('Unknown data format: ' + str(data_info['format']))
 
   return plot_args
 
-
-# CONTINUE HERE!!!
-def make_images_tiny_plotly(
+def plot_graph(
+  output_dir,
+  data_info,
   plot_type,
-  format,
+  title_show = False,
+  node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
+  node_size_min_px = constants.GRAPH_NODE_SIZE_MIN_PX,
+  node_filter_variation_types = constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
+  graph_width_px = constants.GRAPH_WIDTH_PX,
+  graph_height_px = constants.GRAPH_HEIGHT_PX,
+  graph_layout_common_dir = None,
+  line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
+  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
   x_crop = None,
   y_crop = None,
-  **args,
 ):
-  for data_set in get_data_sets(format, None):
-    if data_set['control'] != 'not_control':
-      continue
+  data_label = constants.get_data_label(data_info)
+  log_utils.log('plot_graph: ' + plot_type + ' ' + data_label)
+  plot_args = get_plot_args(
+    data_info = data_info,
+    plot_type = plot_type,
+    title_show = title_show,
+    node_size_max_freq = node_size_max_freq,
+    node_size_min_freq = node_size_min_freq,
+    node_size_max_px = node_size_max_px,
+    node_size_min_px = node_size_min_px,
+    node_filter_variation_types = node_filter_variation_types,
+    graph_width_px = graph_width_px,
+    graph_height_px = graph_height_px,
+    graph_layout_common_dir = graph_layout_common_dir,
+    line_width_scale = line_width_scale,
+    font_size_scale = font_size_scale,
+    legend_colorbar_scale = legend_colorbar_scale,
+  )
+  figure = plot_graph.make_graph_figure(**plot_args)
+  if x_crop is not None:
+    figure.update_xaxes(range=x_crop)
+  if y_crop is not None:
+    figure.update_yaxes(range=y_crop)
 
-    common.log(
-      'make_images_tiny_plotly: ' +
-      plot_type + ' ' +
-      format + ' ' +
-      data_set['pretty_name']
-    )
-    plot_args = get_plot_args_plotly(
-      plot_type = plot_type,
-      format = format,
-      data_set = data_set,
-      image_format = 'tiny',
-      **args,
-    )
-    figure = plot_graph.make_graph_figure(**plot_args)
-    if x_crop is not None:
-      figure.update_xaxes(range=x_crop)
-    if y_crop is not None:
-      figure.update_yaxes(range=y_crop)
+  file_utils.write_plotly(
+    figure,
+    os.path.join(output_dir, file_names.graph_figure(data_label))
+  )
 
-    common.plotly_save(
-      figure,
-      get_file(
-        plot_type = plot_type,
-        file_type = 'image',
-        format = format,
-        data_set = data_set,
-        image_format = 'tiny',
-        **args,
-      ),
+def parse_args():
+  parser = argparse.ArgumentParser(
+    description = 'Plot graph theory graphs.'
+  )
+  parser.add_argument(
+    '-i',
+    '--input',
+    type = common_utils.check_dir,
+    help = 'Directory with the data files.',
+    required = True,
+  )
+  parser.add_argument(
+    '-o',
+    '--output',
+    type = common_utils.check_dir_output,
+    help = 'Output directory.',
+    required = True,
+  )
+  parser.add_argument(
+    '--title',
+    action = 'store_true',
+    help = (
+      'If present adds a title to the plot showing the type of'
+      ' and the name of the data set.'
     )
+  )
+  parser.add_argument(
+    '--layout',
+    type = str,
+    choices = ['kamada', 'radial', 'mds'],
+    default = 'radial',
+    help = 'The algorithm to use for laying out the graph.'
+  )
+  parser.add_argument(
+    '--node_max_freq',
+    type = float,
+    help = (
+      'Max frequency to control node size.' +
+      'Higher frequencies are clipped to this value.'
+    ),
+    default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  )
+  parser.add_argument(
+    '--node_min_freq',
+    type = float,
+    help = (
+      'Min frequency to control node size.' +
+      'Lower frequencies are clipped to this value.'
+    ),
+    default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  )
+  parser.add_argument(
+    '--node_max_px',
+    type = float,
+    help = 'Largest node size as controlled by the log frequency.',
+    default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  )
+  parser.add_argument(
+    '--node_min_freq',
+    type = float,
+    help = 'Smallest node size as controlled by the log frequency.',
+    default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  )
+  parser.add_argument(
+    '--variation_types',
+    type = common_utils.check_comma_separated_values,
+    help = (
+      'The variation types that should be included in the graph.'
+      ' This should be a comma separate list (no spaces) of the types:'
+      ' "insertion", "deletion", "substitution". Default value: "insertion,deletion".',
+    ),
+    default = ["insertion", "deletion"],
+  )
+  parser.add_argument(
+    '--width_px',
+    type = float,
+    default = constants.GRAPH_WIDTH_PX,
+    help = 'The width of the plot in pixels.'
+  )
+  parser.add_argument(
+    '--height_px',
+    type = float,
+    default = constants.GRAPH_HEIGHT_PX,
+    help = 'The height of the plot in pixels.'
+  )
+  parser.add_argument(
+    '--common_layout_dir',
+    type = common_utils.check_dir,
+    default = None,
+    help = (
+      'If present, gives the directory where the common layouts are.' +
+      ' This means the node coordinates will be obtained from the common' +
+      ' layout files rather than laid out individually.'
+    )
+  )
+  # ADD THE X CROP AND Y CROP
+  # Process the arguments. Some need to be modifies slightly.
+# title_show = False,
+#   graph_width_px = constants.GRAPH_WIDTH_PX,
+#   graph_layout_common_dir = None,
+  # x_crop = None,
+  # y_crop = None,
+  return parser.parse_args()
 
 
 def main():
+  pass

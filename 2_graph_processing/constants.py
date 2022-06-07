@@ -292,7 +292,7 @@ def get_data_label(data_info):
   ]
   return '_'.join(x for x in str_list if x is not None)
 
-### Font size constants for figures ###
+### Constants for 3D variation-position histograms ###
 HISTOGRAM_3D_TITLE_FONT_SIZE = 16
 HISTOGRAM_3D_AXIS_LABEL_FONT_SIZE = 12
 HISTOGRAM_3D_AXIS_TICK_FONT_SIZE = 8
@@ -308,3 +308,15 @@ HISTOGRAM_3D_DPI = 100
 HISTOGRAM_3D_FREQ_MIN = 1e-5
 HISTOGRAM_3D_FREQ_MAX = 1
 BASE_FIG_SIZE = 12
+
+### Constants for 3D variation-position histograms ###
+GRAPH_NODE_SIZE_MIN_FREQ = 1e-5
+GRAPH_NODE_SIZE_MAX_FREQ = 1
+GRAPH_NODE_FILTER_VARIATION_TYPES = ['insertion', 'deletion', 'none']
+GRAPH_WIDTH_PX = 3200
+GRAPH_HEIGHT_PX = 2400
+GRAPH_NODE_SIZE_MIN_PX = 10
+GRAPH_NODE_SIZE_MAX_PX = 200
+GRAPH_LINE_WIDTH_SCALE = 8
+GRAPH_FONT_SIZE_SCALE = 8
+GRAPH_LEGEND_COLORBAR_SCALE = 8
