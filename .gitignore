@@ -140,5 +140,8 @@ log*.txt
 # Library files
 libraries*
 
+# Plots
+plots/
+
 # Temp files
 *~*

@@ -41,3 +41,6 @@ def data_info(dir):
 
 def ref(dir):
   return make_file_name(dir, 'ref', ext='.fa')
+
+def histogram_3d(data_name, variation_type):
+  return '_'.join([data_name, variation_type]) + '.png'

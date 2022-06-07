@@ -8,7 +8,7 @@ def check_subst_type(subst_type):
   if subst_type not in SUBST_TYPES:
     raise Exception('Not a valid subst type: ' + str(subst_type))
 
-VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN = 'indel'
+VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN = 'dist_ref'
 VARIATION_POSITION_LAYOUT_DISTANCE_LABEL = {
   'dist_ref': (
     'Variations'
@@ -39,7 +39,7 @@ def get_ref_variation_pos_labels(data_info):
       )),
     )
   else:
-    pos_before_cut = data_info['ref_seq'] // 2
+    pos_before_cut = len(data_info['ref_seq']) // 2
     labels = {}
     for i in range(-1, len(data_info['ref_seq'])):
       if i <= pos_before_cut:
@@ -272,10 +272,39 @@ LABELS = {
   'deletion': 'Deletion',
 }
 
+def get_data_label(data_info):
+  if data_info['format'] == 'individual':
+    treatment_str = data_info['treatment']
+  elif data_info['format'] == 'combined':
+    treatment_str = '_'.join(data_info['treatment_1'], data_info['treatment_2'])
+  else:
+    raise Exception('Unknown format: ' + str(data_info['format']))
+  if data_info['control'] == CONTROL_NOT:
+    control_str = None
+  else:
+    control_str = data_info['control']
+  str_list = [
+    data_info['cell_line'],
+    data_info['hguide'],
+    data_info['strand'],
+    treatment_str,
+    control_str
+  ]
+  return '_'.join(x for x in str_list if x is not None)
 
 ### Font size constants for figures ###
 HISTOGRAM_3D_TITLE_FONT_SIZE = 16
 HISTOGRAM_3D_AXIS_LABEL_FONT_SIZE = 12
 HISTOGRAM_3D_AXIS_TICK_FONT_SIZE = 8
-HITOGRAM_3D_FONT_SIZE_SCALE = 2
+HISTOGRAM_3D_AXIS_TICK_MODULUS = 4
+HISTOGRAM_3D_FONT_SIZE_SCALE = 6
+HISTOGRAM_3D_WIDTH_PX = 1500
+HISTOGRAM_3D_HEIGHT_PX = 1500
+HISTOGRAM_3D_MARGIN_LEFT_PX = 50
+HISTOGRAM_3D_MARGIN_RIGHT_PX = 300
+HISTOGRAM_3D_MARGIN_TOP_PX = 0
+HISTOGRAM_3D_MARGIN_BOTTOM_PX = 100
+HISTOGRAM_3D_DPI = 100
+HISTOGRAM_3D_FREQ_MIN = 1e-5
+HISTOGRAM_3D_FREQ_MAX = 1
 BASE_FIG_SIZE = 12
