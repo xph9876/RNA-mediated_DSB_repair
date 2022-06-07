@@ -21,7 +21,6 @@ import file_utils
 import file_names
 import plot_graph_helpers
 import make_common_layouts
-# import make_figures
 
 import circlify
 
@@ -1684,9 +1683,9 @@ def make_graph_figure(
   graph_layout_type = 'kamada_layout',
   graph_layout_common_dir = None,
   graph_layout_separate_components = True,
-  node_filter_variation_types = None,
   node_type = 'sequence_data',
   node_subst_type = constants.SUBST_WITHOUT,
+  node_filter_variation_types = None,
   node_filter_freq_min = 0,
   node_filter_freq_max = np.inf,
   node_filter_dist_min = 0,
@@ -2012,134 +2011,184 @@ def make_graph_figure(
       font_size_scale = font_size_scale,
       line_width_scale = line_width_scale,
     )
-    # y_shift_curr_px = 0
-
-    # if node_type in ['sequence_data']:
-    #   y_shift_curr_px = make_outline_legend(
-    #     figure = figure,
-    #     node_size_px = node_size_max_px,
-    #     x_anchor = 1,
-    #     y_anchor = 1,
-    #     x_shift = legend_x_shift_px,
-    #     y_shift = y_shift_curr_px,
-    #     legend_item_scale = legend_item_scale,
-    #     font_size_scale = font_size_scale,
-    #     line_width_scale = line_width_scale,
-    #   )
-    #   y_shift_curr_px -= legend_vertical_space_px
-
-    # if node_color_type == 'variation_type':
-    #   y_shift_curr_px = make_variation_color_legend(
-    #     figure = figure,
-    #     variation_types = (
-    #       node_filter_variation_types
-    #       if node_filter_variation_types is not None else
-    #       list(const.VARIATION_TYPES)
-    #     ),
-    #     node_size_px = node_size_max_px,
-    #     x_anchor = 1,
-    #     y_anchor = 1,
-    #     x_shift = legend_x_shift_px,
-    #     y_shift = y_shift_curr_px,
-    #     legend_item_scale = legend_item_scale,
-    #     font_size_scale = font_size_scale,
-    #     line_width_scale = line_width_scale,
-    #   )
-    #   y_shift_curr_px -= legend_vertical_space_px
-    # elif node_color_type == 'freq_group':
-    #   treatment_1_list = list(set(
-    #     data_info['treatment_1'] for data_info in data_info_grid.ravel()
-    #     if data_info['format'] == const.DATA_COMBINED
-    #   ))
-    #   treatment_2_list = list(set(
-    #     data_info['treatment_2'] for data_info in data_info_grid.ravel()
-    #     if data_info['format'] == const.DATA_COMBINED
-    #   ))
-    #   for treatment_1 in treatment_1_list:
-    #     for treatment_2 in treatment_2_list:
-    #       y_shift_curr_px = make_freq_group_legend(
-    #         treatment_1 = treatment_1,
-    #         treatment_2 = treatment_2,
-    #         figure = figure,
-    #         node_size_px = node_size_max_px,
-    #         x_anchor = 1,
-    #         y_anchor = 1,
-    #         x_shift = legend_x_shift_px,
-    #         y_shift = y_shift_curr_px,
-    #         legend_item_scale = legend_item_scale,
-    #         font_size_scale = font_size_scale,
-    #         line_width_scale = line_width_scale,
-    #       )
-    #     y_shift_curr_px -= legend_vertical_space_px
-    # elif node_color_type == 'freq_ratio':
-    #   treatment_pair_row_col = {}
-    #   for row in range(data_info_grid.shape[0]):
-    #     for col in range(data_info_grid.shape[1]):
-    #       treatment_1 = data_info_grid[row, col]['treatment_1']
-    #       treatment_2 = data_info_grid[row, col]['treatment_2']
-    #       treatment_pair_row_col[treatment_1, treatment_2] = (row, col)
-
-    #   # Note: Sometimes the entire plot disappears if the colorbar font is too large!
-    #   # Fixes: Increase the colorbar length or make the fonts smaller.
-    #   # colorbar_height_px = get_plot_arg_scaled(
-    #   #   'COLORBAR_HEIGHT_PX',
-    #   #   legend_colorbar_scale,
-    #   # )
-
-    #   # colorbar_width_px = get_plot_arg_scaled(
-    #   #   'COLORBAR_WIDTH_PX',
-    #   #   legend_colorbar_scale,
-    #   # )
-
-    #   for (treatment_1, treatment_2), (row, col) in treatment_pair_row_col.items():
-    #     y_shift_curr_px = add_plotly_colorbar(
-    #       figure = figure,
-    #       treatment_1 = treatment_1,
-    #       treatment_2 = treatment_2,
-    #       row = row + 1,
-    #       col = col + 1,
-    #       figure_height_px = figure_size_args['total_height_px'],
-    #       legend_colorbar_scale = legend_colorbar_scale,
-    #       legend_x_shift_px = legend_x_shift_px,
-    #       legend_y_shift_px = y_shift_curr_px,
-    #       line_width_scale = line_width_scale,
-    #       font_size_scale = font_size_scale,
-    #     )
-    #     y_shift_curr_px -= legend_vertical_space_px * 2
-    # else:
-    #   raise Exception('Unknown node color type: ' + str(node_color_type))
-    
-    # if edge_show:
-    #   y_shift_curr_px = make_edge_legend(
-    #     figure = figure,
-    #     edge_type_list = edge_show_types,
-    #     line_size_px = PLOT_ARGS['EDGE_LEGEND_ITEM_LINE_SIZE_PX'],
-    #     line_width_px = PLOT_ARGS['EDGE_LEGEND_ITEM_LINE_WIDTH_PX'],
-    #     x_anchor = 1,
-    #     y_anchor = 1,
-    #     x_shift = legend_x_shift_px,
-    #     y_shift = y_shift_curr_px,
-    #     legend_item_scale = legend_item_scale,
-    #     font_size_scale = font_size_scale,
-    #     line_width_scale = line_width_scale,
-    #   )
-    #   y_shift_curr_px -= legend_vertical_space_px
-
-    # if node_size_type == 'freq':
-    #   y_shift_curr_px = make_size_legend(
-    #     figure = figure,
-    #     node_size_min_freq = node_size_min_freq,
-    #     node_size_max_freq = node_size_max_freq,
-    #     node_size_min_px = node_size_min_px,
-    #     node_size_max_px = node_size_max_px,
-    #     x_anchor = 1,
-    #     y_anchor = 1,
-    #     x_shift = legend_x_shift_px,
-    #     y_shift = y_shift_curr_px,
-    #     legend_item_scale = legend_item_scale,
-    #     font_size_scale = font_size_scale,
-    #     line_width_scale = line_width_scale,
-    #   )
-    #   y_shift_curr_px -= legend_vertical_space_px
   
   return figure
+
+
+def get_plot_args(
+  data_info,
+  plot_type,
+  format,
+  image_format,
+  title_show,
+  node_size_min_freq,
+  node_size_max_freq,
+  node_filter_variation_type,
+  graph_layout_common_dir = None,
+  **args,
+):
+  if plot_type not in ['kamada_layout', 'radial_layout' 'mds_layout']:
+    raise Exception('Unhandled plot type: ' + str(plot_type))
+
+
+#   data_dir_grid,
+#   graph_layout_type = 'kamada_layout',
+#   graph_layout_common_dir = None,
+#   graph_layout_separate_components = True,
+#   node_filter_variation_types = None,
+#   node_type = 'sequence_data',
+#   node_subst_type = constants.SUBST_WITHOUT,
+#   node_filter_freq_min = 0,
+#   node_filter_freq_max = np.inf,
+#   node_filter_dist_min = 0,
+#   node_filter_dist_max = np.inf,
+#   node_labels_show = False,
+#   node_label_columns = ['id'],
+#   node_label_position = 'bottom center',
+#   node_color_type = 'freq_group',
+#   node_size_type = 'freq',
+#   node_size_min_px = 10,
+#   node_size_max_px = 50,
+#   node_size_min_freq = 1e-6,
+#   node_size_max_freq = 1,
+#   edge_show = True,
+#   edge_show_labels = False,
+#   edge_show_types = list(constants.EDGE_TYPES),
+#   edge_width_scale = 1,
+#   col_widths_px = None,
+#   row_heights_px = None,
+#   row_space_px = PLOT_ARGS['SUBPLOT_ROW_SPACE_PX'],
+#   col_space_px = PLOT_ARGS['SUBPLOT_COL_SPACE_PX'],
+#   title = None,
+#   title_height_px = PLOT_ARGS['TITLE_HEIGHT_PX'],
+#   title_y_shift_px = 0,
+#   title_subplot_show = True,
+#   legend_plotly_show = False,
+#   legend_custom_show = True,
+#   legend_common = False,
+#   legend_width_px = PLOT_ARGS['LEGEND_WIDTH_PX'],
+#   legend_x_shift_px = 0,
+#   legend_vertical_space_px = PLOT_ARGS['LEGEND_VERTICAL_SPACE_PX'],
+#   legend_item_scale = 1,
+#   legend_colorbar_scale = 1,
+#   line_width_scale = 1,
+#   node_outline_width_scale = 1,
+#   x_plot_range = None,
+#   y_plot_range = None,
+#   graph_stats_show = False,
+#   graph_stats_separate = True,
+#   graph_stats_subplot_px = PLOT_ARGS['GRAPH_STATS_SUBPLOT_PX'],
+#   graph_stats_x = 0,
+#   graph_stats_y = 1,
+#   graph_stats_x_shift = 20,
+#   graph_stats_y_shift = -20,
+#   graph_stats_x_anchor = 'left',
+#   graph_stats_y_anchor = 'top',
+#   margin_top_min_px = PLOT_ARGS['MARGIN_TOP_MIN_PX'],
+#   margin_bottom_min_px = PLOT_ARGS['MARGIN_BOTTOM_MIN_PX'],
+#   margin_left_min_px = PLOT_ARGS['MARGIN_LEFT_MIN_PX'],
+#   margin_right_min_px = PLOT_ARGS['MARGIN_RIGHT_MIN_PX'],
+#   font_size_scale = 1,
+#   axis_show = False,
+#   axis_font_size_scale = 1,
+#   axis_tick_modulo = 1,
+
+  plot_args = dict(
+    data_set_grid = np.array([[data_info['dir']]]),
+    # node_size_min_freq = 1e-5,
+    # node_size_max_freq = 1,
+    node_size_min_freq = node_size_min_freq,
+    node_size_max_freq = node_size_max_freq,
+    node_filter_variation_types = ['insertion', 'deletion', 'none'],
+    legend_common = True,
+    graph_stats_show = False,
+  )
+
+  plot_args['node_type'] = 'sequence_data'
+  plot_args['graph_layout_type'] = plot_type
+  plot_args['graph_layout_common_dir'] = graph_layout_common_dir
+
+  if title_show:
+    plot_title = constants.get_data_label(data_info)
+    plot_title += {
+      'kamada_layout': 'Kamada-Kawaii Layout',
+      'radial_layout': 'Radial Layout',
+      'mds_layout': 'MDS Layout',
+    }[plot_type]
+    plot_args['title'] = plot_title
+  
+  plot_args['node_size_min_px'] = 10
+  plot_args['node_size_max_px'] = 200
+  plot_args['content_col_widths_px'] = [3200]
+  plot_args['content_row_heights_px'] = [2400]
+  plot_args['show_subplot_titles'] = False
+  plot_args['show_margin_labels'] = False
+  plot_args['show_custom_legend'] = False
+  plot_args['line_width_scale'] = 8
+  plot_args['font_size_scale'] = 8
+  plot_args['col_space_px'] = 0
+  plot_args['row_space_px'] = 0
+  plot_args['margin_top_min_px'] = 0
+  plot_args['margin_bottom_min_px'] = 0
+  plot_args['margin_left_min_px'] = 0
+  plot_args['margin_right_min_px'] = 0
+
+  if format == 'combined':
+    plot_args['node_color_type'] = 'freq_ratio'
+    if image_format == 'tiny':
+      plot_args['legend_colorbar_scale'] = 8
+    else:
+      raise Exception('Unknown image format: ' + str(image_format))
+  elif format == 'individual':
+    plot_args['node_color_type'] = 'variation_type'
+  else:
+    raise Exception('Unknown data format: ' + str(format))
+
+  return plot_args
+
+
+# CONTINUE HERE!!!
+def make_images_tiny_plotly(
+  plot_type,
+  format,
+  x_crop = None,
+  y_crop = None,
+  **args,
+):
+  for data_set in get_data_sets(format, None):
+    if data_set['control'] != 'not_control':
+      continue
+
+    common.log(
+      'make_images_tiny_plotly: ' +
+      plot_type + ' ' +
+      format + ' ' +
+      data_set['pretty_name']
+    )
+    plot_args = get_plot_args_plotly(
+      plot_type = plot_type,
+      format = format,
+      data_set = data_set,
+      image_format = 'tiny',
+      **args,
+    )
+    figure = plot_graph.make_graph_figure(**plot_args)
+    if x_crop is not None:
+      figure.update_xaxes(range=x_crop)
+    if y_crop is not None:
+      figure.update_yaxes(range=y_crop)
+
+    common.plotly_save(
+      figure,
+      get_file(
+        plot_type = plot_type,
+        file_type = 'image',
+        format = format,
+        data_set = data_set,
+        image_format = 'tiny',
+        **args,
+      ),
+    )
+
+
+def main():
