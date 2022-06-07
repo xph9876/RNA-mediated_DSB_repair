@@ -1133,18 +1133,6 @@ def make_custom_legends(
         treatment_2 = data_info_grid[row, col]['treatment_2']
         treatment_pair_row_col[treatment_1, treatment_2] = (row, col)
 
-    # Note: Sometimes the entire plot disappears if the colorbar font is too large!
-    # Fixes: Increase the colorbar length or make the fonts smaller.
-    # colorbar_height_px = get_plot_arg_scaled(
-    #   'COLORBAR_HEIGHT_PX',
-    #   legend_colorbar_scale,
-    # )
-
-    # colorbar_width_px = get_plot_arg_scaled(
-    #   'COLORBAR_WIDTH_PX',
-    #   legend_colorbar_scale,
-    # )
-
     for (treatment_1, treatment_2), (row, col) in treatment_pair_row_col.items():
       y_shift_curr_px = add_plotly_colorbar(
         figure = figure,
@@ -2026,14 +2014,16 @@ def get_plot_args(
   node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
   node_size_min_px = constants.GRAPH_NODE_SIZE_MIN_PX,
+  node_outline_width_scale = constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
   node_filter_variation_types = constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
   graph_width_px = constants.GRAPH_WIDTH_PX,
   graph_height_px = constants.GRAPH_HEIGHT_PX,
   graph_layout_common_dir = None,
+  edge_width_scale = constants.GRAPH_EDGE_WIDTH_SCALE,
   line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  legend_show = False,
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
-  **args,
 ):
   if plot_type not in ['kamada_layout', 'radial_layout' 'mds_layout']:
     raise Exception('Unhandled plot type: ' + str(plot_type))
@@ -2101,18 +2091,33 @@ def get_plot_args(
 #   axis_font_size_scale = 1,
 #   axis_tick_modulo = 1,
 
-  plot_args = {
-    'data_set_grid': np.array([[data_info['dir']]]),
-    'node_size_min_freq': node_size_min_freq,
-    'node_size_max_freq': node_size_max_freq,
-    'node_filter_variation_types': node_filter_variation_types,
-    'legend_common': True,
-    'graph_stats_show': False,
-  }
-
+  plot_args = {}
+  plot_args['data_set_grid'] = np.array([[data_info['dir']]])
   plot_args['node_type'] = 'sequence_data'
+  plot_args['node_size_min_freq'] = node_size_min_freq
+  plot_args['node_size_max_freq'] = node_size_max_freq
+  plot_args['node_filter_variation_types'] = node_filter_variation_types
+  plot_args['node_outline_width_scale'] = node_outline_width_scale
+  plot_args['graph_stats_show'] = False
   plot_args['graph_layout_type'] = plot_type
   plot_args['graph_layout_common_dir'] = graph_layout_common_dir
+  plot_args['edge_width_scale'] = edge_width_scale
+  plot_args['legend_common'] = True
+  plot_args['node_size_min_px'] = node_size_min_px
+  plot_args['node_size_max_px'] = node_size_max_px
+  plot_args['content_col_widths_px'] = [graph_width_px]
+  plot_args['content_row_heights_px'] = [graph_height_px]
+  plot_args['title_subplot_show'] = False
+  plot_args['legend_custom_show'] = legend_show
+  plot_args['legend_plotly_show'] = False
+  plot_args['line_width_scale'] = line_width_scale
+  plot_args['font_size_scale'] = font_size_scale
+  plot_args['col_space_px'] = 0
+  plot_args['row_space_px'] = 0
+  plot_args['margin_top_min_px'] = 0
+  plot_args['margin_bottom_min_px'] = 0
+  plot_args['margin_left_min_px'] = 0
+  plot_args['margin_right_min_px'] = 0
 
   if title_show:
     plot_title = constants.get_data_label(data_info)
@@ -2123,21 +2128,6 @@ def get_plot_args(
     }[plot_type]
     plot_args['title'] = plot_title
   
-  plot_args['node_size_min_px'] = node_size_min_px
-  plot_args['node_size_max_px'] = node_size_max_px
-  plot_args['content_col_widths_px'] = [graph_width_px]
-  plot_args['content_row_heights_px'] = [graph_height_px]
-  plot_args['show_subplot_titles'] = False
-  plot_args['show_margin_labels'] = False
-  plot_args['show_custom_legend'] = False
-  plot_args['line_width_scale'] = line_width_scale
-  plot_args['font_size_scale'] = font_size_scale
-  plot_args['col_space_px'] = 0
-  plot_args['row_space_px'] = 0
-  plot_args['margin_top_min_px'] = 0
-  plot_args['margin_bottom_min_px'] = 0
-  plot_args['margin_left_min_px'] = 0
-  plot_args['margin_right_min_px'] = 0
 
   if data_info['format'] == 'combined':
     plot_args['node_color_type'] = 'freq_ratio'
@@ -2158,12 +2148,15 @@ def plot_graph(
   node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
   node_size_min_px = constants.GRAPH_NODE_SIZE_MIN_PX,
+  node_outline_width_scale = constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
   node_filter_variation_types = constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
+  edge_width_scale = constants.GRAPH_EDGE_WIDTH_SCALE,
   graph_width_px = constants.GRAPH_WIDTH_PX,
   graph_height_px = constants.GRAPH_HEIGHT_PX,
   graph_layout_common_dir = None,
   line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  legend_show = False,
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
   x_crop = None,
   y_crop = None,
@@ -2179,11 +2172,14 @@ def plot_graph(
     node_size_max_px = node_size_max_px,
     node_size_min_px = node_size_min_px,
     node_filter_variation_types = node_filter_variation_types,
+    node_outline_width_scale = node_outline_width_scale,
+    edge_width_scale = edge_width_scale,
     graph_width_px = graph_width_px,
     graph_height_px = graph_height_px,
     graph_layout_common_dir = graph_layout_common_dir,
     line_width_scale = line_width_scale,
     font_size_scale = font_size_scale,
+    legend_show = False,
     legend_colorbar_scale = legend_colorbar_scale,
   )
   figure = plot_graph.make_graph_figure(**plot_args)
@@ -2261,46 +2257,122 @@ def parse_args():
     default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   )
   parser.add_argument(
+    '--node_outline_scale',
+    type = float,
+    help = (
+      'How much to scale the node outline width (thickness).' +
+      ' Values > 1 increase the width; values < 1 decrease the width.'
+    )
+  )
+  parser.add_argument(
     '--variation_types',
-    type = common_utils.check_comma_separated_values,
+    type = common_utils.check_comma_separated_enum(['insertion', 'deletion', 'substitution']),
     help = (
       'The variation types that should be included in the graph.'
       ' This should be a comma separate list (no spaces) of the types:'
       ' "insertion", "deletion", "substitution". Default value: "insertion,deletion".',
     ),
-    default = ["insertion", "deletion"],
+    default = "insertion,deletion",
+  )
+  parser.add_argument(
+    '--edge_scale',
+    type = float,
+    help = (
+      'How much to scale the edges width (thickness).' +
+      ' Values > 1 increase the width; values < 1 decrease the width.'
+    )
   )
   parser.add_argument(
     '--width_px',
-    type = float,
+    type = int,
     default = constants.GRAPH_WIDTH_PX,
     help = 'The width of the plot in pixels.'
   )
   parser.add_argument(
     '--height_px',
-    type = float,
+    type = int,
     default = constants.GRAPH_HEIGHT_PX,
     help = 'The height of the plot in pixels.'
   )
   parser.add_argument(
-    '--common_layout_dir',
+    '--line_width_scale',
+    type = float,
+    default = constants.GRAPH_LINE_WIDTH_SCALE,
+    help = (
+      'How much to scale the line widths (aka thickness).' +
+      ' Values > 1 increase the width; values < 1 decrease the width.'
+    ),
+  )
+  parser.add_argument(
+    '--font_size_scale',
+    type = float,
+    default = constants.GRAPH_FONT_SIZE_SCALE,
+    help = (
+      'How much to scale the font size.' +
+      ' Values > 1 increase the font size; values < 1 decrease it.'
+    ),
+  )
+  parser.add_argument(
+    '--layout_dir',
     type = common_utils.check_dir,
     default = None,
     help = (
-      'If present, gives the directory where the common layouts are.' +
-      ' This means the node coordinates will be obtained from the common' +
-      ' layout files rather than laid out individually.'
+      'If present, gives the directory where the precomputed layouts are.' +
+      ' If not present the layout is computed newly.'
     )
   )
-  # ADD THE X CROP AND Y CROP
-  # Process the arguments. Some need to be modifies slightly.
-# title_show = False,
-#   graph_width_px = constants.GRAPH_WIDTH_PX,
-#   graph_layout_common_dir = None,
-  # x_crop = None,
-  # y_crop = None,
+  parser.add_argument(
+    '--x_crop',
+    type = common_utils.check_comma_separated_floats,
+    default = '0,1',
+    help = ''
+  )
+  parser.add_argument(
+    '--y_crop',
+    type = common_utils.check_comma_separated_floats,
+    default = '0,1',
+    help = ''
+  )
+  parser.add_argument(
+    '--title',
+    action = 'store_true',
+    help = 'Whether to show a title on the figure.'
+  )
+  parser.add_argument(
+    '--legend',
+    action = 'store_true',
+    help = 'Whether to show a legend on the figure.'
+  )
+  parser.add_argument(
+    '--legend_color_bar_scale',
+    action = 'store_true',
+    help = 'Whether to show a legend on the figure.'
+  )
+  
   return parser.parse_args()
 
-
+# TEST ME PLEASE!!!
 def main():
-  pass
+  args = parse_args()
+  plot_graph(
+    args.output,
+    data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
+    plot_type = args.layout,
+    title_show = args.title,
+    node_size_max_freq = args.node_max_freq,
+    node_size_min_freq = args.node_min_freq,
+    node_size_max_px = args.node_max_px,
+    node_size_min_px = args.node_min_px,
+    node_outline_width_scale = args.node_outline_scale,
+    node_filter_variation_types = args.variation_types,
+    edge_width_scale = args.edge_scale,
+    graph_width_px = args.width_px,
+    graph_height_px = args.height_px,
+    graph_layout_common_dir = args.layout_dir,
+    line_width_scale = args.line_width_scale,
+    font_size_scale = args.font_size_scale,
+    legend_show = args.legend,
+    legend_colorbar_scale = args.legend_colorbar_scale,
+    x_crop = args.x_crop,
+    y_crop = args.y_crop,
+  )
