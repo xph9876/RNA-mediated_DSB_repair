@@ -10,8 +10,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import common_utils
 import log_utils
 
-NUM_REPEATS = 4
-
 def main():
   parser = argparse.ArgumentParser(
     description = (
@@ -26,17 +24,20 @@ def main():
     '--input',
     type = argparse.FileType('r'),
     help = (
-      '4 TSV files output from script "filter_nhej.py".' +
+      'TSV files output from script "filter_nhej.py".' +
       ' Must have columns: Sequence, CIGAR, Count, Num_Subst.'
     ),
-    nargs = NUM_REPEATS,
+    nargs = '+',
     required = True,
   )
   parser.add_argument(
     '--total_reads',
     type = int,
-    help = 'Total reads for each file.',
-    nargs = NUM_REPEATS,
+    help = (
+      'Total reads for each file.'
+      ' Must be the same number of arguments as the input files.'
+    ),
+    nargs = '+',
     required = True,
   )
   parser.add_argument(
@@ -54,40 +55,49 @@ def main():
   )
   args = parser.parse_args()
 
+  if len(args.input) != len(args.total_reads):
+    raise Exception(
+      f'Must have the same number of arguments for input and total_reads.' +
+      f' Got {len(args.input)} and {len(args.total_reads)}'
+    )
+
+  num_repeats = len(args.input)
+
   log_utils.log('\n' + '\n'.join(x.name for x in args.input) + '\n---->\n' + args.output.name)
 
   if args.quiet:
     log_utils.set_log_file(None)
 
   data = [
-    pd.read_csv(args.input[i], sep='\t').set_index('Sequence')
-    for i in range(NUM_REPEATS)
+    pd.read_csv(args.input[i], sep='\t').set_index(['Sequence', 'CIGAR'])
+    for i in range(num_repeats)
   ]
   names = [
     os.path.splitext(os.path.basename(args.input[i].name))[0].split('_')[0]
-    for i in range(NUM_REPEATS)
+    for i in range(num_repeats)
   ]
 
-  for i in range(NUM_REPEATS):
+  for i in range(num_repeats):
     log_utils.log(f"Num sequences {i}: {data[i].shape[0]}")
 
   data = pd.concat(data, axis='columns', join='inner', keys=names)
   data.columns = data.columns.map(lambda x: '_'.join([x[1], x[0]]))
+  data = data.reset_index()
   
   data_combined = pd.DataFrame(
     {
-      'Sequence': list(data.index),
+      'Sequence': list(data['Sequence']),
       'Num_Subst': list(data['Num_Subst_' + names[0]]),
-      'CIGAR': list(data['CIGAR_' + names[0]])
+      'CIGAR': list(data['CIGAR'])
     },
     index = data.index,
   )
 
-  for i in range(NUM_REPEATS):
+  for i in range(num_repeats):
     data_combined['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
   
-  log_utils.log(f"Num sequences combined: {data_combined.shape[0]}")
-  data_combined.to_csv(args.output, sep='\t', index=False)
+  log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
+  data_combined.to_csv(args.output, sep='\t', index=False, line_terminator='\n')
   
 if __name__ == '__main__':
   main()

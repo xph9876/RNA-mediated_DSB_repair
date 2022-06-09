@@ -108,6 +108,7 @@ def parse_args():
     default = 'without',
     choices = ['with', 'without'],
     help = 'Whether to keep or ignore substitutions.',
+    required = True,
   )
   parser.add_argument(
     '--treatment',
@@ -120,19 +121,20 @@ def parse_args():
       constants.TREATMENT_SPLICING
     ],
     help = 'Name of treatment.',
+    required = True,
   )
   parser.add_argument(
     '--control',
     type = str,
     choices = ['none', constants.CONTROL_NODSB, constants.CONTROL_30BPDOWN],
-    default = 'none',
     help = 'Whether this data is a control.',
+    required = True,
   )
   parser.add_argument(
     '--dsb_type',
     type = str,
-    choices = ['1', '2'],
-    help = 'Whether this data is 1 DSB or 2 DSB.',
+    choices = ['1', '2', '2a'],
+    help = 'Whether this data is 1 DSB, 2 DSB, or 2 DSB antisense.',
     required = True,
   )
   parser.add_argument(
@@ -158,7 +160,11 @@ def parse_args():
   )
   args = parser.parse_args()
   args.subst_type += 'Subst'
-  args.dsb_type = args.dsb_type + 'DSB'
+  args.dsb_type = {
+    '1': constants.DSB_1,
+    '2': constants.DSB_2,
+    '2a': constants.DSB_2anti,
+  }[args.dsb_type]
   args.hguide = 'sg' + args.hguide
   if args.control == 'none':
     args.control = constants.CONTROL_NOT
@@ -252,12 +258,17 @@ def make_alignment_windows(
 
   data = pd.DataFrame(new_data)
 
-  # sum sequences with identical alignment windows
+  # Sum rows with identical sequences
+  # Note: we make an arbitrary choice of which alignment is kept
+  data['read_seq'] = data['read_align'].apply(alignment_utils.get_orig_seq)
   data = data.groupby(
-    ['ref_align', 'read_align', 'library']
+    ['read_seq', 'library']
   ).aggregate(
-    freq = ('freq', 'sum')
+    ref_align = ('ref_align', 'first'),
+    read_align = ('read_align', 'first'),
+    freq = ('freq', 'sum'),
   ).reset_index()
+  data = data.drop('read_seq', axis='columns').reset_index(drop=True)
 
   # get the min frequency of the repeats
   data['freq_repeat_min'] = (
@@ -272,7 +283,7 @@ def make_alignment_windows(
   data_repeats = data.drop('freq_repeat_min', axis='columns')
   file_utils.write_tsv(data_repeats, file_names.main_repeats(output_dir, subst_type))
 
-  # filter the data at minimum threshold
+  # filter the data with the minimum threshold
   data = data.loc[data['freq_repeat_min'] > freq_min_threshold]
 
   # average over repeats

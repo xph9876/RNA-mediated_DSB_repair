@@ -116,6 +116,7 @@ CONTROL_30BPDOWN = '30bpDown'
 ### DSB types ###
 DSB_1 = '1DSB'
 DSB_2 = '2DSB'
+DSB_2anti = '2DSBanti'
 
 ### Hguide types ###
 HGUIDE_A = 'sgA'
