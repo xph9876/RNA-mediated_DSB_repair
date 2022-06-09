@@ -138,9 +138,11 @@ if __name__ == '__main__':
     data_info_1['strand'],
     [data_info_1['treatment'], data_info_2['treatment']],
     data_info_1['control'],
+    data_info_1['ref_seq'],
   )
 
   # Copy over the reference sequence
   ref_file_out = file_names.ref(args.output)
   log_utils.log(ref_file_out)
   shutil.copy(file_names.ref(args.input[0]), ref_file_out)
+  log_utils.log()

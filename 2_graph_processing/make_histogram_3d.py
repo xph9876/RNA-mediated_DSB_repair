@@ -336,10 +336,10 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  sys.argv += [
-    '-i', 'libraries_4\\WT_sgA_R1_sense',
-    '-o', 'plots\\histogram_3d'
-  ]
+  # sys.argv += [
+  #   '-i', 'libraries_4\\WT_sgA_R1_sense',
+  #   '-o', 'plots\\histogram_3d'
+  # ]
   args = parse_args()
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
   data_label = constants.get_data_label(data_info)

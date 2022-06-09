@@ -24,7 +24,7 @@ def parse_args():
     description = 'Process data for downstream graph and variation position analysis.'
   )
   parser.add_argument(
-    '-in',
+    '-i',
     '--input',
     type = argparse.FileType(mode='r'),
     help = (
@@ -388,6 +388,7 @@ def main():
   ref_file_out = file_names.ref(args.output)
   log_utils.log(ref_file_out)
   shutil.copy(args.ref.name, ref_file_out)
+  log_utils.log()
 
 if __name__ == '__main__':
   main()

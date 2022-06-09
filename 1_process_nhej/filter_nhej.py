@@ -209,8 +209,6 @@ def main():
   # parse command line arguments
   args = parser.parse_args()
 
-  # TODO: ALLOW THE LOGGING TO GO TO A SEPARATE LOG FILE DEPENDING ON THE
-  # OUTPUT NAME!
   log_utils.log(args.sam.name + ' -> ' + args.output.name)
 
   if args.quiet:
@@ -345,6 +343,7 @@ def main():
   log_utils.log(f'        Too short: {rejected_too_short}')
   log_utils.log(f'        DSB not touch: {rejected_dsb_not_touch}')
   log_utils.log(f'        Not consecutive: {rejected_not_consecutive}')
+  log_utils.log()
 
 if __name__ == '__main__':
   # sys.argv += "-sam libraries_1/yjl217_R1_2DSBs.sam -ref ref_seq/2DSB_R1_sense.fa -o libraries_2/yjl217_WT_sgAB_R1_sense.tsv --min_length 50 -dsb 67".split(" ")
