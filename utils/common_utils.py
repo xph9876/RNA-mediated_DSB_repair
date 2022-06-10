@@ -25,7 +25,7 @@ def check_comma_separated_floats(arg_str):
 
 def check_comma_separated_enum(choices):
   def check(arg_str):
-    args = check_comma_separated_values(choices)
+    args = check_comma_separated_values(arg_str)
     if not all(x in choices for x in args):
       raise ValueError('Unexpected value: ' + str(arg_str))
   return check

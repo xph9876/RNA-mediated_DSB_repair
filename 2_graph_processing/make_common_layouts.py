@@ -13,7 +13,7 @@ import plotly.subplots as ps
 import common_utils
 import file_utils
 import file_names
-import plot_graph_new
+import plot_graph
 
 def parse_args():
   parser = argparse.ArgumentParser(
@@ -152,7 +152,7 @@ def make_common_layout(data_dir_list, output_dir, subst_type):
   data_info = file_utils.read_tsv_dict(
     file_names.data_info(data_dir_list[0])
   )
-  layout = plot_graph_new.make_graph_layout(
+  layout = plot_graph.make_graph_layout(
     data_info = data_info,
     node_type = 'sequence_data',
     node_subst_type = subst_type,

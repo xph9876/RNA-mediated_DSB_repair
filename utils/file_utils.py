@@ -38,3 +38,15 @@ def count_lines(file):
 def write_pyplot(figure, file):
   make_parent_dir(file)
   figure.savefig(file)
+
+
+def write_plotly(figure, file):
+  make_parent_dir(file)
+  # figure.write_image(file, engine='orca') # In case kaleido doesn't work
+  ext = os.path.splitext(file)[1]
+  if ext == '.png':
+    figure.write_image(file, engine='kaleido')
+  elif ext == '.html':
+    figure.write_html(file)
+  else:
+    raise Exception('Unknown extension: ' + str(ext))

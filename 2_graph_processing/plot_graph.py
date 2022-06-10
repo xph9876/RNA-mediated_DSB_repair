@@ -2019,13 +2019,14 @@ def get_plot_args(
   graph_width_px = constants.GRAPH_WIDTH_PX,
   graph_height_px = constants.GRAPH_HEIGHT_PX,
   graph_layout_common_dir = None,
+  graph_layout_separate_components = False,
   edge_width_scale = constants.GRAPH_EDGE_WIDTH_SCALE,
   line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   legend_show = False,
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
 ):
-  if plot_type not in ['kamada_layout', 'radial_layout' 'mds_layout']:
+  if plot_type not in ['kamada_layout', 'radial_layout', 'mds_layout']:
     raise Exception('Unhandled plot type: ' + str(plot_type))
 
 
@@ -2092,7 +2093,7 @@ def get_plot_args(
 #   axis_tick_modulo = 1,
 
   plot_args = {}
-  plot_args['data_set_grid'] = np.array([[data_info['dir']]])
+  plot_args['data_dir_grid'] = np.array([[data_info['dir']]])
   plot_args['node_type'] = 'sequence_data'
   plot_args['node_size_min_freq'] = node_size_min_freq
   plot_args['node_size_max_freq'] = node_size_max_freq
@@ -2101,12 +2102,13 @@ def get_plot_args(
   plot_args['graph_stats_show'] = False
   plot_args['graph_layout_type'] = plot_type
   plot_args['graph_layout_common_dir'] = graph_layout_common_dir
+  plot_args['graph_layout_separate_components'] = graph_layout_separate_components
   plot_args['edge_width_scale'] = edge_width_scale
   plot_args['legend_common'] = True
   plot_args['node_size_min_px'] = node_size_min_px
   plot_args['node_size_max_px'] = node_size_max_px
-  plot_args['content_col_widths_px'] = [graph_width_px]
-  plot_args['content_row_heights_px'] = [graph_height_px]
+  plot_args['col_widths_px'] = [graph_width_px]
+  plot_args['row_heights_px'] = [graph_height_px]
   plot_args['title_subplot_show'] = False
   plot_args['legend_custom_show'] = legend_show
   plot_args['legend_plotly_show'] = False
@@ -2154,6 +2156,7 @@ def plot_graph(
   graph_width_px = constants.GRAPH_WIDTH_PX,
   graph_height_px = constants.GRAPH_HEIGHT_PX,
   graph_layout_common_dir = None,
+  graph_layout_separate_components = False,
   line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   legend_show = False,
@@ -2177,12 +2180,13 @@ def plot_graph(
     graph_width_px = graph_width_px,
     graph_height_px = graph_height_px,
     graph_layout_common_dir = graph_layout_common_dir,
+    graph_layout_separate_components = graph_layout_separate_components,
     line_width_scale = line_width_scale,
     font_size_scale = font_size_scale,
-    legend_show = False,
+    legend_show = legend_show,
     legend_colorbar_scale = legend_colorbar_scale,
   )
-  figure = plot_graph.make_graph_figure(**plot_args)
+  figure = make_graph_figure(**plot_args)
   if x_crop is not None:
     figure.update_xaxes(range=x_crop)
   if y_crop is not None:
@@ -2195,7 +2199,7 @@ def plot_graph(
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Plot graph theory graphs.'
+    description = 'Plot graph-theory graphs.'
   )
   parser.add_argument(
     '-i',
@@ -2221,7 +2225,6 @@ def parse_args():
   )
   parser.add_argument(
     '--layout',
-    type = str,
     choices = ['kamada', 'radial', 'mds'],
     default = 'radial',
     help = 'The algorithm to use for laying out the graph.'
@@ -2230,7 +2233,7 @@ def parse_args():
     '--node_max_freq',
     type = float,
     help = (
-      'Max frequency to control node size.' +
+      'Max frequency to determine node size.' +
       'Higher frequencies are clipped to this value.'
     ),
     default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
@@ -2239,7 +2242,7 @@ def parse_args():
     '--node_min_freq',
     type = float,
     help = (
-      'Min frequency to control node size.' +
+      'Min frequency to determine node size.' +
       'Lower frequencies are clipped to this value.'
     ),
     default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
@@ -2247,22 +2250,23 @@ def parse_args():
   parser.add_argument(
     '--node_max_px',
     type = float,
-    help = 'Largest node size as controlled by the log frequency.',
-    default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+    help = 'Largest node size as determined by the frequency.',
+    default = constants.GRAPH_NODE_SIZE_MAX_PX,
   )
   parser.add_argument(
-    '--node_min_freq',
+    '--node_min_px',
     type = float,
-    help = 'Smallest node size as controlled by the log frequency.',
-    default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+    help = 'Smallest node size as determined by the frequency.',
+    default = constants.GRAPH_NODE_SIZE_MIN_PX,
   )
   parser.add_argument(
     '--node_outline_scale',
     type = float,
+    default = constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
     help = (
       'How much to scale the node outline width (thickness).' +
       ' Values > 1 increase the width; values < 1 decrease the width.'
-    )
+    ),
   )
   parser.add_argument(
     '--variation_types',
@@ -2334,30 +2338,31 @@ def parse_args():
     help = ''
   )
   parser.add_argument(
-    '--title',
-    action = 'store_true',
-    help = 'Whether to show a title on the figure.'
-  )
-  parser.add_argument(
     '--legend',
     action = 'store_true',
     help = 'Whether to show a legend on the figure.'
   )
   parser.add_argument(
     '--legend_color_bar_scale',
+    type = float,
+    default = constants.GRAPH_LEGEND_COLORBAR_SCALE,
+    help = 'How much to scale the legend color bar (for freq ratio coloring).'
+  )
+  parser.add_argument(
+    '--separate_components',
     action = 'store_true',
-    help = 'Whether to show a legend on the figure.'
+    help = 'If present separate the connected components of the graph.'
   )
   
   return parser.parse_args()
 
-# TEST ME PLEASE!!!
 def main():
+  sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs".split(" ")
   args = parse_args()
   plot_graph(
     args.output,
     data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
-    plot_type = args.layout,
+    plot_type = args.layout + '_layout',
     title_show = args.title,
     node_size_max_freq = args.node_max_freq,
     node_size_min_freq = args.node_min_freq,
@@ -2369,10 +2374,14 @@ def main():
     graph_width_px = args.width_px,
     graph_height_px = args.height_px,
     graph_layout_common_dir = args.layout_dir,
+    graph_layout_separate_components = args.separate_components,
     line_width_scale = args.line_width_scale,
     font_size_scale = args.font_size_scale,
     legend_show = args.legend,
-    legend_colorbar_scale = args.legend_colorbar_scale,
+    legend_colorbar_scale = args.legend_color_bar_scale,
     x_crop = args.x_crop,
     y_crop = args.y_crop,
   )
+
+if __name__ == '__main__':
+  main()
