@@ -347,19 +347,10 @@ def get_ref_seq_window(ref_seq, dsb_pos, window_size):
   return ref_seq_window
 
 def main():
-  # sys.argv += [
-  #   '-in', 'files_input/output_combined.tsv',
-  #   '-o', 'files_data/output_combined',
-  #   '-ref', 'ref_seq/1DSB_R1_sense.fa',
-  #   '-dsb', '67',
-  #   '--dsb_type', '1',
-  #   '--format', 'individual',
-  #   '--strand', 'R1',
-  #   '--hguide', 'A',
-  #   '--cell', 'WT',
-  #   '--treatments', 'sense',
-  # ]
   args = parse_args()
+
+  log_utils.log(args.input.name)
+  log_utils.log('------>')
 
   ref_seq = fasta_utils.read_fasta_seq(args.ref)
   make_alignment_windows(
@@ -388,7 +379,7 @@ def main():
   ref_file_out = file_names.ref(args.output)
   log_utils.log(ref_file_out)
   shutil.copy(args.ref.name, ref_file_out)
-  log_utils.log()
+  log_utils.new_line()
 
 if __name__ == '__main__':
   main()

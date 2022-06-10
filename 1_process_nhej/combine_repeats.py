@@ -20,7 +20,7 @@ def main():
     )
   )
   parser.add_argument(
-    '-in',
+    '-i',
     '--input',
     type = argparse.FileType('r'),
     help = (
@@ -63,7 +63,11 @@ def main():
 
   num_repeats = len(args.input)
 
-  log_utils.log('\n' + '\n'.join(x.name for x in args.input) + '\n---->\n' + args.output.name)
+  for input_file in args.input:
+    log_utils.log(input_file)
+  log_utils.log('------>')
+  log_utils.log(args.output.name)
+  log_utils.new_line()
 
   if args.quiet:
     log_utils.set_log_file(None)

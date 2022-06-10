@@ -13,3 +13,6 @@ def set_log_file(file_name):
 def log(s=''):
   if LOG_FILE is not None:
     LOG_FILE.write(datetime.datetime.now().strftime("%H:%M:%S: ") + str(s) + '\n')
+
+def new_line():
+  LOG_FILE.write('\n')

@@ -421,8 +421,7 @@ def main():
   make_graph_stats(args.dir, args.subst_type)
   make_variation(args.dir, args.subst_type)
   make_variation_grouped(args.dir, args.subst_type)
-  log_utils.log()
+  log_utils.new_line()
 
 if __name__ == '__main__':
-  # sys.argv += ['-st', 'without', '-dir', 'files_data/output_combined']
   main()
