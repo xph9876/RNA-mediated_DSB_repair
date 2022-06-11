@@ -17,6 +17,8 @@ import sklearn.manifold
 
 import circlify
 
+import PIL
+
 import constants
 import common_utils
 import log_utils
@@ -24,7 +26,7 @@ import graph_utils
 import file_utils
 import file_names
 import plot_graph_helpers
-import make_common_layouts
+import make_common_layout
 
 
 PLOT_ARGS = dict(
@@ -72,9 +74,11 @@ LAYOUT_PROPERTIES = {
  'radial_layout': {
     'only_2d': True,
     'do_pca': False,
-    'normalize': True,
+    'normalize': False,
     'has_edges': True,
-    'preserve_aspect': True,
+    # 'preserve_aspect': True,
+    'x_range': (-10, 10),
+    'y_range': (-10, 10)
   },
  'kamada_layout': {
     'only_2d': False,
@@ -507,7 +511,6 @@ def make_graph_layout_single(
       scales = [min(scales)] * layout.shape[1]
     for i in range(layout.shape[1]):
       layout.loc[:, i] = (layout.loc[:, i] - dim_mins[i]) * scales[i]
-
   return layout
 
 
@@ -587,7 +590,7 @@ def make_graph_layout(
     separate_components = False
     node_groups = None
     layout_list = [
-      make_common_layouts.get_common_layout(
+      make_common_layout.get_common_layout(
         common_layout_dir,
         node_data = pd.DataFrame.from_dict(
           dict(graph.nodes(data=True)),
@@ -1664,7 +1667,7 @@ def make_subplots_plotly(
     subplot_titles = list(subplot_titles.ravel()),
     row_heights = row_heights_px,
     column_widths = col_widths_px,
-    print_grid = True,
+    # print_grid = True,
   )
 
   return figure
@@ -1712,8 +1715,8 @@ def make_graph_figure(
   legend_colorbar_scale = 1,
   line_width_scale = 1,
   node_outline_width_scale = 1,
-  x_plot_range = None,
-  y_plot_range = None,
+  plot_range_x = None,
+  plot_range_y = None,
   graph_stats_show = False,
   graph_stats_separate = True,
   graph_stats_subplot_px = PLOT_ARGS['GRAPH_STATS_SUBPLOT_PX'],
@@ -1752,21 +1755,26 @@ def make_graph_figure(
     'variation_position_layout_vertical',
     'variation_position_layout_circle_pack',
   ]:
-    if x_plot_range is None:
-      x_plot_range = [
+    if plot_range_x is None:
+      plot_range_x = [
         constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[0] - 1,
         constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[1] + 1,
       ]
-    if y_plot_range is None:
-      y_plot_range = [
+    if plot_range_y is None:
+      plot_range_y = [
         constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
         constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
       ]
+  elif graph_layout_type == 'radial_layout':
+    if plot_range_x is None:
+      plot_range_x = constants.RADIAL_LAYOUT_RANGE
+    if plot_range_y is None:
+      plot_range_y = constants.RADIAL_LAYOUT_RANGE
   elif LAYOUT_PROPERTIES.get(graph_layout_type, {}).get('normalize'):
-    if x_plot_range is None:
-      x_plot_range = [0, 1]
-    if y_plot_range is None:
-      y_plot_range = [0, 1]
+    if plot_range_x is None:
+      plot_range_x = (0, 1)
+    if plot_range_y is None:
+      plot_range_y = (0, 1)
 
   edge_show = edge_show and LAYOUT_PROPERTIES[graph_layout_type]['has_edges']
     
@@ -1849,8 +1857,8 @@ def make_graph_figure(
         node_size_min_freq = node_size_min_freq,
         node_size_max_freq = node_size_max_freq,
         node_filter_variation_types = node_filter_variation_types,
-        plot_range_x = x_plot_range,
-        plot_range_y = y_plot_range,
+        plot_range_x = plot_range_x,
+        plot_range_y = plot_range_y,
         subplot_width_px = col_widths_px[col - 1],
         subplot_height_px = row_heights_px[row - 1],
         axis_show = axis_show,
@@ -2161,8 +2169,8 @@ def plot_graph(
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   legend_show = False,
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
-  x_crop = None,
-  y_crop = None,
+  crop_x = None,
+  crop_y = None,
 ):
   data_label = constants.get_data_label(data_info)
   log_utils.log('plot_graph: ' + plot_type + ' ' + data_label)
@@ -2187,15 +2195,29 @@ def plot_graph(
     legend_colorbar_scale = legend_colorbar_scale,
   )
   figure = make_graph_figure(**plot_args)
-  if x_crop is not None:
-    figure.update_xaxes(range=x_crop)
-  if y_crop is not None:
-    figure.update_yaxes(range=y_crop)
 
-  file_utils.write_plotly(
-    figure,
-    os.path.join(output_dir, file_names.graph_figure(data_label))
-  )
+  file_out = os.path.join(output_dir, file_names.graph_figure(data_label))
+  log_utils.log(file_out)
+  file_utils.write_plotly(figure, file_out)
+
+  # Note the range must be specified explic
+  if (
+    ((crop_x is not None) and (tuple(crop_x) != (0, 1))) or
+    ((crop_y is not None) and (tuple(crop_y) != (0, 1)))
+  ):
+    if crop_x is None:
+      crop_x = (0, 1)
+    if crop_y is None:
+      crop_y = (0, 1)
+
+    image = PIL.Image.open(file_out)
+    width_px, height_px = image.size
+
+    left = crop_x[0] * width_px
+    right = crop_x[1] * width_px
+    top = crop_y[0] * height_px
+    bottom = crop_y[1] * height_px
+    image.crop((left, top, right, bottom)).save(file_out)
 
 def parse_args():
   parser = argparse.ArgumentParser(
@@ -2326,16 +2348,22 @@ def parse_args():
     )
   )
   parser.add_argument(
-    '--x_crop',
+    '--crop_x',
     type = common_utils.check_comma_separated_floats,
     default = '0,1',
-    help = ''
+    help = (
+      'Range of the horizontal dimension to crop.' +
+      ' Specified with normalized coords in range [0, 1].'
+    )
   )
   parser.add_argument(
-    '--y_crop',
+    '--crop_y',
     type = common_utils.check_comma_separated_floats,
     default = '0,1',
-    help = ''
+    help = (
+      'Range of the vertical dimension to crop.' +
+      ' Specified in normalized coords in range [0, 1].'
+    )
   )
   parser.add_argument(
     '--legend',
@@ -2357,7 +2385,7 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs".split(" ")
+  # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --crop_y 0.15,0.85".split(" ")
   args = parse_args()
   plot_graph(
     args.output,
@@ -2379,8 +2407,8 @@ def main():
     font_size_scale = args.font_size_scale,
     legend_show = args.legend,
     legend_colorbar_scale = args.legend_color_bar_scale,
-    x_crop = args.x_crop,
-    y_crop = args.y_crop,
+    crop_x = args.crop_x,
+    crop_y = args.crop_y,
   )
 
 if __name__ == '__main__':

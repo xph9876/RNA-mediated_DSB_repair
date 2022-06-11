@@ -6,13 +6,15 @@ def make_parent_dir(file_name):
   os.makedirs(os.path.dirname(file_name), exist_ok=True)
 
 def write_tsv(data, file, **args):
-  make_parent_dir(file)
+  if type(file) == str:
+    make_parent_dir(file)
   data.to_csv(
     file,
     sep = '\t',
     na_rep = 'NA',
     quoting = csv.QUOTE_NONNUMERIC,
     index = args.get('index', False),
+    line_terminator = '\n',
   )
 
 def read_tsv(file):
@@ -21,7 +23,7 @@ def read_tsv(file):
     index_col = False,
     keep_default_na = False,
     na_values = 'NA',
-    sep = "\t"
+    sep = '\t',
   )
 
 def read_tsv_dict(file):
@@ -36,12 +38,14 @@ def count_lines(file):
     return sum(1 for _ in input)
 
 def write_pyplot(figure, file):
-  make_parent_dir(file)
+  if type(file) == str:
+    make_parent_dir(file)
   figure.savefig(file)
 
 
 def write_plotly(figure, file):
-  make_parent_dir(file)
+  if type(file) == str:
+    make_parent_dir(file)
   # figure.write_image(file, engine='orca') # In case kaleido doesn't work
   ext = os.path.splitext(file)[1]
   if ext == '.png':

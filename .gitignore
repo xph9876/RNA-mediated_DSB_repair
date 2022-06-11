@@ -145,3 +145,6 @@ plots/
 
 # Temp files
 *~*
+
+# Layout files
+layouts*

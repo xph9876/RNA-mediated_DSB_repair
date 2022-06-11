@@ -7,6 +7,7 @@ import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
+import file_utils
 import common_utils
 import log_utils
 
@@ -64,7 +65,7 @@ def main():
   num_repeats = len(args.input)
 
   for input_file in args.input:
-    log_utils.log(input_file)
+    log_utils.log(input_file.name)
   log_utils.log('------>')
   log_utils.log(args.output.name)
   log_utils.new_line()
@@ -101,7 +102,7 @@ def main():
     data_combined['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
   
   log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
-  data_combined.to_csv(args.output, sep='\t', index=False, line_terminator='\n')
+  file_utils.write_tsv(data_combined, args.output)
   
 if __name__ == '__main__':
   main()

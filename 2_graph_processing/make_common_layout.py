@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './utils/'))) # allow importing the utils dir
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
 import argparse
 
@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 import plotly.subplots as ps
 
 import common_utils
+import log_utils
 import file_utils
 import file_names
 import plot_graph
@@ -20,7 +21,7 @@ def parse_args():
     description = 'Make common layouts for graphs.'
   )
   parser.add_argument(
-    '-in',
+    '-i',
     '--input',
     type = common_utils.check_dir,
     nargs = '+',
@@ -44,7 +45,7 @@ def parse_args():
     type = str,
     default = 'without',
     choices = ['with', 'without'],
-    help = 'Whether to keep or ignore substitutions.',
+    help = 'Whether to use the data with or without substitutions.',
   )
   args = parser.parse_args()
   args.subst_type += 'Subst'
@@ -86,6 +87,10 @@ def make_common_layout(data_dir_list, output_dir, subst_type):
   """
     Make common layout files by combining the node information in the input data sets.
   """
+
+  for data_dir in data_dir_list:
+    log_utils.log(data_dir)
+  log_utils.log('------>')
 
   ### Load node data and edge data ###
   seq_data_list = [
@@ -164,7 +169,7 @@ def make_common_layout(data_dir_list, output_dir, subst_type):
     x_size_px = None,
     y_size_px = None,
     separate_components = False,
-    common_layout_dir = False,
+    common_layout_dir = None,
   )
   layout.columns = ['x', 'y']
 
@@ -173,23 +178,16 @@ def make_common_layout(data_dir_list, output_dir, subst_type):
   seq_data = seq_data.reset_index(drop=True)
 
   ### Write to files ###
-  file_utils.write_tsv(
-    seq_data,
-    file_names.sequence_data(
-      output_dir,
-      subst_type,
-    ),
-  )
-  file_utils.write_tsv(
-    edge_data,
-    file_names.edge_data(
-      output_dir,
-      subst_type,
-    ),
-  )
+  file_out = file_names.sequence_data(output_dir, subst_type)
+  log_utils.log(file_out)
+  file_utils.write_tsv(seq_data, file_out)
+  file_out = file_names.edge_data(output_dir, subst_type)
+  file_utils.write_tsv(edge_data, file_out)
+  log_utils.log(file_out)
+  log_utils.new_line()
 
 def main():
-  # sys.argv += ['-in', 'files_data/output_combined', '-o', 'files_data/output_combined_common', '--subst_type', 'without']
+  # sys.argv += "-i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv -o layouts/2DSB_R1 --subst_type without".split(" ")
   args = parse_args()
   make_common_layout(args.input, args.output, args.subst_type) 
 
