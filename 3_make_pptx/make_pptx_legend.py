@@ -35,6 +35,7 @@ def make_legend_pptx(
   stride_pt,
   title_width_pt,
   title_height_pt,
+  title_x_offset_pt,
   item_width_pt,
   item_height_pt,
   label_width_pt,
@@ -46,11 +47,12 @@ def make_legend_pptx(
   make_pptx_helpers.add_textbox_pptx(
     slide,
     title,
-    x_pt,
+    x_pt + title_x_offset_pt,
     y_pt,
     title_width_pt,
     title_height_pt,
     legend_title_font_size_pt,
+    text_align = 'center',
   )
   y_pt += title_height_pt
 
@@ -150,6 +152,7 @@ def make_edge_legend_pptx(
   stride_pt,
   title_width_pt,
   title_height_pt,
+  title_x_offset_pt,
   item_width_pt,
   item_height_pt,
   label_width_pt,
@@ -186,6 +189,7 @@ def make_edge_legend_pptx(
     stride_pt = stride_pt,
     title_width_pt = title_width_pt,
     title_height_pt = title_height_pt,
+    title_x_offset_pt = title_x_offset_pt,
     item_width_pt = item_width_pt,
     item_height_pt = item_height_pt,
     label_width_pt = label_width_pt,
@@ -202,6 +206,7 @@ def make_variation_color_legend_pptx(
   stride_pt,
   title_width_pt,
   title_height_pt,
+  title_x_offset_pt,
   item_width_pt,
   item_height_pt,
   label_width_pt,
@@ -231,6 +236,7 @@ def make_variation_color_legend_pptx(
     y_pt = y_pt,
     title_width_pt = title_width_pt,
     title_height_pt = title_height_pt,
+    title_x_offset_pt = title_x_offset_pt,
     item_width_pt = item_width_pt,
     item_height_pt = item_height_pt,
     label_width_pt = label_width_pt,
@@ -247,6 +253,7 @@ def make_outline_legend_pptx(
   stride_pt,
   title_width_pt,
   title_height_pt,
+  title_x_offset_pt,
   item_width_pt,
   item_height_pt,
   label_width_pt,
@@ -269,20 +276,21 @@ def make_outline_legend_pptx(
   items.append({
     'type': 'circle',
     'size': node_size_pt,
-    'text': 'Non-Reference',
+    'text': 'Non-reference',
     'color': 'FFFFFF',
     'line_color': constants.DEFAULT_OUTLINE_COLOR,
     'line_width': line_width_pt,
   })
   return make_legend_pptx(
     slide = slide,
-    title = 'Node Outline',
+    title = 'Vertex Outline',
     items = items,
     x_pt = x_pt,
     y_pt = y_pt,
     stride_pt = stride_pt,
     title_width_pt = title_width_pt,
     title_height_pt = title_height_pt,
+    title_x_offset_pt = title_x_offset_pt,
     item_width_pt = item_width_pt,
     item_height_pt = item_height_pt,
     label_width_pt = label_width_pt,
@@ -299,6 +307,7 @@ def make_size_legend_pptx(
   stride_pt,
   title_width_pt,
   title_height_pt,
+  title_x_offset_pt,
   item_width_pt,
   item_height_pt,
   label_width_pt,
@@ -352,6 +361,7 @@ def make_size_legend_pptx(
     stride_pt = stride_pt,
     title_width_pt = title_width_pt,
     title_height_pt = title_height_pt,
+    title_x_offset_pt = title_x_offset_pt,
     item_width_pt = item_width_pt,
     item_height_pt = item_height_pt,
     label_width_pt = label_width_pt,
@@ -368,13 +378,12 @@ def make_freq_ratio_legend_pptx(
   title,
   title_width_pt,
   title_height_pt,
+  title_x_offset_pt,
   label_width_pt,
   label_height_pt,
   color_bar_minor_axis_pt,
   color_bar_major_axis_pt,
   color_bar_file,
-  title_pad_pt = 5,
-  label_width_left_spill_over_pt = 10,
   legend_title_font_size_pt = 8,
   legend_label_font_size_pt = 10,
   orientation = 'v',
@@ -383,13 +392,13 @@ def make_freq_ratio_legend_pptx(
   make_pptx_helpers.add_textbox_pptx(
     slide,
     title,
-    x_pt - label_width_left_spill_over_pt,
+    x_pt + title_x_offset_pt,
     y_pt,
-    title_width_pt + label_width_left_spill_over_pt,
+    title_width_pt,
     title_height_pt,
     legend_title_font_size_pt,
   )
-  y_pt += title_height_pt + title_pad_pt
+  y_pt += title_height_pt
 
   # IN CASE WANT FIXED ASPECT
   # image = PIL.Image.open(color_bar_file)

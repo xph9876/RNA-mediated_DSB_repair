@@ -126,7 +126,7 @@ def make_slide(
   legend_title_font_size_pt = LEGEND_TITLE_FONT_SIZE_PT,
   legend_label_font_size_pt = LEGEND_LABEL_FONT_SIZE_PT,
 ):
-  title_slide_layout = prs.slide_layouts[6]
+  title_slide_layout = prs.slide_layouts[6] # should be a blank layout
   slide = prs.slides.add_slide(title_slide_layout)
   
   slide_width_pt = prs.slide_width / pptx.util.Pt(1)
@@ -140,39 +140,55 @@ def make_slide(
   x_legend_pt = slide_width_pt
 
   ## Legend constants ###
-  legend_title_width_pt = 100
-  legend_title_height_pt = LEGEND_TITLE_HEIGHT_PT
-  legend_item_width_pt = 30
-  legend_item_height_pt = LEGEND_ITEM_HEIGHT_PT
-  legend_label_width_pt = 70
-  legend_label_height_pt = LEGEND_ITEM_HEIGHT_PT
-
   legend_const = {
     'v': {
       'node_size': {
         'stride_pt': 20,
         'title_width_pt': 100,
-        'title_height_pt': 20,
-        'item_width_pt': 30,
+        'title_height_pt': 10,
+        'title_x_offset_pt': 0,
+        'item_width_pt': 10,
         'label_width_pt': 50,
         'item_height_pt': 20,
-        'label_height_pt': 20,
+        'label_height_pt': 10,
       },
       'node_outline': {
-        'stride_pt': 20,
-        'title_width_pt': 100,
-        'title_height_pt': 20,
-        'item_width_pt': 30,
+        'stride_pt': 12,
+        'title_width_pt': 80,
+        'title_height_pt': 10,
+        'title_x_offset_pt': -10,
+        'item_width_pt': 10,
+        'label_width_pt': 70,
+        'item_height_pt': 20,
+        'label_height_pt': 10,
+      },
+      'variation_type': {
+        'stride_pt': 12,
+        'title_width_pt': 80,
+        'title_height_pt': 10,
+        'title_x_offset_pt': -10,
+        'item_width_pt': 10,
         'label_width_pt': 50,
         'item_height_pt': 20,
         'label_height_pt': 20,
       },
       'edge_type': {
+        'stride_pt': 10,
+        'title_width_pt': 80,
+        'title_height_pt': 10,
+        'title_x_offset_pt': -10,
+        'item_width_pt': 20,
+        'label_width_pt': 60,
+        'item_height_pt': 20,
+        'label_height_pt': 20,
+      },
+      'freq_ratio': {
         'stride_pt': 20,
-        'title_width_pt': 100,
-        'title_height_pt': 20,
+        'title_width_pt': 90,
+        'title_height_pt': 40,
+        'title_x_offset_pt': -10,
         'item_width_pt': 30,
-        'label_width_pt': 50,
+        'label_width_pt': 40,
         'item_height_pt': 20,
         'label_height_pt': 20,
       },
@@ -181,12 +197,53 @@ def make_slide(
       'node_size': {
         'stride_pt': 20,
         'title_width_pt': 100,
-        'title_height_pt': 20,
+        'title_height_pt': 10,
+        'title_x_offset_pt': 10,
         'item_width_pt': 30,
         'label_width_pt': 50,
         'item_height_pt': 20,
+        'label_height_pt': 10,
+      },
+      'node_outline': {
+        'stride_pt': 50,
+        'title_width_pt': 90,
+        'title_height_pt': 10,
+        'title_x_offset_pt': 10,
+        'item_width_pt': 30,
+        'label_width_pt': 70,
+        'item_height_pt': 10,
+        'label_height_pt': 10,
+      },
+      'variation_type': {
+        'stride_pt': 30,
+        'title_width_pt': 90,
+        'title_height_pt': 10,
+        'title_x_offset_pt': 0,
+        'item_width_pt': 30,
+        'label_width_pt': 50,
+        'item_height_pt': 10,
+        'label_height_pt': 10,
+      },
+      'edge_type': {
+        'stride_pt': 40,
+        'title_width_pt': 80,
+        'title_height_pt': 10,
+        'title_x_offset_pt': 0,
+        'item_width_pt': 30,
+        'label_width_pt': 60,
+        'item_height_pt': 5,
+        'label_height_pt': 10,
+      },
+      'freq_ratio': {
+        'stride_pt': 40,
+        'title_width_pt': 120,
+        'title_height_pt': 20,
+        'title_x_offset_pt': -20,
+        'item_width_pt': 30,
+        'label_width_pt': 40,
+        'item_height_pt': 20,
         'label_height_pt': 20,
-      }
+      },
     },
   }
   legend_x_offset_pt = {
@@ -239,17 +296,6 @@ def make_slide(
       font_size_pt = MARGIN_TOP_LABEL_FONT_SIZE_PT,
       text_align = 'center',
     )
-    # for row in range(image_grid_list[i].shape[0]):
-    #   for col in range(image_grid_list[i].shape[1]):
-    #     make_pptx_helpers.add_textbox_pptx(
-    #       slide = slide,
-    #       text = label_grid_list[i][row, col],
-    #       x_pt = x_pt + (col) * cell_width_pt,
-    #       y_pt = y_pt + (row) * cell_height_pt,
-    #       width_pt = image_label_width_pt,
-    #       height_pt = image_label_height_pt,
-    #       font_size_pt = MARGIN_TOP_LABEL_FONT_SIZE_PT,
-    #     )
 
     y_pt += image_grid_list[i].shape[0] * cell_height_pt
     
@@ -262,6 +308,7 @@ def make_slide(
         stride_pt = legend_const[orientation]['node_size']['stride_pt'],
         title_width_pt = legend_const[orientation]['node_size']['title_width_pt'],
         title_height_pt = legend_const[orientation]['node_size']['title_height_pt'],
+        title_x_offset_pt = legend_const[orientation]['node_size']['title_x_offset_pt'],
         item_width_pt = legend_const[orientation]['node_size']['item_width_pt'],
         item_height_pt = legend_const[orientation]['node_size']['item_height_pt'],
         label_width_pt = legend_const[orientation]['node_size']['label_width_pt'],
@@ -289,13 +336,14 @@ def make_slide(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
-          stride_pt = legend_item_height_pt,
-          title_width_pt = legend_title_width_pt,
-          title_height_pt = legend_title_height_pt,
-          item_width_pt = legend_item_width_pt,
-          item_height_pt = legend_item_height_pt,
-          label_width_pt = legend_label_width_pt,
-          label_height_pt = legend_item_height_pt,
+          stride_pt = legend_const[orientation]['node_outline']['stride_pt'],
+          title_width_pt = legend_const[orientation]['node_outline']['title_width_pt'],
+          title_height_pt = legend_const[orientation]['node_outline']['title_height_pt'],
+          title_x_offset_pt = legend_const[orientation]['node_outline']['title_x_offset_pt'],
+          item_width_pt = legend_const[orientation]['node_outline']['item_width_pt'],
+          item_height_pt = legend_const[orientation]['node_outline']['item_height_pt'],
+          label_width_pt = legend_const[orientation]['node_outline']['label_width_pt'],
+          label_height_pt = legend_const[orientation]['node_outline']['label_height_pt'],
           node_size_pt = LEGEND_NODE_SIZE_PT,
           line_width_pt = LEGEND_NODE_OUTLINE_WIDTH_PT,
           legend_title_font_size_pt = legend_title_font_size_pt,
@@ -307,13 +355,14 @@ def make_slide(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
-          stride_pt = legend_item_height_pt,
-          title_width_pt = legend_title_width_pt,
-          title_height_pt = legend_title_height_pt,
-          item_width_pt = legend_item_width_pt,
-          item_height_pt = legend_item_height_pt,
-          label_width_pt = legend_label_width_pt,
-          label_height_pt = legend_item_height_pt,
+          stride_pt = legend_const[orientation]['edge_type']['stride_pt'],
+          title_width_pt = legend_const[orientation]['edge_type']['title_width_pt'],
+          title_height_pt = legend_const[orientation]['edge_type']['title_height_pt'],
+          title_x_offset_pt = legend_const[orientation]['edge_type']['title_x_offset_pt'],
+          item_width_pt = legend_const[orientation]['edge_type']['item_width_pt'],
+          item_height_pt = legend_const[orientation]['edge_type']['item_height_pt'],
+          label_width_pt = legend_const[orientation]['edge_type']['label_width_pt'],
+          label_height_pt = legend_const[orientation]['edge_type']['label_height_pt'],
           line_size_pt = LEGEND_EDGE_LINE_SIZE_PT,
           line_width_pt = LEGEND_EDGE_LINE_WIDTH_PT,
           legend_title_font_size_pt = legend_title_font_size_pt,
@@ -325,13 +374,14 @@ def make_slide(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
-          stride_pt = legend_item_height_pt,
-          title_width_pt = legend_title_width_pt,
-          title_height_pt = legend_title_height_pt,
-          item_width_pt = legend_item_width_pt,
-          item_height_pt = legend_item_height_pt,
-          label_width_pt = legend_label_width_pt,
-          label_height_pt = legend_label_height_pt,
+          stride_pt = legend_const[orientation]['variation_type']['stride_pt'],
+          title_width_pt = legend_const[orientation]['variation_type']['title_width_pt'],
+          title_height_pt = legend_const[orientation]['variation_type']['title_height_pt'],
+          title_x_offset_pt = legend_const[orientation]['variation_type']['title_x_offset_pt'],
+          item_width_pt = legend_const[orientation]['variation_type']['item_width_pt'],
+          item_height_pt = legend_const[orientation]['variation_type']['item_height_pt'],
+          label_width_pt = legend_const[orientation]['variation_type']['label_width_pt'],
+          label_height_pt = legend_const[orientation]['variation_type']['label_height_pt'],
           variation_types = ['insertion', 'deletion', 'none'],
           node_size_pt = LEGEND_NODE_SIZE_PT,
           line_width_pt = LEGEND_NODE_OUTLINE_WIDTH_PT,
@@ -342,22 +392,26 @@ def make_slide(
       elif legend['type'] == 'freq_ratio':
         treatment_1 = legend['treatment_1']
         treatment_2 = legend['treatment_2']
-        title = f'Ratio [{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
+        if orientation == 'v':
+          title = f'Ratio\n[{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
+        elif orientation == 'h':
+          title = f'Ratio [{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
+        else:
+          raise Exception('Impossible')
         color_bar_file = legend['color_bar_file']
         y_legend_new_pt = make_pptx_legend.make_freq_ratio_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
           title = title,
-          title_width_pt = legend_title_width_pt,
-          title_height_pt = legend_title_height_pt * 2,
-          label_width_pt = legend_label_width_pt,
-          label_height_pt = legend_label_height_pt,
-          label_width_left_spill_over_pt = 10,
+          title_width_pt = legend_const[orientation]['freq_ratio']['title_width_pt'],
+          title_height_pt = legend_const[orientation]['freq_ratio']['title_height_pt'],
+          title_x_offset_pt = legend_const[orientation]['freq_ratio']['title_x_offset_pt'],
+          label_width_pt = legend_const[orientation]['freq_ratio']['label_width_pt'],
+          label_height_pt = legend_const[orientation]['freq_ratio']['label_height_pt'],
           color_bar_minor_axis_pt = LEGEND_FREQ_RATIO_COLOR_BAR_WIDTH_PT,
           color_bar_major_axis_pt = legend_freq_ratio_color_bar_height_pt,
           color_bar_file = color_bar_file,
-          title_pad_pt = 7 if treatment_1 == 'antisense_splicing' else 5,
           legend_title_font_size_pt = legend_title_font_size_pt,
           legend_label_font_size_pt = legend_label_font_size_pt,
           orientation = orientation,
@@ -489,19 +543,19 @@ if __name__ == '__main__':
   prs = pptx.Presentation(PPTX_TEMPLATE_FILE)
   image_grid = np.array(
     [
-      "WT_sgAB_R1_branch.png", "WT_sgAB_R1_cmv.png", "WT_sgAB_R1_sense.png",
-      "WT_sgAB_R2_branch.png", "WT_sgAB_R2_cmv.png", "WT_sgAB_R2_sense.png",
-      "WT_sgA_R1_branch.png", "WT_sgA_R1_cmv.png", "WT_sgA_R1_sense.png",
-      "WT_sgB_R2_branch.png", "WT_sgB_R2_cmv.png", "WT_sgB_R2_sense.png",
+      "WT_sgAB_R1_sense.png", "WT_sgAB_R1_branch.png", "WT_sgAB_R1_cmv.png",
+      "WT_sgAB_R2_sense.png", "WT_sgAB_R2_branch.png", "WT_sgAB_R2_cmv.png",
+      "WT_sgA_R1_sense.png", "WT_sgA_R1_branch.png", "WT_sgA_R1_cmv.png",
+      "WT_sgB_R2_sense.png", "WT_sgB_R2_branch.png", "WT_sgB_R2_cmv.png",
     ],
     dtype = object,
   ).reshape((-1, 3))
   label_grid = np.array(
     [
-      "WT_sgAB_R1_branch", "WT_sgAB_R1_cmv", "WT_sgAB_R1_sense",
-      "WT_sgAB_R2_branch", "WT_sgAB_R2_cmv", "WT_sgAB_R2_sense",
-      "WT_sgA_R1_branch", "WT_sgA_R1_cmv", "WT_sgA_R1_sense",
-      "WT_sgB_R2_branch", "WT_sgB_R2_cmv", "WT_sgB_R2_sense",
+      "WT_sgAB_R1_sense", "WT_sgAB_R1_branch", "WT_sgAB_R1_cmv",
+       "WT_sgAB_R2_sense", "WT_sgAB_R2_branch", "WT_sgAB_R2_cmv",
+       "WT_sgA_R1_sense", "WT_sgA_R1_branch", "WT_sgA_R1_cmv",
+       "WT_sgB_R2_sense", "WT_sgB_R2_branch", "WT_sgB_R2_cmv",
     ],
     dtype = object,
   ).reshape((-1, 3))
@@ -510,15 +564,21 @@ if __name__ == '__main__':
       image_grid[i, j] = 'plots/graphs/individual/' + image_grid[i, j]
 
   legend_list = [
-    # {
-    #   'type': 'freq_ratio',
-    #   'treatment_1': 'sense',
-    #   'treatment_2': 'branch',
-    #   'color_bar_file': 'images/freq_ratio_sense_cmv.png',
-    # }
+    {
+      'type': 'freq_ratio',
+      'treatment_1': 'sense',
+      'treatment_2': 'branch',
+      'color_bar_file': 'images/freq_ratio_sense_cmv.png',
+    },
     {
       'type': 'variation_type',
-    }
+    },
+    {
+      'type': 'node_outline',
+    },
+    {
+      'type': 'edge_type',
+    },
   ]
   make_slide(
     prs,
