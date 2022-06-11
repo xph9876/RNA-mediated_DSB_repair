@@ -277,7 +277,7 @@ def get_data_label(data_info):
   if data_info['format'] == 'individual':
     treatment_str = data_info['treatment']
   elif data_info['format'] == 'combined':
-    treatment_str = '_'.join(data_info['treatment_1'], data_info['treatment_2'])
+    treatment_str = '_'.join([data_info['treatment_1'], data_info['treatment_2']])
   else:
     raise Exception('Unknown format: ' + str(data_info['format']))
   if data_info['control'] == CONTROL_NOT:

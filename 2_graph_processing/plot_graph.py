@@ -2173,7 +2173,6 @@ def plot_graph(
   crop_y = None,
 ):
   data_label = constants.get_data_label(data_info)
-  log_utils.log('plot_graph: ' + plot_type + ' ' + data_label)
   plot_args = get_plot_args(
     data_info = data_info,
     plot_type = plot_type,

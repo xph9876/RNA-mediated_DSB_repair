@@ -188,6 +188,7 @@ def make_common_layout(data_dir_list, output_dir, subst_type):
 
 def main():
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv -o layouts/2DSB_R1 --subst_type without".split(" ")
+  sys.argv += "-i libraries_4/WT_sgCD_R1_antisense libraries_4/WT_sgCD_R1_splicing -o layouts/2DSBanti_R1 --subst_type without".split(" ")
   args = parse_args()
   make_common_layout(args.input, args.output, args.subst_type) 
 

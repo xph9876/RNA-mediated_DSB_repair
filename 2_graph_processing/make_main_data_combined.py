@@ -82,8 +82,6 @@ def make_combined_data(
   output_dir,
   subst_type,
 ):
-  log_utils.log(output_dir + ' ' + subst_type)
-
   input_file_1 = file_names.main(input_dir_1, subst_type)
   input_file_2 = file_names.main(input_dir_2, subst_type)
 
@@ -97,15 +95,10 @@ def make_combined_data(
     ['freq_mean'],
   )
   output_file = file_names.main(output_dir, subst_type)
+  log_utils.log(output_file)
   file_utils.write_tsv(data, output_file)
 
 if __name__ == '__main__':
-  # sys.argv += [
-  #   '--input', 'libraries_4/WT_2DSB_R1_sense', 'libraries_4/WT_2DSB_R1_branch',
-  #   '--output', 'libraries_4/WT_2DSB_R1_sense_branch',
-  #   '--subst_type', 'without'
-  # ]
-
   # Parse args
   args = parse_args()
 
