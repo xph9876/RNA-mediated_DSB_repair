@@ -45,5 +45,5 @@ def ref(dir):
 def histogram_3d(data_name, variation_type):
   return '_'.join([data_name, variation_type]) + '.png'
 
-def graph_figure(data_name):
-  return data_name + '.png'
+def graph_figure(data_name, ext='png'):
+  return data_name + '.' + ext

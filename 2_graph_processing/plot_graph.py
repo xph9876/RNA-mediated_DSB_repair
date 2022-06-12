@@ -332,33 +332,26 @@ def make_radial_layout(data_info, graph):
         key = lambda x: max(x[col] for col in constants.FREQ_COLUMNS[data_info['format']]),
         reverse = True,
       ))
-      # FIXME: DELETE!!!
-      # if var_type == 'insertion':
-      #   bucket = list(sorted(
-      #     bucket_dict[var_type][dist_ref],
-      #     key = lambda x: max(x[col] for col in common.get_freq_columns(data_set))
-      #   ))
-      # elif var_type == 'deletion':
-      #   # sort by the average position of the indel
-      #   bucket = list(sorted(
-      #     bucket_dict[var_type][dist_ref],
-      #     key = lambda x: (x['seq_align'].index('-') + x['seq_align'].rindex('-')) / 2
-      #   ))
-      # else:
-      #   raise Exception('Impossible: ' + str(var_type))
 
       if var_type == 'insertion':
-        angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
+        # angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
+        angle_list = np.linspace((180 / 180) * np.pi, (0 / 180) * np.pi, len(bucket))
       elif var_type == 'deletion':
-        angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
+        # angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
+        angle_list = np.linspace((180 / 180) * np.pi, (0 / 180) * np.pi, len(bucket))
       else:
         raise Exception('Impossible: ' + str(var_type))
 
       for angle, data in zip(angle_list, bucket):
         xy_dict[data['id']] = (
-          dist_ref * np.cos(angle) * dist_scale,
-          dist_ref * np.sin(angle) * dist_scale * y_sign
+          (dist_ref) * np.cos(angle) * dist_scale + 2 * np.cos(angle),
+          ((dist_ref) * np.sin(angle) * dist_scale + 2 * np.sin(angle) + 1.5) * y_sign
         )
+      # for angle, data in zip(angle_list, bucket):
+      #   xy_dict[data['id']] = (
+      #     (dist_ref) * np.cos(angle) * dist_scale,
+      #     ((dist_ref) * np.sin(angle) * dist_scale) * y_sign
+      #   )
   return xy_dict
 
 # idea to make the nodes a reasonable distance from the reference
@@ -2151,6 +2144,7 @@ def get_plot_args(
 
 def plot_graph(
   output_dir,
+  output_ext,
   data_info,
   plot_type,
   title_show = False,
@@ -2195,15 +2189,16 @@ def plot_graph(
   )
   figure = make_graph_figure(**plot_args)
 
-  file_out = os.path.join(output_dir, file_names.graph_figure(data_label))
+  file_out = os.path.join(output_dir, file_names.graph_figure(data_label, output_ext))
   log_utils.log(file_out)
   file_utils.write_plotly(figure, file_out)
 
-  # Note the range must be specified explic
   if (
     ((crop_x is not None) and (tuple(crop_x) != (0, 1))) or
     ((crop_y is not None) and (tuple(crop_y) != (0, 1)))
   ):
+    if output_ext == 'html':
+      raise Exception("Cannot use crop setting with HTML output")
     if crop_x is None:
       crop_x = (0, 1)
     if crop_y is None:
@@ -2235,6 +2230,15 @@ def parse_args():
     type = common_utils.check_dir_output,
     help = 'Output directory.',
     required = True,
+  )
+  parser.add_argument(
+    '-ext',
+    choices = ['png', 'html'],
+    default = 'png',
+    help = (
+      'Which types of file to generate from the Plotly library:' +
+      ' static PNG or interactive HTML.'
+    ),
   )
   parser.add_argument(
     '--title',
@@ -2387,7 +2391,8 @@ def main():
   # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --crop_y 0.15,0.85".split(" ")
   args = parse_args()
   plot_graph(
-    args.output,
+    output_dir = args.output,
+    output_ext = args.ext,
     data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
     plot_type = args.layout + '_layout',
     title_show = args.title,
