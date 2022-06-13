@@ -1,6 +1,8 @@
 import os
 import constants
 
+IMAGE_DIR = 'images'
+
 def make_file_name(dir, *args, ext=None):
   return os.path.join(dir, '_'.join(map(str, args)) + ext)
 

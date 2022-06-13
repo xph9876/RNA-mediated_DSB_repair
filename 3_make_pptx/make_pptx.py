@@ -10,8 +10,9 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.subplots as ps
 
-
 import common_utils
+import file_names
+import log_utils
 import constants
 import make_pptx_helpers
 import make_pptx_legend
@@ -58,6 +59,31 @@ FREQ_RATIO_LEGENDS = {
   '2DSBanti': [
     'freq_ratio_antisense_splicing',
   ],
+}
+
+LEGENDS = {
+  'node_size': {'type': 'node_size'},
+  'node_outline': {'type': 'node_outline'},
+  'edge_type': {'type': 'edge_type'},
+  'variation_type': {'type': 'variation_type'},
+  'freq_ratio_sense_branch': {
+   'type': 'freq_ratio',
+   'treatment_1': 'sense',
+   'treatment_2': 'branch',
+   'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_sense_branch.png'),
+  },
+  'freq_ratio_sense_cmv': {
+   'type': 'freq_ratio',
+   'treatment_1': 'sense',
+   'treatment_2': 'cmv',
+   'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_sense_branch.png'),
+  },
+  'freq_ratio_antisense_splicing': {
+   'type': 'freq_ratio',
+   'treatment_1': 'antisense',
+   'treatment_2': 'splicing',
+   'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_antisense_splicing.png'),
+  },
 }
 
 TITLE_FONT_SIZE_PT = 16
@@ -430,14 +456,20 @@ def parse_args():
     '-i',
     '--input',
     nargs = '+',
-    type = argparse.FileType('r'),
+    type = common_utils.check_file,
     help = 'List of images to include in the grid',
+    required = True,
+  )
+  parser.add_argument(
+    '-lab',
+    '--labels',
+    nargs = '+',
+    help = 'Labels of images in the grid',
     required = True,
   )
   parser.add_argument(
     '-o',
     '--output',
-    type = argparse.FileType('w'),
     help = 'Output PPTX file.',
     required = True,
   )
@@ -470,128 +502,205 @@ def parse_args():
       ' Number of arguments should match the number of grids.'
     ),
   )
-  # parser.add_argument(
-  #   '--node_max_freq',
-  #   type = float,
-  #   help = (
-  #     'Max frequency to determine node size.' +
-  #     'Higher frequencies are clipped to this value.'
-  #   ),
-  #   default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
-  # )
-  # parser.add_argument(
-  #   '--node_min_freq',
-  #   type = float,
-  #   help = (
-  #     'Min frequency to determine node size.' +
-  #     'Lower frequencies are clipped to this value.'
-  #   ),
-  #   default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
-  # )
-  # parser.add_argument(
-  #   '--node_max_px',
-  #   type = float,
-  #   help = 'Largest node size as determined by the frequency.',
-  #   default = constants.GRAPH_NODE_SIZE_MAX_PX,
-  # )
-  # parser.add_argument(
-  #   '--node_min_px',
-  #   type = float,
-  #   help = 'Smallest node size as determined by the frequency.',
-  #   default = constants.GRAPH_NODE_SIZE_MIN_PX,
-  # )
-  
+  parser.add_argument(
+    '--node_max_freq',
+    type = float,
+    help = (
+      'Max frequency to determine node size.' +
+      'Higher frequencies are clipped to this value.'
+    ),
+    default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  )
+  parser.add_argument(
+    '--node_min_freq',
+    type = float,
+    help = (
+      'Min frequency to determine node size.' +
+      'Lower frequencies are clipped to this value.'
+    ),
+    default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  )
+  parser.add_argument(
+    '--node_max_px',
+    type = float,
+    help = 'Largest node size as determined by the frequency.',
+    default = constants.GRAPH_NODE_SIZE_MAX_PX,
+  )
+  parser.add_argument(
+    '--node_min_px',
+    type = float,
+    help = 'Smallest node size as determined by the frequency.',
+    default = constants.GRAPH_NODE_SIZE_MIN_PX,
+  )
+  parser.add_argument(
+    '--title',
+    default = None,
+    help = 'Page title',
+  )
+  parser.add_argument(
+    '--legends',
+    nargs = '+',
+    choices = list(LEGENDS),
+    default = None,
+    help = 'Legends to draw outside the page.',
+  )
+  parser.add_argument(
+    '--template',
+    default = os.path.join(os.path.dirname(__file__), 'template.pptx'),
+    help = 'The PPTX file to use as a template. Controls the page size.',
+  )
   return parser.parse_args()
+
+# legend_list = [
+#     {
+#       'type': 'freq_ratio',
+#       'treatment_1': 'sense',
+#       'treatment_2': 'branch',
+#       'color_bar_file': 'images/freq_ratio_sense_cmv.png',
+#     },
+#     {
+#       'type': 'variation_type',
+#     },
+#     {
+#       'type': 'node_outline',
+#     },
+#     {
+#       'type': 'edge_type',
+#     },
+#   ]
 
 
 if __name__ == '__main__':
-  # make_legend_images()
-  # make_pptx_1()
-  # args = parse_args()
-
-  # if args.num_grids != len(args.num_rows):
-  #   raise Exception(
-  #     f'Incorrect num rows specification: {args.num_rows}.' +
-  #     f' Expected {args.num_grids} values.' 
-  #   )
-  
-  # if args.num_grids != len(args.num_columns):
-  #   raise Exception(
-  #     f'Incorrect num columns specification: {args.num_cols}.' +
-  #     f' Expected {args.num_grids} values.' 
-  #   )
-
-  # num_images_total = sum(r * c for r, c in zip(args.num_rows, args.num_cols))
-  # if num_images_total != len(args.input):
-  #   raise Exception(
-  #     f'Incorrect number of input files: {len(args.input)}.' +
-  #     f' Expected {num_images_total} values.' 
-  #   )
-
-  # image_grid_list = []
-  # image_index = 0
-  # for i in range(args.num_grids):
-  #   num_images = args.num_rows[i] * args.num_cols[i]
-  #   image_grid = np.array(
-  #     [args.input[image_index + j] for j in range(num_images)]
-  #   )
-  #   image_grid = image_grid.reshape((args.num_rows[i], args.num_cols[i]))
-  #   image_grid_list.append(image_grid)
-  #   image_index += num_images
-
-  
-  prs = pptx.Presentation(PPTX_TEMPLATE_FILE)
-  image_grid = np.array(
-    [
-      "WT_sgAB_R1_sense.png", "WT_sgAB_R1_branch.png", "WT_sgAB_R1_cmv.png",
-      "WT_sgAB_R2_sense.png", "WT_sgAB_R2_branch.png", "WT_sgAB_R2_cmv.png",
-      "WT_sgA_R1_sense.png", "WT_sgA_R1_branch.png", "WT_sgA_R1_cmv.png",
-      "WT_sgB_R2_sense.png", "WT_sgB_R2_branch.png", "WT_sgB_R2_cmv.png",
-    ],
-    dtype = object,
-  ).reshape((-1, 3))
-  label_grid = np.array(
-    [
-      "WT_sgAB_R1_sense", "WT_sgAB_R1_branch", "WT_sgAB_R1_cmv",
-       "WT_sgAB_R2_sense", "WT_sgAB_R2_branch", "WT_sgAB_R2_cmv",
-       "WT_sgA_R1_sense", "WT_sgA_R1_branch", "WT_sgA_R1_cmv",
-       "WT_sgB_R2_sense", "WT_sgB_R2_branch", "WT_sgB_R2_cmv",
-    ],
-    dtype = object,
-  ).reshape((-1, 3))
-  for i in range(image_grid.shape[0]):
-    for j in range(image_grid.shape[1]):
-      image_grid[i, j] = 'plots/graphs/individual/' + image_grid[i, j]
-
-  legend_list = [
-    {
-      'type': 'freq_ratio',
-      'treatment_1': 'sense',
-      'treatment_2': 'branch',
-      'color_bar_file': 'images/freq_ratio_sense_cmv.png',
-    },
-    {
-      'type': 'variation_type',
-    },
-    {
-      'type': 'node_outline',
-    },
-    {
-      'type': 'edge_type',
-    },
+  argv = [
+    "-i",
+    "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
+    "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
+    "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
+    "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
+    "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
+    "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
+    "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
+    "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
+    "-ng", "1", "-nr", "4", "-nc", "3",
+    "-o", "hello.pptx",
+    "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
   ]
+  sys.argv += argv
+  args = parse_args()
+
+  if args.num_grids != len(args.num_rows):
+    raise Exception(
+      f'Incorrect num rows specification: {args.num_rows}.' +
+      f' Expected {args.num_grids} values.' 
+    )
+  
+  if args.num_grids != len(args.num_cols):
+    raise Exception(
+      f'Incorrect num columns specification: {args.num_cols}.' +
+      f' Expected {args.num_grids} values.' 
+    )
+
+  num_images_total = sum(r * c for r, c in zip(args.num_rows, args.num_cols))
+  if num_images_total != len(args.input):
+    raise Exception(
+      f'Incorrect number of input files: {len(args.input)}.' +
+      f' Expected {num_images_total} values.' 
+    )
+
+  image_grid_list = []
+  image_index = 0
+  for i in range(args.num_grids):
+    num_images = args.num_rows[i] * args.num_cols[i]
+    image_grid = np.array(
+      [args.input[image_index + j] for j in range(num_images)]
+    )
+    image_grid = image_grid.reshape((args.num_rows[i], args.num_cols[i]))
+    image_grid_list.append(image_grid)
+    image_index += num_images
+
+  label_grid_list = None
+  if args.labels is not None:
+    if len(args.labels) != num_images_total:
+      raise Exception(
+        f'Incorrect number of input labels: {len(args.input)}.' +
+        f' Expected {num_images_total} values.' 
+      )
+    label_grid_list = []
+    label_index = 0
+    for i in range(args.num_grids):
+      num_labels = args.num_rows[i] * args.num_cols[i]
+      label_grid = np.array(
+        [args.labels[label_index + j] for j in range(num_labels)]
+      )
+      label_grid = label_grid.reshape((args.num_rows[i], args.num_cols[i]))
+      label_grid_list.append(label_grid)
+      label_index += num_labels
+  
+  legend_list = [LEGENDS[x] for x in args.legends]
+
+  prs = pptx.Presentation(PPTX_TEMPLATE_FILE)
+
+  # legend_list = [
+  #   {
+  #     'type': 'freq_ratio',
+  #     'treatment_1': 'sense',
+  #     'treatment_2': 'branch',
+  #     'color_bar_file': 'images/freq_ratio_sense_cmv.png',
+  #   },
+  #   {
+  #     'type': 'variation_type',
+  #   },
+  #   {
+  #     'type': 'node_outline',
+  #   },
+  #   {
+  #     'type': 'edge_type',
+  #   },
+  # ]
+  # make_slide(
+  #   prs,
+  #   title = '',
+  #   image_grid_list = [image_grid],
+  #   label_grid_list = [label_grid],
+  #   node_size_max_freq = 1,
+  #   node_size_min_freq = 1e-5,
+  #   node_size_max_px = 200,
+  #   node_size_min_px = 10,
+  #   legend_list = legend_list,
+  # )
   make_slide(
     prs,
-    title = '',
-    image_grid_list = [image_grid],
-    label_grid_list = [label_grid],
-    node_size_max_freq = 1,
-    node_size_min_freq = 1e-5,
-    node_size_max_px = 200,
-    node_size_min_px = 10,
+    title = args.title,
+    image_grid_list = image_grid_list,
+    label_grid_list = label_grid_list,
+    node_size_max_freq = args.node_max_freq,
+    node_size_min_freq = args.node_min_freq,
+    node_size_max_px = args.node_max_px,
+    node_size_min_px = args.node_min_px,
     legend_list = legend_list,
   )
-  prs.save('hello.pptx')
+  
+  log_utils.log(args.output)
+  prs.save(args.output)
   # make_pptx_2()
   pass
 
+  # image_grid = np.array(
+  #   [
+  #     "WT_sgAB_R1_sense.png", "WT_sgAB_R1_branch.png", "WT_sgAB_R1_cmv.png",
+  #     "WT_sgAB_R2_sense.png", "WT_sgAB_R2_branch.png", "WT_sgAB_R2_cmv.png",
+  #     "WT_sgA_R1_sense.png", "WT_sgA_R1_branch.png", "WT_sgA_R1_cmv.png",
+  #     "WT_sgB_R2_sense.png", "WT_sgB_R2_branch.png", "WT_sgB_R2_cmv.png",
+  #   ],
+  #   dtype = object,
+  # ).reshape((-1, 3))
+
+
+# -i WT_sgAB_R1_sense.png, WT_sgAB_R1_branch.png, WT_sgAB_R1_cmv.png, WT_sgAB_R2_sense.png,
+#  WT_sgAB_R2_branch.png, WT_sgAB_R2_cmv.png, WT_sgA_R1_sense.png, WT_sgA_R1_branch.png,
+#  WT_sgA_R1_cmv.png, WT_sgB_R2_sense.png, WT_sgB_R2_branch.png, WT_sgB_R2_cmv.png
+# -l "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
+#  "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
+#  "sgRNA A\nForward strand\nSense", "sgRNA A\Forward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
+#  "sgRNA B\nReverse strand\nSense", "sgRNA B\Reverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ"
+# 

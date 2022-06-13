@@ -2,11 +2,18 @@ import pandas as pd
 import os
 import shutil
 
+
+def check_file(file_name):
+  if os.path.exists(file_name):
+    return file_name
+  else:
+    raise ValueError('File does not exist: ' + str(file_name))
+
 def check_dir(dir_name):
   if os.path.isdir(dir_name):
     return dir_name
   else:
-    raise Exception('Not a directory: ' + str(dir_name))
+    raise ValueError('Not a directory: ' + str(dir_name))
 
 def check_dir_output(dir_name):
   os.makedirs(dir_name, exist_ok=True)
