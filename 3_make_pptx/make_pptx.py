@@ -76,7 +76,7 @@ LEGENDS = {
    'type': 'freq_ratio',
    'treatment_1': 'sense',
    'treatment_2': 'cmv',
-   'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_sense_branch.png'),
+   'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_sense_cmv.png'),
   },
   'freq_ratio_antisense_splicing': {
    'type': 'freq_ratio',
@@ -117,25 +117,25 @@ MULTIPLE_GRIDS_SPACING_PT = 40
 CONTENT_LEGEND_SPACING_PT = 20
 
 
-def get_data_set_spec_label(spec):
-  labels_list = []
+# def get_data_set_spec_label(spec):
+#   labels_list = []
 
-  if spec['DSB'] == '2DSB':
-    labels_list.append(common.LABELS['sgAB'])
-  elif spec['DSB'] == '2DSBanti':
-    labels_list.append(common.LABELS['sgCD'])
+#   if spec['DSB'] == '2DSB':
+#     labels_list.append(common.LABELS['sgAB'])
+#   elif spec['DSB'] == '2DSBanti':
+#     labels_list.append(common.LABELS['sgCD'])
   
-  if spec['DSB'] in ['2DSB', '2DSBanti']:
-    labels_list.append(common.LABELS[spec['strand']])
-  elif spec['DSB'] in ['1DSB']:
-    labels_list.append(common.LABELS[spec['hguide']])
-  else:
-    raise Exception('Bad DSB key: ' + str(spec['DSB']))
+#   if spec['DSB'] in ['2DSB', '2DSBanti']:
+#     labels_list.append(common.LABELS[spec['strand']])
+#   elif spec['DSB'] in ['1DSB']:
+#     labels_list.append(common.LABELS[spec['hguide']])
+#   else:
+#     raise Exception('Bad DSB key: ' + str(spec['DSB']))
   
-  if spec['control'] != 'not_control':
-    labels_list.append(common.LABELS[spec['control']])
+#   if spec['control'] != 'not_control':
+#     labels_list.append(common.LABELS[spec['control']])
   
-  return join_margin_label(labels_list)
+#   return join_margin_label(labels_list)
 
 def make_slide(
   prs,
@@ -326,29 +326,30 @@ def make_slide(
     y_pt += image_grid_list[i].shape[0] * cell_height_pt
     
     # Size legends
-    for orientation in ['h', 'v']:
-      y_legend_new_pt = make_pptx_legend.make_size_legend_pptx(
-        slide = slide,
-        x_pt = x_legend_pt + legend_x_offset_pt[orientation],
-        y_pt = y_legend_pt,
-        stride_pt = legend_const[orientation]['node_size']['stride_pt'],
-        title_width_pt = legend_const[orientation]['node_size']['title_width_pt'],
-        title_height_pt = legend_const[orientation]['node_size']['title_height_pt'],
-        title_x_offset_pt = legend_const[orientation]['node_size']['title_x_offset_pt'],
-        item_width_pt = legend_const[orientation]['node_size']['item_width_pt'],
-        item_height_pt = legend_const[orientation]['node_size']['item_height_pt'],
-        label_width_pt = legend_const[orientation]['node_size']['label_width_pt'],
-        label_height_pt = legend_const[orientation]['node_size']['label_height_pt'],
-        node_size_min_freq = node_size_min_freq,
-        node_size_max_freq = node_size_max_freq,
-        node_size_min_pt = node_size_min_px * ratio_pt_px,
-        node_size_max_pt = node_size_max_px * ratio_pt_px,
-        line_width_pt = LEGEND_SIZE_NODE_OUTLINE_WIDTH_PT,
-        legend_title_font_size_pt = legend_title_font_size_pt,
-        legend_label_font_size_pt = legend_label_font_size_pt,
-        orientation = orientation,
-      )
-    y_legend_pt = y_legend_new_pt
+    if any(legend['type'] == 'node_size' for legend in legend_list):
+      for orientation in ['h', 'v']:
+        y_legend_new_pt = make_pptx_legend.make_size_legend_pptx(
+          slide = slide,
+          x_pt = x_legend_pt + legend_x_offset_pt[orientation],
+          y_pt = y_legend_pt,
+          stride_pt = legend_const[orientation]['node_size']['stride_pt'],
+          title_width_pt = legend_const[orientation]['node_size']['title_width_pt'],
+          title_height_pt = legend_const[orientation]['node_size']['title_height_pt'],
+          title_x_offset_pt = legend_const[orientation]['node_size']['title_x_offset_pt'],
+          item_width_pt = legend_const[orientation]['node_size']['item_width_pt'],
+          item_height_pt = legend_const[orientation]['node_size']['item_height_pt'],
+          label_width_pt = legend_const[orientation]['node_size']['label_width_pt'],
+          label_height_pt = legend_const[orientation]['node_size']['label_height_pt'],
+          node_size_min_freq = node_size_min_freq,
+          node_size_max_freq = node_size_max_freq,
+          node_size_min_pt = node_size_min_px * ratio_pt_px,
+          node_size_max_pt = node_size_max_px * ratio_pt_px,
+          line_width_pt = LEGEND_SIZE_NODE_OUTLINE_WIDTH_PT,
+          legend_title_font_size_pt = legend_title_font_size_pt,
+          legend_label_font_size_pt = legend_label_font_size_pt,
+          orientation = orientation,
+        )
+      y_legend_pt = y_legend_new_pt
 
   x_pt = slide_width_pt # place legends outside the actual slide
 
@@ -571,21 +572,21 @@ def parse_args():
 
 
 if __name__ == '__main__':
-  argv = [
-    "-i",
-    "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
-    "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
-    "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
-    "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
-    "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
-    "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
-    "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
-    "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
-    "-ng", "1", "-nr", "4", "-nc", "3",
-    "-o", "hello.pptx",
-    "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
-  ]
-  sys.argv += argv
+  # argv = [
+  #   "-i",
+  #   "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
+  #   "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
+  #   "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
+  #   "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
+  #   "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
+  #   "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
+  #   "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
+  #   "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
+  #   "-ng", "1", "-nr", "4", "-nc", "3",
+  #   "-o", "hello.pptx",
+  #   "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
+  # ]
+  # sys.argv += argv
   args = parse_args()
 
   if args.num_grids != len(args.num_rows):
@@ -682,8 +683,6 @@ if __name__ == '__main__':
   
   log_utils.log(args.output)
   prs.save(args.output)
-  # make_pptx_2()
-  pass
 
   # image_grid = np.array(
   #   [

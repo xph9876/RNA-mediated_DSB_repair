@@ -138,7 +138,11 @@ log*.txt
 *.sam
 
 # Library files
-libraries*
+libraries_0/
+libraries_1/
+libraries_2/
+libraries_3/
+libraries_4/
 
 # Plots
 plots/
@@ -147,4 +151,8 @@ plots/
 *~*
 
 # Layout files
-layouts*
+layouts/
+
+# PPTX files
+pptx/
+*.pptx
