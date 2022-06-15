@@ -340,9 +340,7 @@ def make_size_legend_pptx(
       text = '1'
     else:
       text = f'10' + {-1: '⁻¹', -2: '⁻²', -3: '⁻³', -4: '⁻⁴', -5: '⁻⁵', -6: '⁻⁶'}[freq_log10]
-    if i == num_legend_items - 1:
-      text = '≥' + text
-    elif i == 0:
+    if i == 0:
       text = '≤' + text
     items.append({
       'type': 'circle',
@@ -354,7 +352,7 @@ def make_size_legend_pptx(
   items = items[::-1] # Show largest to smallest
   return make_legend_pptx(
     slide = slide,
-    title = 'Frequency Size Scale',
+    title = 'Sequence frequency',
     items = items,
     x_pt = x_pt,
     y_pt = y_pt,
