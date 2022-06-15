@@ -85,8 +85,10 @@ LEGENDS = {
    'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_antisense_splicing.png'),
   },
 }
-
+IMAGE_LABEL_FONT_SIZE_PT = 8
 TITLE_FONT_SIZE_PT = 16
+IMAGE_LABEL_WIDTH_PT = 60
+IMAGE_LABEL_HEIGHT_PT = 20
 MARGIN_CORNER_LABEL_FONT_SIZE_PT = 12
 MARGIN_TOP_LABEL_FONT_SIZE_PT = 9
 MARGIN_LEFT_LABEL_FONT_SIZE_PT = 8
@@ -137,11 +139,17 @@ CONTENT_LEGEND_SPACING_PT = 20
   
 #   return join_margin_label(labels_list)
 
+
+# TODO: Separate out the conditions for left margins and top margins
+#
 def make_slide(
   prs,
   title,
   image_grid_list,
-  label_grid_list,
+  image_label_grid_list,
+  image_label_font_size_pt = IMAGE_LABEL_FONT_SIZE_PT,
+  image_label_width_pt = IMAGE_LABEL_WIDTH_PT,
+  image_label_height_pt = IMAGE_LABEL_HEIGHT_PT,
   node_size_min_freq = None,
   node_size_max_freq = None,
   node_size_min_px = None,
@@ -151,14 +159,42 @@ def make_slide(
   legend_freq_ratio_color_bar_height_pt = LEGEND_FREQ_RATIO_COLOR_BAR_HEIGHT_PT,
   legend_title_font_size_pt = LEGEND_TITLE_FONT_SIZE_PT,
   legend_label_font_size_pt = LEGEND_LABEL_FONT_SIZE_PT,
+  margin_label_top_list = None,
+  margin_label_left_list = None,
+  margin_top_font_size_pt = MARGIN_TOP_LABEL_FONT_SIZE_PT,
+  margin_left_font_size_pt = MARGIN_LEFT_LABEL_FONT_SIZE_PT,
+  margin_top_height_pt = MARGIN_TOP_HEIGHT_PT,
+  margin_left_width_pt = MARGIN_LEFT_WIDTH_PT,
+  margin_left_spill_over_pt = MARGIN_LEFT_SPILL_OVER_PT,
 ):
+  num_grids = len(image_grid_list)
+
+  image_label_show = image_label_grid_list is not None
+  if image_label_show and (len(image_label_grid_list) != num_grids):
+    raise Exception(
+      f"Incorrect number of image label grids : {len(image_label_grid_list)}." +
+      f" Expected {num_grids}."
+    )
+
+  margin_show_top = margin_label_top_list is not None
+  margin_show_left = margin_label_left_list is not None
+  if margin_show_left:
+    if (margin_label_left_list is None) or (len(margin_label_left_list) != num_grids):
+      raise Exception(
+        f"Incorrect number of left margin lists: {len(margin_label_left_list)}." +
+        f" Expected {num_grids}."
+      )
+  if margin_show_top:
+    if (margin_label_left_list is None) or (len(margin_label_left_list) != num_grids):
+      raise Exception(
+        f"Incorrect number of top margin lists: {len(margin_label_left_list)}." +
+        f" Expected {num_grids}."
+      )
+
   title_slide_layout = prs.slide_layouts[6] # should be a blank layout
   slide = prs.slides.add_slide(title_slide_layout)
   
   slide_width_pt = prs.slide_width / pptx.util.Pt(1)
-
-  image_label_width_pt = 60
-  image_label_height_pt = 20
   
   y_pt = 0
   x_pt = 0
@@ -277,7 +313,7 @@ def make_slide(
     'h': 100,
   }
 
-  for i in range(len(image_grid_list)):
+  for i in range(num_grids):
     max_image_width_px = 0
     max_image_height_px = 0
 
@@ -291,39 +327,91 @@ def make_slide(
 
     content_width_px = image_grid_list[i].shape[1] * max_image_width_px
 
-    ratio_pt_px = slide_width_pt / content_width_px
+    content_width_pt = slide_width_pt
+    if margin_show_left:
+      content_width_pt -= margin_left_width_pt
+
+    ratio_pt_px = content_width_pt / content_width_px
     cell_width_pt = ratio_pt_px * max_image_width_px
     cell_height_pt = ratio_pt_px * max_image_height_px
+
+    content_x_pt = x_pt
+    content_y_pt = y_pt
+    content_height_pt = image_grid_list[i].shape[0] * cell_height_pt
+    content_width_pt = image_grid_list[i].shape[1] * cell_width_pt
+
+    if margin_show_top:
+      content_y_pt += margin_top_height_pt
+    if margin_show_left:
+      content_x_pt += margin_left_width_pt
 
     # Content images
     make_pptx_helpers.add_picture_grid_pptx(
       slide = slide,
       file_name_grid = image_grid_list[i],
-      x_pt = x_pt,
-      y_pt = y_pt,
+      x_pt = content_x_pt,
+      y_pt = content_y_pt,
       cell_width_pt = cell_width_pt,
       cell_height_pt = cell_height_pt,
       cell_width_spacing_pt = 0,
       cell_height_spacing_pt = 0,
     )
 
-    # Content labels
-    make_pptx_helpers.add_text_grid_pptx(
-      slide = slide,
-      text_grid = label_grid_list[i],
-      x_pt = x_pt,
-      y_pt = y_pt,
-      cell_width_pt = cell_width_pt,
-      cell_height_pt = cell_height_pt,
-      cell_width_spacing_pt = 0,
-      cell_height_spacing_pt = 0,
-      text_width_pt = image_label_width_pt,
-      text_height_pt = image_label_height_pt,
-      font_size_pt = MARGIN_TOP_LABEL_FONT_SIZE_PT,
-      text_align = 'center',
-    )
+    if image_label_show:
+      if image_grid_list[i].shape != image_grid_list[i].shape:
+        raise Exception(
+          f"Incorrect shape of {i}'th label grid: {image_grid_list[i].shape}." +
+          f" Expected: {image_grid_list[i].shape}."
+        )
+      # Image labels
+      make_pptx_helpers.add_textbox_grid_pptx(
+        slide = slide,
+        text_grid = image_label_grid_list[i],
+        x_pt = content_x_pt,
+        y_pt = content_y_pt,
+        cell_width_pt = cell_width_pt,
+        cell_height_pt = cell_height_pt,
+        cell_width_spacing_pt = 0,
+        cell_height_spacing_pt = 0,
+        text_width_pt = image_label_width_pt,
+        text_height_pt = image_label_height_pt,
+        font_size_pt = image_label_font_size_pt,
+        text_align = 'center',
+      )
 
-    y_pt += image_grid_list[i].shape[0] * cell_height_pt
+    if margin_show_top:
+      # Top margin
+      make_pptx_helpers.add_textbox_grid_pptx(
+        slide = slide,
+        text_grid = np.array(margin_label_top_list[i]).reshape(1, -1),
+        x_pt = margin_left_width_pt,
+        y_pt = y_pt,
+        cell_width_pt = cell_width_pt,
+        cell_height_pt = margin_top_height_pt,
+        cell_width_spacing_pt = 0,
+        cell_height_spacing_pt = 0,
+        text_height_pt = margin_top_height_pt,
+        text_width_pt = cell_width_pt,
+        font_size_pt = margin_top_font_size_pt,
+      )
+
+    if margin_show_left:
+      # Left margin
+      make_pptx_helpers.add_textbox_grid_pptx(
+        slide = slide,
+        text_grid = np.array(margin_label_left_list[i]).reshape(-1, 1),
+        x_pt = -margin_left_spill_over_pt,
+        y_pt = content_y_pt,
+        cell_width_pt = margin_left_width_pt + margin_left_spill_over_pt,
+        cell_height_pt = cell_height_pt,
+        cell_width_spacing_pt = 0,
+        cell_height_spacing_pt = 0,
+        text_height_pt = cell_height_pt,
+        text_width_pt = margin_left_width_pt + margin_left_spill_over_pt,
+        font_size_pt = margin_left_font_size_pt,
+      )
+
+    y_pt = content_x_pt + content_height_pt
     
     # Size legends
     if any(legend['type'] == 'node_size' for legend in legend_list):
@@ -469,6 +557,18 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
+    '-tmlab',
+    '--top_margin_labels',
+    nargs = '+',
+    help = 'Labels in the top margins of the grids',
+  )
+  parser.add_argument(
+    '-lmlab',
+    '--left_margin_labels',
+    nargs = '+',
+    help = 'Labels in the left margins of the grids',
+  )
+  parser.add_argument(
     '-o',
     '--output',
     help = 'Output PPTX file.',
@@ -572,21 +672,23 @@ def parse_args():
 
 
 if __name__ == '__main__':
-  # argv = [
-  #   "-i",
-  #   "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
-  #   "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
-  #   "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
-  #   "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
-  #   "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
-  #   "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
-  #   "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
-  #   "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
-  #   "-ng", "1", "-nr", "4", "-nc", "3",
-  #   "-o", "hello.pptx",
-  #   "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
-  # ]
-  # sys.argv += argv
+  argv = [
+    "-i",
+    "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
+    "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
+    "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
+    "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
+    "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
+    "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
+    "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
+    "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
+    "-ng", "1", "-nr", "4", "-nc", "3",
+    "-o", "hello.pptx",
+    "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
+    "-lmlab", "A", "B", "C", "D",
+    "-tmlab", "A", "B", "C",
+  ]
+  sys.argv += argv
   args = parse_args()
 
   if args.num_grids != len(args.num_rows):
@@ -627,53 +729,58 @@ if __name__ == '__main__':
         f' Expected {num_images_total} values.' 
       )
     label_grid_list = []
-    label_index = 0
+    index = 0
     for i in range(args.num_grids):
       num_labels = args.num_rows[i] * args.num_cols[i]
       label_grid = np.array(
-        [args.labels[label_index + j] for j in range(num_labels)]
+        [args.labels[index + j] for j in range(num_labels)]
       )
       label_grid = label_grid.reshape((args.num_rows[i], args.num_cols[i]))
       label_grid_list.append(label_grid)
-      label_index += num_labels
+      index += num_labels
   
+  margin_label_left_list = None
+  if args.left_margin_labels is not None:
+    num_left_margin_labels = sum(args.num_rows[i] for i in range(args.num_grids))
+    if len(args.left_margin_labels) != num_left_margin_labels:
+      raise Exception(
+        f'Incorrect number of left margin labels: {len(args.left_margin_labels)}.' +
+        f' Expected {num_left_margin_labels} values.' 
+      )
+    margin_label_left_list = []
+    index = 0
+    for i in range(args.num_grids):
+      num_labels = args.num_rows[i]
+      label_list = [args.left_margin_labels[index + j] for j in range(num_labels)]
+      margin_label_left_list.append(label_list)
+      index += num_labels
+  
+  margin_label_top_list = None
+  if args.top_margin_labels is not None:
+    num_top_margin_labels = sum(args.num_cols[i] for i in range(args.num_grids))
+    if len(args.top_margin_labels) != num_top_margin_labels:
+      raise Exception(
+        f'Incorrect number of top margin labels: {len(args.top_margin_labels)}.' +
+        f' Expected {num_top_margin_labels} values.' 
+      )
+    margin_label_top_list = []
+    index = 0
+    for i in range(args.num_grids):
+      num_labels = args.num_cols[i]
+      label_list = [args.top_margin_labels[index + j] for j in range(num_labels)]
+      margin_label_top_list.append(label_list)
+      index += num_labels
   legend_list = [LEGENDS[x] for x in args.legends]
 
   prs = pptx.Presentation(PPTX_TEMPLATE_FILE)
 
-  # legend_list = [
-  #   {
-  #     'type': 'freq_ratio',
-  #     'treatment_1': 'sense',
-  #     'treatment_2': 'branch',
-  #     'color_bar_file': 'images/freq_ratio_sense_cmv.png',
-  #   },
-  #   {
-  #     'type': 'variation_type',
-  #   },
-  #   {
-  #     'type': 'node_outline',
-  #   },
-  #   {
-  #     'type': 'edge_type',
-  #   },
-  # ]
-  # make_slide(
-  #   prs,
-  #   title = '',
-  #   image_grid_list = [image_grid],
-  #   label_grid_list = [label_grid],
-  #   node_size_max_freq = 1,
-  #   node_size_min_freq = 1e-5,
-  #   node_size_max_px = 200,
-  #   node_size_min_px = 10,
-  #   legend_list = legend_list,
-  # )
   make_slide(
     prs,
     title = args.title,
     image_grid_list = image_grid_list,
-    label_grid_list = label_grid_list,
+    image_label_grid_list = label_grid_list,
+    margin_label_left_list = margin_label_left_list,
+    margin_label_top_list = margin_label_top_list,
     node_size_max_freq = args.node_max_freq,
     node_size_min_freq = args.node_min_freq,
     node_size_max_px = args.node_max_px,
@@ -683,23 +790,3 @@ if __name__ == '__main__':
   
   log_utils.log(args.output)
   prs.save(args.output)
-
-  # image_grid = np.array(
-  #   [
-  #     "WT_sgAB_R1_sense.png", "WT_sgAB_R1_branch.png", "WT_sgAB_R1_cmv.png",
-  #     "WT_sgAB_R2_sense.png", "WT_sgAB_R2_branch.png", "WT_sgAB_R2_cmv.png",
-  #     "WT_sgA_R1_sense.png", "WT_sgA_R1_branch.png", "WT_sgA_R1_cmv.png",
-  #     "WT_sgB_R2_sense.png", "WT_sgB_R2_branch.png", "WT_sgB_R2_cmv.png",
-  #   ],
-  #   dtype = object,
-  # ).reshape((-1, 3))
-
-
-# -i WT_sgAB_R1_sense.png, WT_sgAB_R1_branch.png, WT_sgAB_R1_cmv.png, WT_sgAB_R2_sense.png,
-#  WT_sgAB_R2_branch.png, WT_sgAB_R2_cmv.png, WT_sgA_R1_sense.png, WT_sgA_R1_branch.png,
-#  WT_sgA_R1_cmv.png, WT_sgB_R2_sense.png, WT_sgB_R2_branch.png, WT_sgB_R2_cmv.png
-# -l "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
-#  "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
-#  "sgRNA A\nForward strand\nSense", "sgRNA A\Forward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
-#  "sgRNA B\nReverse strand\nSense", "sgRNA B\Reverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ"
-# 

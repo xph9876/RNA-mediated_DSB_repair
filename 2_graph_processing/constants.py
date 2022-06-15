@@ -61,7 +61,8 @@ EDGE_TYPES = {
   },
   'indel': {
     'label': 'In/Del',
-    'line_dash': 'dash',
+    # 'line_dash': 'dash',
+    'line_dash': 'solid',
     'legend_color': 'black',
     'plot_color': 'rgba(0,0,0,0.5)',
   },
@@ -318,7 +319,7 @@ GRAPH_WIDTH_PX = 2400
 GRAPH_HEIGHT_PX = 2400
 GRAPH_NODE_SIZE_MIN_PX = 10
 GRAPH_NODE_SIZE_MAX_PX = 120
-GRAPH_NODE_OUTLINE_WIDTH_SCALE = 8
+GRAPH_NODE_OUTLINE_WIDTH_SCALE = 4
 GRAPH_EDGE_WIDTH_SCALE = 8
 GRAPH_LINE_WIDTH_SCALE = 8
 GRAPH_FONT_SIZE_SCALE = 8

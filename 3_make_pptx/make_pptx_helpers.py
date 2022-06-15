@@ -48,7 +48,7 @@ def add_textbox_pptx(
   shape.line.fill.background()
   return shape
 
-def add_text_grid_pptx(
+def add_textbox_grid_pptx(
   slide,
   text_grid,
   x_pt,

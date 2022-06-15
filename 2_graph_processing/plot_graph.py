@@ -333,19 +333,25 @@ def make_radial_layout(data_info, graph):
         reverse = True,
       ))
 
+      # FIXME: EXPERIMENTING HERE. HARDCODED STUFF.
+      d = dist_ref + 30*(-1)**dist_ref / dist_ref
       if var_type == 'insertion':
         # angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
-        angle_list = np.linspace((180 / 180) * np.pi, (0 / 180) * np.pi, len(bucket))
+        angle_list = np.linspace(((180 - d) / 180) * np.pi, (d / 180) * np.pi, len(bucket))
+        # angle_list = np.linspace(((175) / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
       elif var_type == 'deletion':
+        angle_list = np.linspace(((180 - d) / 180) * np.pi, (d / 180) * np.pi, len(bucket))
         # angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
-        angle_list = np.linspace((180 / 180) * np.pi, (0 / 180) * np.pi, len(bucket))
+        # angle_list = np.linspace(((175) / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
       else:
         raise Exception('Impossible: ' + str(var_type))
 
       for angle, data in zip(angle_list, bucket):
         xy_dict[data['id']] = (
-          (dist_ref) * np.cos(angle) * dist_scale + 2 * np.cos(angle),
-          ((dist_ref) * np.sin(angle) * dist_scale + 2 * np.sin(angle) + 1.5) * y_sign
+          (dist_ref) * np.cos(angle) * dist_scale + 0 * np.cos(angle),
+          ((dist_ref) * np.sin(angle) * dist_scale + 0 * np.sin(angle) + 2) * y_sign
+          # (np.cosh(dist_ref / 3) * dist_scale + 2) * np.cos(angle),
+          # ((np.sinh(dist_ref / 3) * dist_scale + 2) * np.sin(angle) + 1.5) * y_sign
         )
       # for angle, data in zip(angle_list, bucket):
       #   xy_dict[data['id']] = (
@@ -2187,7 +2193,10 @@ def plot_graph(
     legend_show = legend_show,
     legend_colorbar_scale = legend_colorbar_scale,
   )
-  figure = make_graph_figure(**plot_args)
+  # FIXME: MAKE THIS CONFIGURABLE FROM COMMNAD LINE/EITHER PLTO OR SHOW
+  figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
+  figure.show()
+  exit()
 
   file_out = os.path.join(output_dir, file_names.graph_figure(data_label, output_ext))
   log_utils.log(file_out)
@@ -2388,13 +2397,15 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --crop_y 0.15,0.85".split(" ")
+  # FIXME: HARDCODED STUFF HERE
+  sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs".split(" ")
   args = parse_args()
   plot_graph(
     output_dir = args.output,
     output_ext = args.ext,
     data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
-    plot_type = args.layout + '_layout',
+    # plot_type = args.layout + '_layout',
+    plot_type = 'radial_layout',
     title_show = args.title,
     node_size_max_freq = args.node_max_freq,
     node_size_min_freq = args.node_min_freq,
