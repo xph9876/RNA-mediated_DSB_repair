@@ -190,4 +190,8 @@ def get_variation_info(ref_align, read_align):
       ref_i += 1
   return variation_info
 
-# NOTE: CHANGES REF_I TO BE 1-BASED, FIX EVERYTHING ELSE!
+def get_insertion_str(ref_align: str, read_align:str):
+  return ''.join(read_align[i] for i in range(len(ref_align)) if ref_align[i] == '-')
+
+def get_first_deletion_pos(align_str: str):
+  return 1 + align_str.index('-')

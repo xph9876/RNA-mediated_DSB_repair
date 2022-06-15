@@ -24,6 +24,8 @@ import common_utils
 import log_utils
 import graph_utils
 import file_utils
+import kmer_utils
+import alignment_utils
 import file_names
 import plot_graph_helpers
 import make_common_layout
@@ -78,13 +80,13 @@ LAYOUT_PROPERTIES = {
     'x_range': (-10, 10),
     'y_range': (-10, 10),
   },
- 'radial_universal_layout': {
+ 'universal_layout': {
     'only_2d': True,
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    'x_range': (-10, 10),
-    'y_range': (-10, 10),
+    # 'x_range': (-10, 10),
+    # 'y_range': (-10, 10),
   },
  'kamada_layout': {
     'only_2d': False,
@@ -301,9 +303,7 @@ def make_variation_position_layout(
     y_size_px = y_size_px,
   )
 
-# FIXME: THIS IS THE REAL RADIAL LAYOUT. MAKE THE 
-# NEW RADIAL LAYOUT CALLED UNIVERSAL LAYOUT!!
-def make_radial_layout_old(data_info, graph):
+def make_radial_layout(data_info, graph):
   node_list = graph.nodes(data=True)
 
   bucket_dict = {
@@ -359,25 +359,7 @@ def make_radial_layout_old(data_info, graph):
         )
   return xy_dict
 
-
-def kmer_index(kmer):
-  nuc_index = {
-    'A': 0,
-    'C': 1,
-    'G': 2,
-    'T': 3,
-  }
-  index = 0
-  for x in kmer:
-    index *= 4
-    index += nuc_index[x]
-  return index
-
-def deletion_index(read_align: str):
-  return read_align.index('-')
-
-# FIXME: THIS IS THE UNIVERSAL LAYOUT RENAME THIS!!!
-def make_radial_layout(data_info, graph):
+def make_universal_layout(data_info, graph):
   node_list = graph.nodes(data=True)
 
   bucket_dict = {
@@ -400,13 +382,6 @@ def make_radial_layout(data_info, graph):
   for data in ref_nodes:
     xy_dict[data['id']] = (0, 0)
   for var_type in bucket_dict:
-    # Heuristics to make the nodes nicely spaced.
-    # Each distance is perturbed slightly so that nodes zig-zag a
-    # bit along radii instead od being in a smooth curve. The angle is
-    # also offset a bit at each distance level so that the nodes are not
-    # collinear. The insertions are placed above and deletion are place below.
-    # A bit of offset is added to the y-coord so that the insertions and deletions
-    # do not overlap as much.
     if var_type == 'insertion':
       y_sign = 1
       dist_scale = 2
@@ -422,46 +397,38 @@ def make_radial_layout(data_info, graph):
         reverse = True,
       ))
 
-      # delta_angle = dist_ref + 30 * (-1)**dist_ref / dist_ref
-      delta_angle = 0
-      delta_dist = 0
-      if var_type =='insertion':
-        angle_list = np.linspace(((180 - delta_angle) / 180) * np.pi, (delta_angle / 180) * np.pi, 4 ** dist_ref)
-      elif var_type == 'deletion':
-        delta_angle = 0
-        angle_list = np.linspace(((180 - delta_angle) / 180) * np.pi, (delta_angle / 180) * np.pi, 1 + dist_ref)
-      else:
-        raise Exception('Impossible.')
-
+      num_kmers = kmer_utils.get_num_kmers(dist_ref)
+      cut_pos_ref = len(data_info['ref_seq']) / 2
       for data in bucket:
         if var_type == 'insertion':
-          i = kmer_index(''.join(y for x, y in zip(list(data['ref_align']), list(data['read_align'])) if x == '-'))
-          angle = angle_list[i]
-          i = (i / 4**dist_ref - 0.5 * (1 - 1 / 4**(dist_ref))) * 10
+          # Place the x coordinate alphabetically so that A is left most
+          # and T is right most. This is intended to place the insertions
+          # in a tree where the path from the root to the leaf corresponds
+          # to the prefixes of the insertion.
+          kmer_index = kmer_utils.get_kmer_index(alignment_utils.get_insertion_str(
+            data['ref_align'],
+            data['read_align'],
+          ))
+          x = (kmer_index / num_kmers - 0.5 * (1 - 1 / num_kmers)) * 10
+          delta_y = 0
+          if dist_ref >= 4:
+            mod = dist_ref - 2
+            delta_y = (2 / 3) * ((kmer_index % mod) - (mod - 1) / 2) / (mod - 1)
           xy_dict[data['id']] = (
-            3.6 * i,
-            (dist_ref * dist_scale + 1.5) * y_sign
-            # (dist_ref * dist_scale + delta_dist) * np.cos(angle),
-            # ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
+            3.6 * x,
+            (dist_ref * dist_scale + 1.5 + delta_y) * y_sign
           )
         elif var_type == 'deletion':
-          i = deletion_index(data['read_align'])
-          i -= 9 - dist_ref + 1
-          j = deletion_index(data['read_align'])
-          j -= 9.5
-          j += (dist_ref - 1)/2
-          angle = angle_list[i]
-          # xy_dict[data['id']] = (
-          #   # (dist_ref * dist_scale + delta_dist) * np.cos(angle),
-          #   # ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
-          #   1.8 * dist_ref * np.cos(angle),
-          #   (dist_ref * np.sin(angle) + 1.5) * y_sign
-          # )
+          # Place the x coordinate so that the most upstream deletion
+          # is the left most, and most downstream deletion is right most.
+          # A deletion with equal number of deletions on either side of the
+          # cut position should be placed at x = 0.
+          x = alignment_utils.get_first_deletion_pos(data['read_align'])
+          x -= cut_pos_ref + 0.5
+          x += (dist_ref - 1) / 2
           xy_dict[data['id']] = (
-            # (dist_ref * dist_scale + delta_dist) * np.cos(angle),
-            # ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
-            3.6 * j,
-            (dist_ref + 1.5) * y_sign
+            3.6 * x,
+            (dist_ref * dist_scale + 1.5) * y_sign
           )
         else:
           raise Exception('Impossible.')
@@ -541,6 +508,8 @@ def make_graph_layout_single(
     layout = make_mds_layout(data_info, graph, distance_matrix)
   elif layout_type == 'radial_layout':
     layout = make_radial_layout(data_info, graph)
+  elif layout_type == 'universal_layout':
+    layout = make_universal_layout(data_info, graph)
   elif layout_type == 'kamada_layout':
     layout = nx.kamada_kawai_layout(
       graph,
@@ -2140,71 +2109,13 @@ def get_plot_args(
   legend_show = False,
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
 ):
-  if plot_type not in ['kamada_layout', 'radial_layout', 'mds_layout']:
+  if plot_type not in [
+    'kamada_layout',
+    'radial_layout',
+    'mds_layout',
+    'universal_layout',
+  ]:
     raise Exception('Unhandled plot type: ' + str(plot_type))
-
-
-#   data_dir_grid,
-#   graph_layout_type = 'kamada_layout',
-#   graph_layout_common_dir = None,
-#   graph_layout_separate_components = True,
-#   node_filter_variation_types = None,
-#   node_type = 'sequence_data',
-#   node_subst_type = constants.SUBST_WITHOUT,
-#   node_filter_freq_min = 0,
-#   node_filter_freq_max = np.inf,
-#   node_filter_dist_min = 0,
-#   node_filter_dist_max = np.inf,
-#   node_labels_show = False,
-#   node_label_columns = ['id'],
-#   node_label_position = 'bottom center',
-#   node_color_type = 'freq_group',
-#   node_size_type = 'freq',
-#   node_size_min_px = 10,
-#   node_size_max_px = 50,
-#   node_size_min_freq = 1e-6,
-#   node_size_max_freq = 1,
-#   edge_show = True,
-#   edge_show_labels = False,
-#   edge_show_types = list(constants.EDGE_TYPES),
-#   edge_width_scale = 1,
-#   col_widths_px = None,
-#   row_heights_px = None,
-#   row_space_px = PLOT_ARGS['SUBPLOT_ROW_SPACE_PX'],
-#   col_space_px = PLOT_ARGS['SUBPLOT_COL_SPACE_PX'],
-#   title = None,
-#   title_height_px = PLOT_ARGS['TITLE_HEIGHT_PX'],
-#   title_y_shift_px = 0,
-#   title_subplot_show = True,
-#   legend_plotly_show = False,
-#   legend_custom_show = True,
-#   legend_common = False,
-#   legend_width_px = PLOT_ARGS['LEGEND_WIDTH_PX'],
-#   legend_x_shift_px = 0,
-#   legend_vertical_space_px = PLOT_ARGS['LEGEND_VERTICAL_SPACE_PX'],
-#   legend_item_scale = 1,
-#   legend_colorbar_scale = 1,
-#   line_width_scale = 1,
-#   node_outline_width_scale = 1,
-#   x_plot_range = None,
-#   y_plot_range = None,
-#   graph_stats_show = False,
-#   graph_stats_separate = True,
-#   graph_stats_subplot_px = PLOT_ARGS['GRAPH_STATS_SUBPLOT_PX'],
-#   graph_stats_x = 0,
-#   graph_stats_y = 1,
-#   graph_stats_x_shift = 20,
-#   graph_stats_y_shift = -20,
-#   graph_stats_x_anchor = 'left',
-#   graph_stats_y_anchor = 'top',
-#   margin_top_min_px = PLOT_ARGS['MARGIN_TOP_MIN_PX'],
-#   margin_bottom_min_px = PLOT_ARGS['MARGIN_BOTTOM_MIN_PX'],
-#   margin_left_min_px = PLOT_ARGS['MARGIN_LEFT_MIN_PX'],
-#   margin_right_min_px = PLOT_ARGS['MARGIN_RIGHT_MIN_PX'],
-#   font_size_scale = 1,
-#   axis_show = False,
-#   axis_font_size_scale = 1,
-#   axis_tick_modulo = 1,
 
   plot_args = {}
   plot_args['data_dir_grid'] = np.array([[data_info['dir']]])
@@ -2241,6 +2152,7 @@ def get_plot_args(
       'kamada_layout': 'Kamada-Kawaii Layout',
       'radial_layout': 'Radial Layout',
       'mds_layout': 'MDS Layout',
+      'universal_layout': 'Universal Layout',
     }[plot_type]
     plot_args['title'] = plot_title
   
@@ -2369,7 +2281,7 @@ def parse_args():
   )
   parser.add_argument(
     '--layout',
-    choices = ['kamada', 'radial', 'mds'],
+    choices = ['kamada', 'radial', 'mds', 'universal'],
     default = 'radial',
     help = 'The algorithm to use for laying out the graph.'
   )
@@ -2516,7 +2428,7 @@ def parse_args():
 
 def main():
   # FIXME: HARDCODED STUFF HERE
-  # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --layout radial --interactive".split(" ")
+  # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --layout universal --interactive".split(" ")
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1".split(" ")
   args = parse_args()
   plot_graph(
