@@ -672,6 +672,22 @@ def parse_args():
 
 
 if __name__ == '__main__':
+  # argv = [
+  #   "-i",
+  #   "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
+  #   "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
+  #   "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
+  #   "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
+  #   "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
+  #   "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
+  #   "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
+  #   "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
+  #   "-ng", "1", "-nr", "4", "-nc", "3",
+  #   "-o", "hello.pptx",
+  #   "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
+  #   "-lmlab", "A", "B", "C", "D",
+  #   "-tmlab", "A", "B", "C",
+  # ]
   argv = [
     "-i",
     "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",

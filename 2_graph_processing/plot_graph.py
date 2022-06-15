@@ -28,7 +28,6 @@ import file_names
 import plot_graph_helpers
 import make_common_layout
 
-
 PLOT_ARGS = dict(
   SUBPLOT_WIDTH_PX = 1600,
   SUBPLOT_HEIGHT_PX = 1000,
@@ -76,9 +75,16 @@ LAYOUT_PROPERTIES = {
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    # 'preserve_aspect': True,
     'x_range': (-10, 10),
-    'y_range': (-10, 10)
+    'y_range': (-10, 10),
+  },
+ 'radial_universal_layout': {
+    'only_2d': True,
+    'do_pca': False,
+    'normalize': False,
+    'has_edges': True,
+    'x_range': (-10, 10),
+    'y_range': (-10, 10),
   },
  'kamada_layout': {
     'only_2d': False,
@@ -295,6 +301,82 @@ def make_variation_position_layout(
     y_size_px = y_size_px,
   )
 
+# FIXME: THIS IS THE REAL RADIAL LAYOUT. MAKE THE 
+# NEW RADIAL LAYOUT CALLED UNIVERSAL LAYOUT!!
+def make_radial_layout_old(data_info, graph):
+  node_list = graph.nodes(data=True)
+
+  bucket_dict = {
+    'insertion': {},
+    'deletion': {},
+  }
+
+  ref_nodes = []
+
+  for _, data in node_list:
+    if data['dist_ref'] == 0:
+      ref_nodes.append(data)
+    else:
+      dist_ref = data['dist_ref']
+      var_type = data['variation_type']
+      bucket_dict[var_type].setdefault(dist_ref, [])
+      bucket_dict[var_type][dist_ref].append(data)
+
+  xy_dict = {}
+  for data in ref_nodes:
+    xy_dict[data['id']] = (0, 0)
+  for var_type in bucket_dict:
+    # Heuristics to make the nodes nicely spaced.
+    # Each distance is perturbed slightly so that nodes zig-zag a
+    # bit along radii instead od being in a smooth curve. The angle is
+    # also offset a bit at each distance level so that the nodes are not
+    # collinear. The insertions are placed above and deletion are place below.
+    # A bit of offset is added to the y-coord so that the insertions and deletions
+    # do not overlap as much.
+    if var_type == 'insertion':
+      y_sign = 1
+      dist_scale = 2
+    elif var_type == 'deletion':
+      y_sign = -1
+      dist_scale = 1
+    else:
+      raise Exception('Impossible: ' + str(var_type))
+    for dist_ref in bucket_dict[var_type]:
+      bucket = list(sorted(
+        bucket_dict[var_type][dist_ref],
+        key = lambda x: max(x[col] for col in constants.FREQ_COLUMNS[data_info['format']]),
+        reverse = True,
+      ))
+
+      delta_angle = dist_ref + 30 * (-1)**dist_ref / dist_ref
+      delta_dist = 0
+      angle_list = np.linspace(((180 - delta_angle) / 180) * np.pi, (delta_angle / 180) * np.pi, len(bucket))
+
+      for angle, data in zip(angle_list, bucket):
+        xy_dict[data['id']] = (
+          (dist_ref * dist_scale + delta_dist) * np.cos(angle),
+          ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
+        )
+  return xy_dict
+
+
+def kmer_index(kmer):
+  nuc_index = {
+    'A': 0,
+    'C': 1,
+    'G': 2,
+    'T': 3,
+  }
+  index = 0
+  for x in kmer:
+    index *= 4
+    index += nuc_index[x]
+  return index
+
+def deletion_index(read_align: str):
+  return read_align.index('-')
+
+# FIXME: THIS IS THE UNIVERSAL LAYOUT RENAME THIS!!!
 def make_radial_layout(data_info, graph):
   node_list = graph.nodes(data=True)
 
@@ -318,6 +400,13 @@ def make_radial_layout(data_info, graph):
   for data in ref_nodes:
     xy_dict[data['id']] = (0, 0)
   for var_type in bucket_dict:
+    # Heuristics to make the nodes nicely spaced.
+    # Each distance is perturbed slightly so that nodes zig-zag a
+    # bit along radii instead od being in a smooth curve. The angle is
+    # also offset a bit at each distance level so that the nodes are not
+    # collinear. The insertions are placed above and deletion are place below.
+    # A bit of offset is added to the y-coord so that the insertions and deletions
+    # do not overlap as much.
     if var_type == 'insertion':
       y_sign = 1
       dist_scale = 2
@@ -333,31 +422,49 @@ def make_radial_layout(data_info, graph):
         reverse = True,
       ))
 
-      # FIXME: EXPERIMENTING HERE. HARDCODED STUFF.
-      d = dist_ref + 30*(-1)**dist_ref / dist_ref
-      if var_type == 'insertion':
-        # angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
-        angle_list = np.linspace(((180 - d) / 180) * np.pi, (d / 180) * np.pi, len(bucket))
-        # angle_list = np.linspace(((175) / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
+      # delta_angle = dist_ref + 30 * (-1)**dist_ref / dist_ref
+      delta_angle = 0
+      delta_dist = 0
+      if var_type =='insertion':
+        angle_list = np.linspace(((180 - delta_angle) / 180) * np.pi, (delta_angle / 180) * np.pi, 4 ** dist_ref)
       elif var_type == 'deletion':
-        angle_list = np.linspace(((180 - d) / 180) * np.pi, (d / 180) * np.pi, len(bucket))
-        # angle_list = np.linspace((175 / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
-        # angle_list = np.linspace(((175) / 180) * np.pi, (5 / 180) * np.pi, len(bucket))
+        delta_angle = 0
+        angle_list = np.linspace(((180 - delta_angle) / 180) * np.pi, (delta_angle / 180) * np.pi, 1 + dist_ref)
       else:
-        raise Exception('Impossible: ' + str(var_type))
+        raise Exception('Impossible.')
 
-      for angle, data in zip(angle_list, bucket):
-        xy_dict[data['id']] = (
-          (dist_ref) * np.cos(angle) * dist_scale + 0 * np.cos(angle),
-          ((dist_ref) * np.sin(angle) * dist_scale + 0 * np.sin(angle) + 2) * y_sign
-          # (np.cosh(dist_ref / 3) * dist_scale + 2) * np.cos(angle),
-          # ((np.sinh(dist_ref / 3) * dist_scale + 2) * np.sin(angle) + 1.5) * y_sign
-        )
-      # for angle, data in zip(angle_list, bucket):
-      #   xy_dict[data['id']] = (
-      #     (dist_ref) * np.cos(angle) * dist_scale,
-      #     ((dist_ref) * np.sin(angle) * dist_scale) * y_sign
-      #   )
+      for data in bucket:
+        if var_type == 'insertion':
+          i = kmer_index(''.join(y for x, y in zip(list(data['ref_align']), list(data['read_align'])) if x == '-'))
+          angle = angle_list[i]
+          i = (i / 4**dist_ref - 0.5 * (1 - 1 / 4**(dist_ref))) * 10
+          xy_dict[data['id']] = (
+            3.6 * i,
+            (dist_ref * dist_scale + 1.5) * y_sign
+            # (dist_ref * dist_scale + delta_dist) * np.cos(angle),
+            # ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
+          )
+        elif var_type == 'deletion':
+          i = deletion_index(data['read_align'])
+          i -= 9 - dist_ref + 1
+          j = deletion_index(data['read_align'])
+          j -= 9.5
+          j += (dist_ref - 1)/2
+          angle = angle_list[i]
+          # xy_dict[data['id']] = (
+          #   # (dist_ref * dist_scale + delta_dist) * np.cos(angle),
+          #   # ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
+          #   1.8 * dist_ref * np.cos(angle),
+          #   (dist_ref * np.sin(angle) + 1.5) * y_sign
+          # )
+          xy_dict[data['id']] = (
+            # (dist_ref * dist_scale + delta_dist) * np.cos(angle),
+            # ((dist_ref * dist_scale + delta_dist) * np.sin(angle) + 2) * y_sign
+            3.6 * j,
+            (dist_ref + 1.5) * y_sign
+          )
+        else:
+          raise Exception('Impossible.')
   return xy_dict
 
 # idea to make the nodes a reasonable distance from the reference
@@ -2171,6 +2278,7 @@ def plot_graph(
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
   crop_x = None,
   crop_y = None,
+  interactive = False,
 ):
   data_label = constants.get_data_label(data_info)
   plot_args = get_plot_args(
@@ -2193,10 +2301,12 @@ def plot_graph(
     legend_show = legend_show,
     legend_colorbar_scale = legend_colorbar_scale,
   )
-  # FIXME: MAKE THIS CONFIGURABLE FROM COMMNAD LINE/EITHER PLTO OR SHOW
+  
   figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
-  figure.show()
-  exit()
+
+  if interactive:
+    log_utils.log("Opening interactive version in browser.")
+    figure.show()
 
   file_out = os.path.join(output_dir, file_names.graph_figure(data_label, output_ext))
   log_utils.log(file_out)
@@ -2393,19 +2503,27 @@ def parse_args():
     action = 'store_true',
     help = 'If present separate the connected components of the graph.'
   )
+  parser.add_argument(
+    '--interactive',
+    action = 'store_true',
+    help = (
+      'If present opens the interactive version in a browser.'
+      ' Uses the Ploty library figure.show() function to do so.'
+    ),
+  )
   
   return parser.parse_args()
 
 def main():
   # FIXME: HARDCODED STUFF HERE
-  sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs".split(" ")
+  # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --layout radial --interactive".split(" ")
+  # sys.argv += "-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1".split(" ")
   args = parse_args()
   plot_graph(
     output_dir = args.output,
     output_ext = args.ext,
     data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
-    # plot_type = args.layout + '_layout',
-    plot_type = 'radial_layout',
+    plot_type = args.layout + '_layout',
     title_show = args.title,
     node_size_max_freq = args.node_max_freq,
     node_size_min_freq = args.node_min_freq,
@@ -2424,6 +2542,7 @@ def main():
     legend_colorbar_scale = args.legend_color_bar_scale,
     crop_x = args.crop_x,
     crop_y = args.crop_y,
+    interactive = args.interactive,
   )
 
 if __name__ == '__main__':
