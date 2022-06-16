@@ -42,13 +42,19 @@ def parse_args():
   parser.add_argument(
     '-st',
     '--subst_type',
-    type = str,
     default = 'without',
     choices = ['with', 'without'],
     help = 'Whether to use the data with or without substitutions.',
   )
+  parser.add_argument(
+    '--layout',
+    default = 'radial',
+    choices = ['radial', 'mds', 'kamada', 'universal'],
+    help = 'Type of layout to use.',
+  )
   args = parser.parse_args()
   args.subst_type += 'Subst'
+  args.layout += '_layout'
   return args
 
 def get_common_layout(
@@ -83,7 +89,12 @@ def get_common_layout(
   return node_data
 
 
-def make_common_layout(data_dir_list, output_dir, subst_type):
+def make_common_layout(
+  data_dir_list,
+  output_dir,
+  subst_type,
+  layout_type,
+):
   """
     Make common layout files by combining the node information in the input data sets.
   """
@@ -162,7 +173,7 @@ def make_common_layout(data_dir_list, output_dir, subst_type):
     node_type = 'sequence_data',
     node_subst_type = subst_type,
     graph = graph,
-    layout_type = 'radial_layout',
+    layout_type = layout_type,
     node_size_px_dict = None,
     x_size_domain = None,
     y_size_domain = None,
@@ -190,7 +201,7 @@ def main():
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv -o layouts/2DSB_R1 --subst_type without".split(" ")
   # sys.argv += "-i libraries_4/WT_sgCD_R1_antisense libraries_4/WT_sgCD_R1_splicing -o layouts/2DSBanti_R1 --subst_type without".split(" ")
   args = parse_args()
-  make_common_layout(args.input, args.output, args.subst_type) 
+  make_common_layout(args.input, args.output, args.subst_type, args.layout) 
 
 
 if __name__ == '__main__':

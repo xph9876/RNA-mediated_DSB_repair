@@ -85,8 +85,8 @@ LAYOUT_PROPERTIES = {
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    # 'x_range': (-10, 10),
-    # 'y_range': (-10, 10),
+    'x_range': (-10, 10),
+    'y_range': (-10, 10),
   },
  'kamada_layout': {
     'only_2d': False,
@@ -2232,9 +2232,10 @@ def plot_graph(
     log_utils.log("Opening interactive version in browser.")
     figure.show()
 
-  file_out = os.path.join(output_dir, file_names.graph_figure(data_label, output_ext))
-  log_utils.log(file_out)
-  file_utils.write_plotly(figure, file_out)
+  if output_dir is not None:
+    file_out = os.path.join(output_dir, file_names.graph_figure(data_label, output_ext))
+    log_utils.log(file_out)
+    file_utils.write_plotly(figure, file_out)
 
   if (
     ((crop_x is not None) and (tuple(crop_x) != (0, 1))) or
@@ -2441,7 +2442,7 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --layout universal --interactive".split(" ")
+  # sys.argv += "-i libraries_4/WT_sgA_R1_branch --layout universal --interactive".split(" ")
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1".split(" ")
   args = parse_args()
   plot_graph(
