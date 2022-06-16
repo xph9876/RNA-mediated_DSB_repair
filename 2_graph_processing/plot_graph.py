@@ -397,27 +397,41 @@ def make_universal_layout(data_info, graph):
         reverse = True,
       ))
 
-      num_kmers = kmer_utils.get_num_kmers(dist_ref)
       cut_pos_ref = len(data_info['ref_seq']) / 2
       for data in bucket:
         if var_type == 'insertion':
           # Place the x coordinate alphabetically so that A is left most
           # and T is right most. This is intended to place the insertions
-          # in a tree where the path from the root to the leaf corresponds
-          # to the prefixes of the insertion.
+          # in a tree based on the common prefix of the insertion nucleotides.
+          # To prevent overlapping the nodes are placed in multiple rows for
+          # higher numbers of insertions.
           kmer_index = kmer_utils.get_kmer_index(alignment_utils.get_insertion_str(
             data['ref_align'],
             data['read_align'],
           ))
-          x = (kmer_index / num_kmers - 0.5 * (1 - 1 / num_kmers)) * 10
-          delta_y = 0
-          if dist_ref >= 4:
-            mod = dist_ref - 2
-            delta_y = (2 / 3) * ((kmer_index % mod) - (mod - 1) / 2) / (mod - 1)
-          xy_dict[data['id']] = (
-            3.6 * x,
-            (dist_ref * dist_scale + 1.5 + delta_y) * y_sign
+          
+          insertion_row_spec = {
+            1: {'rows': 1, 'cols': 4, 'row_space': 2},
+            2: {'rows': 1, 'cols': 16, 'row_space': 2},
+            3: {'rows': 2, 'cols': 32, 'row_space': 1},
+            4: {'rows': 2, 'cols': 128, 'row_space': 0.5},
+            5: {'rows': 4, 'cols': 256, 'row_space': 0.25},
+            6: {'rows': 8, 'cols': 512, 'row_space': 0.25},
+            7: {'rows': 8, 'cols': 2048, 'row_space': 0.25},
+            8: {'rows': 8, 'cols': 8192, 'row_space': 0.25},
+          }
+          num_rows = insertion_row_spec[dist_ref]['rows']
+          num_cols = insertion_row_spec[dist_ref]['cols']
+          row = kmer_index % num_rows
+          col = kmer_index // num_rows
+          y = sum(
+            1 + insertion_row_spec[i]['rows'] * insertion_row_spec[i]['row_space']
+            for i in insertion_row_spec
+            if i < dist_ref
           )
+          y += row * insertion_row_spec[dist_ref]['row_space']
+          x = ((col / num_cols) - 0.5 * (1 - 1 / num_cols))
+          xy_dict[data['id']] = (x * 22, y + 1)
         elif var_type == 'deletion':
           # Place the x coordinate so that the most upstream deletion
           # is the left most, and most downstream deletion is right most.
@@ -426,10 +440,8 @@ def make_universal_layout(data_info, graph):
           x = alignment_utils.get_first_deletion_pos(data['read_align'])
           x -= cut_pos_ref + 0.5
           x += (dist_ref - 1) / 2
-          xy_dict[data['id']] = (
-            3.6 * x,
-            (dist_ref * dist_scale + 1.5) * y_sign
-          )
+          y = dist_ref
+          xy_dict[data['id']] = (x * 2, -(y + 1))
         else:
           raise Exception('Impossible.')
   return xy_dict
@@ -2259,8 +2271,10 @@ def parse_args():
     '-o',
     '--output',
     type = common_utils.check_dir_output,
-    help = 'Output directory.',
-    required = True,
+    help = (
+      'Output directory.' +
+      ' If not given not output will be written (only useful when using --interative).'
+    ),
   )
   parser.add_argument(
     '-ext',
@@ -2427,7 +2441,6 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  # FIXME: HARDCODED STUFF HERE
   # sys.argv += "-i libraries_4/WT_sgA_R1_branch -o plots/graphs --layout universal --interactive".split(" ")
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1".split(" ")
   args = parse_args()
