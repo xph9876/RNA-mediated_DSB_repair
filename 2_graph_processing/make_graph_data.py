@@ -397,22 +397,6 @@ def exhaustive_cycle_search(nodes, edge_list, cycle_size):
 def make_cycle(data_set):
   pass
 
-# def main_old():
-#   for data_set in common.DATA_SETS.values():
-#     for subst_type in common.MAIN_FILE_TYPES['subst_type']:
-#       # if data_set['DSB'] != '2DSBanti':
-#       #   continue
-#       # for anchor_type in common.MAIN_FILE_TYPES['anchor_type']:
-#       for anchor_type in ['withAnchor']:
-#         # make_sequence_data(data_set, subst_type=subst_type, anchor_type=anchor_type)
-#         # make_edge_data(data_set, subst_type=subst_type, anchor_type=anchor_type)
-#         make_distance_matrix(data_set, subst_type=subst_type, anchor_type=anchor_type)
-#         # make_alignment_window(data_set, subst_type=subst_type, anchor_type=anchor_type)
-#         # make_variation(data_set, subst_type=subst_type, anchor_type=anchor_type)
-#         # make_variation_grouped(data_set, subst_type=subst_type, anchor_type=anchor_type)
-      
-#         # make_graph_stats(data_set, subst_type=subst_type, anchor_type=anchor_type)
-
 def main():
   args = parse_args()
   make_sequence_data(args.dir, args.subst_type)
