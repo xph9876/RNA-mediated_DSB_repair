@@ -77,16 +77,14 @@ LAYOUT_PROPERTIES = {
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    'x_range': (-10, 10),
-    'y_range': (-10, 10),
+    'plot_range': {'x': (-10, 10), 'y': (-10, 10)},
   },
  'universal_layout': {
     'only_2d': True,
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    'x_range': (-10, 10),
-    'y_range': (-10, 10),
+    # 'plot_range': {'x': (-12, 12), 'y': (-22, 18)},
   },
  'kamada_layout': {
     'only_2d': False,
@@ -1852,11 +1850,11 @@ def make_graph_figure(
         constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
         constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
       ]
-  elif graph_layout_type == 'radial_layout':
+  elif 'plot_range' in LAYOUT_PROPERTIES[graph_layout_type]:
     if plot_range_x is None:
-      plot_range_x = constants.RADIAL_LAYOUT_RANGE
+      plot_range_x = LAYOUT_PROPERTIES[graph_layout_type]['plot_range']['x']
     if plot_range_y is None:
-      plot_range_y = constants.RADIAL_LAYOUT_RANGE
+      plot_range_y = LAYOUT_PROPERTIES[graph_layout_type]['plot_range']['y']
   elif LAYOUT_PROPERTIES.get(graph_layout_type, {}).get('normalize'):
     if plot_range_x is None:
       plot_range_x = (0, 1)
@@ -2442,7 +2440,7 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  # sys.argv += "-i libraries_4/WT_sgA_R1_branch --layout universal --interactive".split(" ")
+  # sys.argv += "-i libraries_4/WT_sgCD_R1_splicing --layout universal --interactive".split(" ")
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1".split(" ")
   args = parse_args()
   plot_graph(
