@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './utils/'))) # allow importing the utils dir
 
 import constants
+import kmer_utils
 
 import plotly.graph_objects as go
 import plotly.colors as pc
@@ -17,16 +18,19 @@ def format_hover_html(data_info, the_dict, format_type):
       value = f'{value:.2e}'
     return f'<b>{name}:</b> {value}'
 
-  def create_mismatch_htmls(ref_aligns, seq_aligns):
+  def create_mismatch_htmls(ref_align, read_align):
+    if data_info['strand'] == constants.STRAND_R2:
+      ref_align = kmer_utils.reverse_complement(ref_align)
+      read_align = kmer_utils.reverse_complement(read_align)
     ref_html = ''
     read_html = ''
-    for i in range(len(ref_aligns)):
-      if ref_aligns[i] == seq_aligns[i]:
-        ref_html += ref_aligns[i]
-        read_html += seq_aligns[i]
+    for i in range(len(ref_align)):
+      if ref_align[i] == read_align[i]:
+        ref_html += ref_align[i]
+        read_html += read_align[i]
       else:
-        ref_html += "<span style='color: red;'><b>{}</b></span>".format(ref_aligns[i])
-        read_html += "<span style='color: red;'><b>{}</b></span>".format(seq_aligns[i])
+        ref_html += "<span style='color: red;'><b>{}</b></span>".format(ref_align[i])
+        read_html += "<span style='color: red;'><b>{}</b></span>".format(read_align[i])
     return ref_html, read_html
   
   title = None
