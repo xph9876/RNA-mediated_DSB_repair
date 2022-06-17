@@ -30,40 +30,6 @@ import file_names
 import plot_graph_helpers
 import make_common_layout
 
-PLOT_ARGS = dict(
-  SUBPLOT_WIDTH_PX = 1600,
-  SUBPLOT_HEIGHT_PX = 1000,
-  GRAPH_STATS_SUBPLOT_PX = 800,
-  TITLE_HEIGHT_PX = 100,
-  DESCRIPTION_HEIGHT_PX = 700,
-  TITLE_FONT_SIZE = 30,
-  SUBPLOT_TITLE_FONT_SIZE = 24,
-  AXES_TITLE_FONT_SIZE = 20,
-  AXES_TICK_FONT_SIZE = 16,
-  LEGEND_WIDTH_PX = 400,
-  LEGEND_VERTICAL_SPACE_PX = 100,
-  LEGEND_TITLE_FONT_SIZE = 24,
-  LEGEND_GROUP_TITLE_FONT_SIZE = 20,
-  LEGEND_FONT_SIZE = 18,
-  EDGE_LEGEND_ITEM_LINE_SIZE_PX = 100,
-  EDGE_LEGEND_ITEM_LINE_WIDTH_PX = 2.5,
-  BACKGROUND_COLOR = 'white',
-  SUBPLOT_ROW_SPACE_PX = 100,
-  SUBPLOT_COL_SPACE_PX = 100,
-  COLORBAR_HEIGHT_PX = 500,
-  COLORBAR_WIDTH_PX = 50,
-  LABEL_FONT_SIZE = 16,
-  MARGIN_ROW_HEIGHTS_PX = [500],
-  MARGIN_COL_WIDTHS_PX = [800, 1500, 1000],
-  MARGIN_TOP_MIN_PX = 300,
-  MARGIN_BOTTOM_MIN_PX = 300,
-  MARGIN_LEFT_MIN_PX = 300,
-  MARGIN_RIGHT_MIN_PX = 300,
-  MARGIN_FONT_SIZES_TOP = [30, 30],
-  MARGIN_FONT_SIZES_LEFT = [30, 30, 20],
-  KAMADA_CUSTOM_INIT = False,
-)
-
 LAYOUT_PROPERTIES = {
  'mds_layout': {
     'only_2d': True,
@@ -80,6 +46,14 @@ LAYOUT_PROPERTIES = {
     'plot_range': {'x': (-10, 10), 'y': (-10, 10)},
   },
  'universal_layout': {
+    'only_2d': True,
+    'do_pca': False,
+    'normalize': False,
+    'has_edges': True,
+    # 'plot_range': {'x': (-12, 12), 'y': (-22, 18)},
+    'radial': False,
+  },
+ 'fractal_layout': {
     'only_2d': True,
     'do_pca': False,
     'normalize': False,
@@ -160,9 +134,6 @@ LAYOUT_PROPERTIES = {
     'has_edges': False, 
   },
 }
-
-def get_plot_arg_scaled(name, scale):
-  return PLOT_ARGS[name] * scale
 
 def group_graph_nodes_by(graph, data_name):
   data = pd.series(dict(graph.nodes(data_name)))
@@ -358,6 +329,87 @@ def make_radial_layout(data_info, graph):
         )
   return xy_dict
 
+def get_kmer_fractal_x_y(kmer):
+  X_COORD_MAP = {'A': 0, 'C': 1, 'G': 0, 'T': 1}
+  Y_COORD_MAP = {'A': 1, 'C': 1, 'G': 0, 'T': 0}
+  x = 0
+  y = 0
+  for letter in kmer:
+    x = 2 * x + X_COORD_MAP[letter]
+    y = 2 * y + Y_COORD_MAP[letter]
+  x = (x + 0.5) / (2 ** len(kmer))
+  y = (y + 0.5) / (2 ** len(kmer))
+  return (x, y)
+
+def make_fractal_layout(data_info, graph):
+  node_list = graph.nodes(data=True)
+
+  bucket_dict = {
+    'insertion': {},
+    'deletion': {},
+  }
+
+  ref_nodes = []
+
+  for _, data in node_list:
+    if data['dist_ref'] == 0:
+      ref_nodes.append(data)
+    else:
+      dist_ref = data['dist_ref']
+      var_type = data['variation_type']
+      bucket_dict[var_type].setdefault(dist_ref, [])
+      bucket_dict[var_type][dist_ref].append(data)
+
+  xy_dict = {}
+  for data in ref_nodes:
+    xy_dict[data['id']] = (0, 0)
+  for var_type in bucket_dict:
+    for dist_ref in bucket_dict[var_type]:
+      bucket = list(sorted(
+        bucket_dict[var_type][dist_ref],
+        key = lambda x: max(x[col] for col in constants.FREQ_COLUMNS[data_info['format']]),
+        reverse = True,
+      ))
+
+      cut_pos_ref = len(data_info['ref_seq']) / 2
+      for data in bucket:
+        ref_align = data['ref_align']
+        read_align = data['read_align']
+
+        if data_info['strand'] == constants.STRAND_R2:
+          ref_align = kmer_utils.reverse_complement(ref_align)
+          read_align = kmer_utils.reverse_complement(read_align)
+
+        if var_type == 'insertion':
+          x, y = get_kmer_fractal_x_y(
+            alignment_utils.get_insertion_str(
+              ref_align,
+              read_align,
+            )
+          )
+          print(x, y)
+          xy_dict[data['id']] = (10 * (x - 0.5), 10 * (y - 0.5))
+        elif var_type == 'deletion':
+          # Place the x coordinate so that the most upstream deletion
+          # is the left most, and most downstream deletion is right most.
+          # A deletion with equal number of deletions on either side of the
+          # cut position should be placed at x = 0.
+          first_del_pos = alignment_utils.get_first_deletion_pos(read_align)
+          last_del_pos = first_del_pos + dist_ref - 1
+          avg_del_pos = (first_del_pos + last_del_pos) / 2
+          x = avg_del_pos - (cut_pos_ref + 0.5)
+          y = dist_ref
+          if LAYOUT_PROPERTIES['universal_layout']['radial']:
+            angle = np.pi / 2 - 2 * (np.pi / 2) * (x / (dist_ref + 1))
+            xy_dict[data['id']] = (2 * y * np.cos(angle), -0.25 - 0.5 * (y * np.sin(angle)))
+          else:
+            xy_dict[data['id']] = (x * 2, -(y + 1))
+          xy_dict[data['id']] = (0, 0)
+        else:
+          raise Exception('Impossible.')
+  return xy_dict
+
+
 def make_universal_layout(data_info, graph):
   node_list = graph.nodes(data=True)
 
@@ -530,6 +582,8 @@ def make_graph_layout_single(
     layout = make_radial_layout(data_info, graph)
   elif layout_type == 'universal_layout':
     layout = make_universal_layout(data_info, graph)
+  elif layout_type == 'fractal_layout':
+    layout = make_fractal_layout(data_info, graph)
   elif layout_type == 'kamada_layout':
     layout = nx.kamada_kawai_layout(
       graph,
@@ -783,14 +837,14 @@ def make_legend(
     xshift = x_shift,
     yshift = y_shift,
     showarrow = False,
-    font_size = get_plot_arg_scaled('LEGEND_TITLE_FONT_SIZE', font_size_scale),
+    font_size = constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
   )
 
   y_shift_step_sign = -1 if y_shift_item_step < 0 else 1
   y_shift_item_step = legend_item_scale * y_shift_item_step
   curr_y_shift = (
     y_shift +
-    y_shift_step_sign * get_plot_arg_scaled('LEGEND_TITLE_FONT_SIZE', font_size_scale) +
+    y_shift_step_sign * constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale +
     y_shift_items
   )
   for _, item in enumerate(legend_items):
@@ -842,11 +896,11 @@ def make_legend(
       xanchor = 'left',
       yanchor = 'middle',
       showarrow = False,
-      font_size = get_plot_arg_scaled('LEGEND_FONT_SIZE', font_size_scale),
+      font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     )
     curr_y_shift += y_shift_step_sign * max(
       abs(y_shift_item_step),
-      1.5 * get_plot_arg_scaled('LEGEND_FONT_SIZE', font_size_scale),
+      1.5 * constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     )
   return curr_y_shift
 
@@ -943,7 +997,7 @@ def make_outline_legend(
     'type': 'circle',
     'size': node_size_px,
     'text': 'Reference',
-    'color': PLOT_ARGS['BACKGROUND_COLOR'],
+    'color': constants.GRAPH_BACKGROUND_COLOR,
     'line_color': constants.REFERENCE_OUTLINE_COLOR,
     'line_width': constants.REFERENCE_OUTLINE_WIDTH,
   })
@@ -951,7 +1005,7 @@ def make_outline_legend(
     'type': 'circle',
     'size': node_size_px,
     'text': 'Non-reference',
-    'color': PLOT_ARGS['BACKGROUND_COLOR'],
+    'color': constants.GRAPH_BACKGROUND_COLOR,
     'line_color': constants.DEFAULT_OUTLINE_COLOR,
     'line_width': constants.DEFAULT_OUTLINE_WIDTH,
   })
@@ -1137,9 +1191,9 @@ def add_plotly_colorbar(
             'Color Scale<br>'
             f'[{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
           ),
-          'font_size': get_plot_arg_scaled('LEGEND_TITLE_FONT_SIZE', font_size_scale),
+          'font_size': constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
         },
-        'tickfont_size': get_plot_arg_scaled('LEGEND_FONT_SIZE', font_size_scale),
+        'tickfont_size': constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
       },
     },
     row = row,
@@ -1254,8 +1308,8 @@ def make_custom_legends(
     y_shift_curr_px = make_edge_legend(
       figure = figure,
       edge_type_list = edge_show_types,
-      line_size_px = PLOT_ARGS['EDGE_LEGEND_ITEM_LINE_SIZE_PX'],
-      line_width_px = PLOT_ARGS['EDGE_LEGEND_ITEM_LINE_WIDTH_PX'],
+      line_size_px = constants.EDGE_LEGEND_ITEM_LINE_SIZE_PX,
+      line_width_px = constants.EDGE_LEGEND_ITEM_LINE_WIDTH_PX,
       x_anchor = 1,
       y_anchor = 1,
       x_shift = legend_x_shift_px,
@@ -1316,7 +1370,7 @@ def make_graph_stats(
     xanchor = x_anchor,
     yanchor = y_anchor,
     align = 'left',
-    font_size = get_plot_arg_scaled('LEGEND_FONT_SIZE', font_size_scale),
+    font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     font_family = 'Monospace',
     text = (
       f'Num nodes:            {graph_stats["num_nodes"][0]}<br>'
@@ -1358,7 +1412,7 @@ def make_graph_stats_ref_component(
     y = [0],
     row = row,
     col = col,
-    marker_color = PLOT_ARGS['BACKGROUND_COLOR'],
+    marker_color = constants.GRAPH_BACKGROUND_COLOR,
     marker_size = 0,
     showlegend = False,
   )
@@ -1432,7 +1486,7 @@ def make_graph_stats_ref_component(
     xanchor = x_anchor,
     yanchor = y_anchor,
     align = 'left',
-    font_size = get_plot_arg_scaled('LEGEND_FONT_SIZE', font_size_scale),
+    font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     font_family = 'Monospace',
     text = (
       # data_set['label']['main'] + '<br>' +
@@ -1576,7 +1630,7 @@ def make_graph_single_panel(
     show_node_labels = node_labels_show,
     node_label_columns = node_label_columns,
     node_label_position = node_label_position,
-    node_label_font_size = get_plot_arg_scaled('LABEL_FONT_SIZE', font_size_scale),
+    node_label_font_size = constants.GRAPH_LABEL_FONT_SIZE * font_size_scale,
     node_type = node_type,
     node_color_type = node_color_type,
     node_size_type = node_size_type,
@@ -1635,8 +1689,8 @@ def make_graph_single_panel(
         dtick = 1,
         linecolor = 'black',
         linewidth = line_width_scale,
-        title_font_size = get_plot_arg_scaled('AXES_TITLE_FONT_SIZE', axis_font_size_scale),
-        tickfont_size = get_plot_arg_scaled('AXES_TICK_FONT_SIZE', axis_font_size_scale),
+        title_font_size = constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
+        tickfont_size = constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
         ticktext = x_axis_tick_text,
         tickvals = x_axis_tick_vals,
         range = plot_range_x,
@@ -1653,8 +1707,8 @@ def make_graph_single_panel(
         dtick = 1,
         linecolor = 'black',
         linewidth = line_width_scale,
-        title_font_size = get_plot_arg_scaled('AXES_TITLE_FONT_SIZE', axis_font_size_scale),
-        tickfont_size = get_plot_arg_scaled('AXES_TICK_FONT_SIZE', axis_font_size_scale),
+        title_font_size = constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
+        tickfont_size = constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
         ticktext = y_axis_tick_text,
         tickvals = y_axis_tick_vals,
         range = plot_range_y,
@@ -1794,18 +1848,18 @@ def make_graph_figure(
   edge_width_scale = 1,
   col_widths_px = None,
   row_heights_px = None,
-  row_space_px = PLOT_ARGS['SUBPLOT_ROW_SPACE_PX'],
-  col_space_px = PLOT_ARGS['SUBPLOT_COL_SPACE_PX'],
+  row_space_px = constants.GRAPH_SUBPLOT_ROW_SPACE_PX,
+  col_space_px = constants.GRAPH_SUBPLOT_COL_SPACE_PX,
   title = None,
-  title_height_px = PLOT_ARGS['TITLE_HEIGHT_PX'],
+  title_height_px = constants.GRAPH_TITLE_HEIGHT_PX,
   title_y_shift_px = 0,
   title_subplot_show = True,
   legend_plotly_show = False,
   legend_custom_show = True,
   legend_common = False,
-  legend_width_px = PLOT_ARGS['LEGEND_WIDTH_PX'],
+  legend_width_px = constants.GRAPH_LEGEND_WIDTH_PX,
   legend_x_shift_px = 0,
-  legend_vertical_space_px = PLOT_ARGS['LEGEND_VERTICAL_SPACE_PX'],
+  legend_vertical_space_px = constants.GRAPH_LEGEND_VERTICAL_SPACE_PX,
   legend_item_scale = 1,
   legend_colorbar_scale = 1,
   line_width_scale = 1,
@@ -1814,17 +1868,17 @@ def make_graph_figure(
   plot_range_y = None,
   graph_stats_show = False,
   graph_stats_separate = True,
-  graph_stats_subplot_px = PLOT_ARGS['GRAPH_STATS_SUBPLOT_PX'],
+  graph_stats_subplot_px = constants.GRAPH_STATS_SUBPLOT_PX,
   graph_stats_x = 0,
   graph_stats_y = 1,
   graph_stats_x_shift = 20,
   graph_stats_y_shift = -20,
   graph_stats_x_anchor = 'left',
   graph_stats_y_anchor = 'top',
-  margin_top_min_px = PLOT_ARGS['MARGIN_TOP_MIN_PX'],
-  margin_bottom_min_px = PLOT_ARGS['MARGIN_BOTTOM_MIN_PX'],
-  margin_left_min_px = PLOT_ARGS['MARGIN_LEFT_MIN_PX'],
-  margin_right_min_px = PLOT_ARGS['MARGIN_RIGHT_MIN_PX'],
+  margin_top_min_px = constants.GRAPH_MARGIN_TOP_MIN_PX,
+  margin_bottom_min_px = constants.GRAPH_MARGIN_BOTTOM_MIN_PX,
+  margin_left_min_px = constants.GRAPH_MARGIN_LEFT_MIN_PX,
+  margin_right_min_px = constants.GRAPH_MARGIN_RIGHT_MIN_PX,
   font_size_scale = 1,
   axis_show = False,
   axis_font_size_scale = 1,
@@ -1889,9 +1943,9 @@ def make_graph_figure(
     shared_y_axes = False
 
   if row_heights_px is None:
-    row_heights_px = [PLOT_ARGS['SUBPLOT_HEIGHT_PX']] * num_rows_total
+    row_heights_px = [constants.GRAPH_SUBPLOT_HEIGHT_PX] * num_rows_total
   if col_widths_px is None:
-    col_widths_px = [PLOT_ARGS['SUBPLOT_WIDTH_PX']] * num_cols_total
+    col_widths_px = [constants.GRAPH_SUBPLOT_WIDTH_PX] * num_cols_total
 
   content_col_widths_with_stats_px = col_widths_px.copy()
   if graph_stats_separate:
@@ -1912,7 +1966,7 @@ def make_graph_figure(
 
   # For setting the subplot title font size
   figure.update_annotations(
-    font_size = get_plot_arg_scaled('SUBPLOT_TITLE_FONT_SIZE', font_size_scale),
+    font_size = constants.GRAPH_SUBPLOT_TITLE_FONT_SIZE * font_size_scale,
   )
 
   for row in range(1, data_dir_grid.shape[0] + 1):
@@ -2041,9 +2095,9 @@ def make_graph_figure(
 
     font_color = 'black',
 
-    legend_title_font_size = get_plot_arg_scaled('LEGEND_TITLE_FONT_SIZE', font_size_scale),
-    legend_grouptitlefont_size = get_plot_arg_scaled('LEGEND_GROUP_TITLE_FONT_SIZE', font_size_scale),
-    legend_font_size = get_plot_arg_scaled('LEGEND_FONT_SIZE', font_size_scale),
+    legend_title_font_size = constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
+    legend_grouptitlefont_size = constants.GRAPH_LEGEND_GROUP_TITLE_FONT_SIZE * font_size_scale,
+    legend_font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     legend_itemsizing = 'constant',
     legend_itemwidth = 100,
     legend_yanchor = 'top',
@@ -2060,7 +2114,7 @@ def make_graph_figure(
     hoverlabel_font_family = 'Courier New, monospace',
     hoverlabel_bgcolor = 'white',
 
-    plot_bgcolor = PLOT_ARGS['BACKGROUND_COLOR'],
+    plot_bgcolor = constants.GRAPH_BACKGROUND_COLOR,
   )
 
   if LAYOUT_PROPERTIES[graph_layout_type].get('preserve_aspect', False):
@@ -2079,7 +2133,7 @@ def make_graph_figure(
       xanchor = 'center',
       yanchor = 'bottom',
       yshift = title_y_shift_px,
-      font_size = get_plot_arg_scaled('TITLE_FONT_SIZE', font_size_scale),
+      font_size = constants.GRAPH_TITLE_FONT_SIZE * font_size_scale,
       showarrow = False,
     )
 
@@ -2134,6 +2188,7 @@ def get_plot_args(
     'radial_layout',
     'mds_layout',
     'universal_layout',
+    'fractal_layout',
   ]:
     raise Exception('Unhandled plot type: ' + str(plot_type))
 
@@ -2173,6 +2228,7 @@ def get_plot_args(
       'radial_layout': 'Radial Layout',
       'mds_layout': 'MDS Layout',
       'universal_layout': 'Universal Layout',
+      'fractal_layout': 'Fractal Layout',
     }[plot_type]
     plot_args['title'] = plot_title
   
@@ -2304,7 +2360,7 @@ def parse_args():
   )
   parser.add_argument(
     '--layout',
-    choices = ['kamada', 'radial', 'mds', 'universal'],
+    choices = ['kamada', 'radial', 'mds', 'universal', 'fractal'],
     default = 'radial',
     help = 'The algorithm to use for laying out the graph.'
   )
@@ -2450,9 +2506,9 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  # sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout universal --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout fractal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
-  sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout universal --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout universal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1'.split(' ')
   args = parse_args()
