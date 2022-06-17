@@ -13,3 +13,13 @@ def get_kmer_index(kmer):
 
 def get_num_kmers(kmer_size):
   return 4**kmer_size
+
+def reverse_complement(nucleotides):
+  rev_map = {
+    'A': 'T',
+    'C': 'G',
+    'G': 'C',
+    'T': 'A',
+    '-': '-',
+  }
+  return ''.join(reversed([rev_map[x] for x in nucleotides]))

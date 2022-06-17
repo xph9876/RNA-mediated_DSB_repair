@@ -45,8 +45,8 @@ PLOT_ARGS = dict(
   LEGEND_TITLE_FONT_SIZE = 24,
   LEGEND_GROUP_TITLE_FONT_SIZE = 20,
   LEGEND_FONT_SIZE = 18,
-  EDGE_LEGEND_ITEM_LINE_SIZE_PX =  100,
-  EDGE_LEGEND_ITEM_LINE_WIDTH_PX =  2.5,
+  EDGE_LEGEND_ITEM_LINE_SIZE_PX = 100,
+  EDGE_LEGEND_ITEM_LINE_WIDTH_PX = 2.5,
   BACKGROUND_COLOR = 'white',
   SUBPLOT_ROW_SPACE_PX = 100,
   SUBPLOT_COL_SPACE_PX = 100,
@@ -390,6 +390,13 @@ def make_universal_layout(data_info, graph):
 
       cut_pos_ref = len(data_info['ref_seq']) / 2
       for data in bucket:
+        ref_align = data['ref_align']
+        read_align = data['read_align']
+
+        if data_info['strand'] == constants.STRAND_R2:
+          ref_align = kmer_utils.reverse_complement(ref_align)
+          read_align = kmer_utils.reverse_complement(read_align)
+
         if var_type == 'insertion':
           # Place the x coordinate alphabetically so that A is left most
           # and T is right most. This is intended to place the insertions
@@ -397,8 +404,8 @@ def make_universal_layout(data_info, graph):
           # To prevent overlapping the nodes are placed in multiple rows for
           # higher numbers of insertions.
           kmer_index = kmer_utils.get_kmer_index(alignment_utils.get_insertion_str(
-            data['ref_align'],
-            data['read_align'],
+            ref_align,
+            read_align,
           ))
           
           insertion_row_spec = {
@@ -433,7 +440,7 @@ def make_universal_layout(data_info, graph):
           # is the left most, and most downstream deletion is right most.
           # A deletion with equal number of deletions on either side of the
           # cut position should be placed at x = 0.
-          first_del_pos = alignment_utils.get_first_deletion_pos(data['read_align'])
+          first_del_pos = alignment_utils.get_first_deletion_pos(read_align)
           last_del_pos = first_del_pos + dist_ref - 1
           avg_del_pos = (first_del_pos + last_del_pos) / 2
           x = avg_del_pos - (cut_pos_ref + 0.5)
@@ -2444,7 +2451,8 @@ def parse_args():
 
 def main():
   # sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout universal --interactive'.split(' ')
-  sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout universal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout universal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1'.split(' ')
   args = parse_args()
