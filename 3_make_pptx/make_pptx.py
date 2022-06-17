@@ -122,30 +122,6 @@ WIDTH_SPACING_PT = 5
 MULTIPLE_GRIDS_SPACING_PT = 40
 CONTENT_LEGEND_SPACING_PT = 20
 
-
-# def get_data_set_spec_label(spec):
-#   labels_list = []
-
-#   if spec['DSB'] == '2DSB':
-#     labels_list.append(common.LABELS['sgAB'])
-#   elif spec['DSB'] == '2DSBanti':
-#     labels_list.append(common.LABELS['sgCD'])
-  
-#   if spec['DSB'] in ['2DSB', '2DSBanti']:
-#     labels_list.append(common.LABELS[spec['strand']])
-#   elif spec['DSB'] in ['1DSB']:
-#     labels_list.append(common.LABELS[spec['hguide']])
-#   else:
-#     raise Exception('Bad DSB key: ' + str(spec['DSB']))
-  
-#   if spec['control'] != 'not_control':
-#     labels_list.append(common.LABELS[spec['control']])
-  
-#   return join_margin_label(labels_list)
-
-
-# TODO: Separate out the conditions for left margins and top margins
-#
 def make_slide(
   prs,
   image_grid_list,
