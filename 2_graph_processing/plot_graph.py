@@ -2509,11 +2509,12 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout fractal --title --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout universal --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout fractal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout fractal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgB_R2_sense --layout fractal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout fractal --title --interactive'.split(' ')
   args = parse_args()
   plot_graph(
     output_dir = args.output,
