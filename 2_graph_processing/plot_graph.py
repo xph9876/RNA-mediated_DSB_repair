@@ -85,6 +85,7 @@ LAYOUT_PROPERTIES = {
     'normalize': False,
     'has_edges': True,
     # 'plot_range': {'x': (-12, 12), 'y': (-22, 18)},
+    'radial': False,
   },
  'kamada_layout': {
     'only_2d': False,
@@ -380,14 +381,6 @@ def make_universal_layout(data_info, graph):
   for data in ref_nodes:
     xy_dict[data['id']] = (0, 0)
   for var_type in bucket_dict:
-    if var_type == 'insertion':
-      y_sign = 1
-      dist_scale = 2
-    elif var_type == 'deletion':
-      y_sign = -1
-      dist_scale = 1
-    else:
-      raise Exception('Impossible: ' + str(var_type))
     for dist_ref in bucket_dict[var_type]:
       bucket = list(sorted(
         bucket_dict[var_type][dist_ref],
@@ -422,24 +415,34 @@ def make_universal_layout(data_info, graph):
           num_cols = insertion_row_spec[dist_ref]['cols']
           row = kmer_index % num_rows
           col = kmer_index // num_rows
-          y = sum(
+          prev_rows_offset = sum(
             1 + insertion_row_spec[i]['rows'] * insertion_row_spec[i]['row_space']
             for i in insertion_row_spec
             if i < dist_ref
           )
-          y += row * insertion_row_spec[dist_ref]['row_space']
+          curr_row_offset = row * insertion_row_spec[dist_ref]['row_space']
+          y = 1 + prev_rows_offset + curr_row_offset
           x = ((col / num_cols) - 0.5 * (1 - 1 / num_cols))
-          xy_dict[data['id']] = (x * 22, y + 1)
+          if LAYOUT_PROPERTIES['universal_layout']['radial']:
+            angle = np.pi / 2 - np.pi * x
+            xy_dict[data['id']] = (y * np.cos(angle), y * np.sin(angle))
+          else:
+            xy_dict[data['id']] = (x * 22, y + 1)
         elif var_type == 'deletion':
           # Place the x coordinate so that the most upstream deletion
           # is the left most, and most downstream deletion is right most.
           # A deletion with equal number of deletions on either side of the
           # cut position should be placed at x = 0.
-          x = alignment_utils.get_first_deletion_pos(data['read_align'])
-          x -= cut_pos_ref + 0.5
-          x += (dist_ref - 1) / 2
+          first_del_pos = alignment_utils.get_first_deletion_pos(data['read_align'])
+          last_del_pos = first_del_pos + dist_ref - 1
+          avg_del_pos = (first_del_pos + last_del_pos) / 2
+          x = avg_del_pos - (cut_pos_ref + 0.5)
           y = dist_ref
-          xy_dict[data['id']] = (x * 2, -(y + 1))
+          if LAYOUT_PROPERTIES['universal_layout']['radial']:
+            angle = np.pi / 2 - 2 * (np.pi / 2) * (x / (dist_ref + 1))
+            xy_dict[data['id']] = (2 * y * np.cos(angle), -0.25 - 0.5 * (y * np.sin(angle)))
+          else:
+            xy_dict[data['id']] = (x * 2, -(y + 1))
         else:
           raise Exception('Impossible.')
   return xy_dict
@@ -2047,7 +2050,7 @@ def make_graph_figure(
 
     hovermode = 'closest',
     hoverlabel_font_size = 16,
-    hoverlabel_font_family = "Courier New, monospace",
+    hoverlabel_font_family = 'Courier New, monospace',
     hoverlabel_bgcolor = 'white',
 
     plot_bgcolor = PLOT_ARGS['BACKGROUND_COLOR'],
@@ -2055,7 +2058,7 @@ def make_graph_figure(
 
   if LAYOUT_PROPERTIES[graph_layout_type].get('preserve_aspect', False):
     figure.update_yaxes(
-      scaleanchor = "x",
+      scaleanchor = 'x',
       scaleratio = 1,
     )
 
@@ -2227,7 +2230,7 @@ def plot_graph(
   figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
 
   if interactive:
-    log_utils.log("Opening interactive version in browser.")
+    log_utils.log('Opening interactive version in browser.')
     figure.show()
 
   if output_dir is not None:
@@ -2240,7 +2243,7 @@ def plot_graph(
     ((crop_y is not None) and (tuple(crop_y) != (0, 1)))
   ):
     if output_ext == 'html':
-      raise Exception("Cannot use crop setting with HTML output")
+      raise Exception('Cannot use crop setting with HTML output')
     if crop_x is None:
       crop_x = (0, 1)
     if crop_y is None:
@@ -2345,7 +2348,7 @@ def parse_args():
       ' This should be a comma separate list (no spaces) of the types:'
       ' "insertion", "deletion", "substitution". Default value: "insertion,deletion".',
     ),
-    default = "insertion,deletion",
+    default = 'insertion,deletion',
   )
   parser.add_argument(
     '--edge_scale',
@@ -2440,8 +2443,10 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  # sys.argv += "-i libraries_4/WT_sgCD_R1_splicing --layout universal --interactive".split(" ")
-  # sys.argv += "-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1".split(" ")
+  # sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout universal --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout universal --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense -o plots/graphs/individual  --layout_dir layouts/2DSB_R1'.split(' ')
   args = parse_args()
   plot_graph(
     output_dir = args.output,
