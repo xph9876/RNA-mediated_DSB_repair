@@ -387,7 +387,6 @@ def make_fractal_layout(data_info, graph):
               read_align,
             )
           )
-          print(x, y)
           xy_dict[data['id']] = (10 * (x - 0.5), 10 * (y - 0.5))
         elif var_type == 'deletion':
           # Place the x coordinate so that the most upstream deletion
@@ -1806,6 +1805,8 @@ def make_subplots_plotly(
     margin_right_px = 0,
   )
   
+  if subplot_titles is not None:
+    subplot_titles = list(subplot_titles.ravel())
   figure = ps.make_subplots(
     rows = len(row_heights_px),
     cols = len(col_widths_px),
@@ -1813,7 +1814,7 @@ def make_subplots_plotly(
     shared_yaxes = shared_y_axes,
     vertical_spacing = size_args['row_space_frac'],
     horizontal_spacing = size_args['col_space_frac'],
-    subplot_titles = list(subplot_titles.ravel()),
+    subplot_titles = subplot_titles,
     row_heights = row_heights_px,
     column_widths = col_widths_px,
     # print_grid = True,
@@ -1852,7 +1853,7 @@ def make_graph_figure(
   col_space_px = constants.GRAPH_SUBPLOT_COL_SPACE_PX,
   title = None,
   title_height_px = constants.GRAPH_TITLE_HEIGHT_PX,
-  title_y_shift_px = 0,
+  title_y_shift_px = constants.GRAPH_TITLE_HEIGHT_PX / 2,
   title_subplot_show = True,
   legend_plotly_show = False,
   legend_custom_show = True,
@@ -1930,11 +1931,13 @@ def make_graph_figure(
   num_rows_total = data_dir_grid.shape[0]
   num_cols_total = data_dir_grid.shape[1]
 
-  subplot_titles = np.full_like(data_dir_grid, None)
   if title_subplot_show:
+    subplot_titles = np.full_like(data_dir_grid, None)
     for row in range(num_rows_total):
       for col in range(num_cols_total):
         subplot_titles[row, col] = os.path.split(data_dir_grid[row, col])[-1]
+  else:
+    subplot_titles = None
 
   shared_x_axes = 'all'
   shared_y_axes = 'all'
@@ -1961,7 +1964,7 @@ def make_graph_figure(
     col_space_px = col_space_px,
     shared_x_axes = shared_x_axes,
     shared_y_axes = shared_y_axes,
-    subplot_titles = data_dir_grid,
+    subplot_titles = subplot_titles,
   )
 
   # For setting the subplot title font size
@@ -2062,7 +2065,7 @@ def make_graph_figure(
   
   ### Make the margins ###
   margin_top_px = 0
-  if title is not None:
+  if (title is not None) or (title_subplot_show):
     margin_top_px = title_height_px
   
   margin_bottom_px = 0
@@ -2223,7 +2226,7 @@ def get_plot_args(
 
   if title_show:
     plot_title = constants.get_data_label(data_info)
-    plot_title += {
+    plot_title += ' ' + {
       'kamada_layout': 'Kamada-Kawaii Layout',
       'radial_layout': 'Radial Layout',
       'mds_layout': 'MDS Layout',
@@ -2506,7 +2509,7 @@ def parse_args():
   return parser.parse_args()
 
 def main():
-  sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout fractal --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgCD_R1_splicing --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout universal --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout universal --interactive'.split(' ')
