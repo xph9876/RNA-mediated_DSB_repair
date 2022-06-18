@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
-
 import itertools
 import pandas as pd
 import argparse
@@ -14,7 +13,6 @@ import log_utils
 import common_utils
 import constants as constants
 import graph_utils
-
 
 def parse_args():
   parser = argparse.ArgumentParser(

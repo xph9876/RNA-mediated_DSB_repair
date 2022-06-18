@@ -12,16 +12,16 @@ import numpy as np
 
 HOVER_TEMPLATE = '%{hovertext}<extra></extra>' # use pre-formatted hovertext field and disable extra margin
 
-def format_hover_html(data_info, the_dict, format_type):
+def format_hover_html(data_info, the_dict, format_type, reverse_complement=False):
   def format_name_value(name, value): 
     if isinstance(value, float):
       value = f'{value:.2e}'
     return f'<b>{name}:</b> {value}'
 
   def create_mismatch_htmls(ref_align, read_align):
-    # if data_info['strand'] == constants.STRAND_R2:
-    #   ref_align = kmer_utils.reverse_complement(ref_align)
-    #   read_align = kmer_utils.reverse_complement(read_align)
+    if reverse_complement:
+      ref_align = kmer_utils.reverse_complement(ref_align)
+      read_align = kmer_utils.reverse_complement(read_align)
     ref_html = ''
     read_html = ''
     for i in range(len(ref_align)):
@@ -121,16 +121,31 @@ def format_hover_html(data_info, the_dict, format_type):
       format.append(format_name_value(name, value))
   return '<br>'.join(format)
 
-def format_hover_html_all(data_info, sequence_data, format_type):
+def format_hover_html_all(
+  data_info,
+  sequence_data,
+  format_type,
+  reverse_complement = False,
+):
   return pd.Series(
     [
-      format_hover_html(data_info, x, format_type)
+      format_hover_html(
+        data_info,
+        x,
+        format_type,
+        reverse_complement = reverse_complement
+      )
       for x in sequence_data.to_dict('records')
     ],
     index = sequence_data.index
   )
 
-def get_node_label_text(data_info, node_data, node_label_fields):
+def get_node_label_text(
+  data_info,
+  node_data,
+  node_label_fields,
+  reverse_complement = False,
+):
   node_labels = {}
   for id, row_data in node_data.to_dict('index').items():
     node_label_row = []
@@ -140,6 +155,8 @@ def get_node_label_text(data_info, node_data, node_label_fields):
           label = constants.VARIATION_TYPES[row_data[label_type]]['short_label']
         elif constants.is_freq_column(label_type):
           label = f'{row_data[label_type]: .2e}'
+        elif reverse_complement and (label_type in ['ref_align', 'read_align']):
+          label = kmer_utils.reverse_complement(str(row_data[label_type]))
         else:
           label = str(row_data[label_type])
       node_label_row.append(label)
@@ -284,8 +301,18 @@ def get_node_color(
   else:
     return pd.Series(constants.DEFAULT_NODE_COLOR, index=node_data.index)
 
-def get_node_hover_text(data_info, node_data, node_type):
-  return format_hover_html_all(data_info, node_data, node_type)
+def get_node_hover_text(
+  data_info,
+  node_data,
+  node_type,
+  reverse_complement = False,
+):
+  return format_hover_html_all(
+    data_info,
+    node_data,
+    node_type,
+    reverse_complement =  reverse_complement,
+  )
 
 def get_node_trace_group(node_type, node_data, node_group_type):
   group_key_lists = []
@@ -380,12 +407,24 @@ def make_point_traces(
   node_size_min_freq,
   node_size_max_freq,
   node_outline_width_scale = 1,
+  reverse_complement = False,
 ):
   if show_node_labels:
-    node_label = get_node_label_text(data_info, node_data, node_type, node_label_columns)
+    node_label = get_node_label_text(
+      data_info,
+      node_data,
+      node_type,
+      node_label_columns,
+      reverse_complement = reverse_complement,
+    )
   else:
     node_label = pd.Series('', index=node_data.index)
-  hover_text = get_node_hover_text(data_info, node_data, node_type)
+  hover_text = get_node_hover_text(
+    data_info,
+    node_data,
+    node_type,
+    reverse_complement =  reverse_complement,
+  )
 
   node_size = get_node_size(
     data_info = data_info,
@@ -427,13 +466,7 @@ def make_point_traces(
     node_group_type = node_color_type,
     line_width_scale = node_outline_width_scale,
   )
-
-  # Note: this is where we used to append the cluster outline traces on top of the
-  # nodes traces. If you ever want to do something like that again, this is the
-  # place to do so.
-
   return traces
-
 
 def make_edges_traces(
   data_info,
@@ -442,6 +475,7 @@ def make_edges_traces(
   show_edge_labels,
   show_edge_types,
   edge_width_scale = 1,
+  reverse_complement = False,
 ):
   edge_args = {}
   for edge_type in show_edge_types:
@@ -483,7 +517,12 @@ def make_edges_traces(
       label_args['x'].append((x1 + x2) / 2)
       label_args['y'].append((y1 + y2) / 2)
       label_args['hovertext'].append(
-        format_hover_html(data_info, graph.edges[id_a, id_b], 'edge')
+        format_hover_html(
+          data_info,
+          graph.edges[id_a, id_b],
+          'edge',
+          reverse_complement = reverse_complement,
+        )
       )
       if show_edge_labels:
         label_args['text'].append(edge_type[0].upper())

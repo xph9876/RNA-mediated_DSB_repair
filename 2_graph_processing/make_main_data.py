@@ -180,7 +180,6 @@ def make_alignment_windows(
   anchor_mismatch_limit,
   subst_type,
   freq_min_threshold,
-  reverse_complement,
 ):
   """
     Performs preprocessing steps for the NHEJ graphs.
@@ -239,7 +238,6 @@ def make_alignment_windows(
       window_size,
       anchor_size,
       anchor_mismatch_limit,
-      reverse_complement,
     )
     if ref_align is None:
       continue
@@ -331,7 +329,7 @@ def make_data_info(
   log_utils.log(file_out)
   file_utils.write_tsv(data_info, file_out)
 
-def get_ref_seq_window(ref_seq, dsb_pos, window_size, reverse_complement):
+def get_ref_seq_window(ref_seq, dsb_pos, window_size):
   """
     Get the window of the reference sequence around the DSB.
   """
@@ -345,7 +343,6 @@ def get_ref_seq_window(ref_seq, dsb_pos, window_size, reverse_complement):
     window_size,
     0,
     0,
-    reverse_complement,
   )
   return ref_seq_window
 
@@ -356,7 +353,6 @@ def main():
   log_utils.log('------>')
 
   ref_seq = fasta_utils.read_fasta_seq(args.ref)
-  reverse_complement = args.strand == constants.STRAND_R2
   make_alignment_windows(
     args.input, 
     args.output,
@@ -367,7 +363,6 @@ def main():
     args.anchor_mismatch,
     args.subst_type,
     args.filter_min_freq,
-    reverse_complement,
   )
   make_data_info(
     args.output,
@@ -382,7 +377,6 @@ def main():
       ref_seq,
       args.dsb,
       args.window_size,
-      reverse_complement
     ),
   )
 

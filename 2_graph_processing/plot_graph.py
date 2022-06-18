@@ -340,7 +340,7 @@ def get_kmer_fractal_x_y(kmer):
   y = (y + 0.5) / (2 ** len(kmer))
   return (x, y)
 
-def make_fractal_layout(data_info, graph):
+def make_fractal_layout(data_info, graph, reverse_complement=False):
   node_list = graph.nodes(data=True)
 
   bucket_dict = {
@@ -375,9 +375,9 @@ def make_fractal_layout(data_info, graph):
         ref_align = data['ref_align']
         read_align = data['read_align']
 
-        # if data_info['strand'] == constants.STRAND_R2:
-        #   ref_align = kmer_utils.reverse_complement(ref_align)
-        #   read_align = kmer_utils.reverse_complement(read_align)
+        if reverse_complement:
+          ref_align = kmer_utils.reverse_complement(ref_align)
+          read_align = kmer_utils.reverse_complement(read_align)
 
         if var_type == 'insertion':
           x, y = get_kmer_fractal_x_y(
@@ -408,7 +408,7 @@ def make_fractal_layout(data_info, graph):
   return xy_dict
 
 
-def make_universal_layout(data_info, graph):
+def make_universal_layout(data_info, graph, reverse_complement=False):
   node_list = graph.nodes(data=True)
 
   bucket_dict = {
@@ -443,9 +443,9 @@ def make_universal_layout(data_info, graph):
         ref_align = data['ref_align']
         read_align = data['read_align']
 
-        # if data_info['strand'] == constants.STRAND_R2:
-        #   ref_align = kmer_utils.reverse_complement(ref_align)
-        #   read_align = kmer_utils.reverse_complement(read_align)
+        if reverse_complement:
+          ref_align = kmer_utils.reverse_complement(ref_align)
+          read_align = kmer_utils.reverse_complement(read_align)
 
         if var_type == 'insertion':
           # Place the x coordinate alphabetically so that A is left most
@@ -573,15 +573,16 @@ def make_graph_layout_single(
   x_size_px = None,
   y_size_px = None,
   distance_matrix = None,
+  reverse_complement = False,
 ):
   if layout_type == 'mds_layout':
     layout = make_mds_layout(data_info, graph, distance_matrix)
   elif layout_type == 'radial_layout':
     layout = make_radial_layout(data_info, graph)
   elif layout_type == 'universal_layout':
-    layout = make_universal_layout(data_info, graph)
+    layout = make_universal_layout(data_info, graph, reverse_complement)
   elif layout_type == 'fractal_layout':
-    layout = make_fractal_layout(data_info, graph)
+    layout = make_fractal_layout(data_info, graph, reverse_complement)
   elif layout_type == 'kamada_layout':
     layout = nx.kamada_kawai_layout(
       graph,
@@ -732,6 +733,7 @@ def make_graph_layout(
   x_size_px = None,
   y_size_px = None,
   separate_components = True,
+  reverse_complement = False,
 ):
   if common_layout_dir is not None:
     separate_components = False
@@ -784,6 +786,7 @@ def make_graph_layout(
         x_size_px = x_size_px,
         y_size_px = y_size_px,
         distance_matrix = distance_matrix,
+        reverse_complement = reverse_complement,
       )
       for subgraph in subgraph_list
     ]
@@ -1504,6 +1507,7 @@ def make_graph_single_panel(
   row,
   col,
   data_info,
+  sequence_reverse_complement = False,
   node_type = 'sequence_data',
   node_subst_type = constants.SUBST_WITHOUT,
   node_filter_freq_min = 0,
@@ -1606,6 +1610,7 @@ def make_graph_single_panel(
     layout_type = graph_layout_type,
     common_layout_dir = graph_layout_common_dir,
     separate_components = graph_layout_separate_components,
+    reverse_complement = sequence_reverse_complement,
     **extra_layout_args,
   )
 
@@ -1619,6 +1624,7 @@ def make_graph_single_panel(
       show_edge_labels = edge_labels_show,
       show_edge_types = edge_types_show,
       edge_width_scale = edge_width_scale,
+      reverse_complement = sequence_reverse_complement,
     )
 
   node_traces = plot_graph_helpers.make_point_traces(
@@ -1637,6 +1643,7 @@ def make_graph_single_panel(
     node_size_min_freq = node_size_min_freq,
     node_size_max_freq = node_size_max_freq,
     node_outline_width_scale = node_outline_width_scale,
+    reverse_complement = sequence_reverse_complement,
   )
 
   for trace in edge_traces + node_traces:
@@ -1826,6 +1833,7 @@ def make_graph_figure(
   graph_layout_type = 'kamada_layout',
   graph_layout_common_dir = None,
   graph_layout_separate_components = True,
+  sequence_reverse_complement = False,
   node_type = 'sequence_data',
   node_subst_type = constants.SUBST_WITHOUT,
   node_filter_variation_types = None,
@@ -1973,11 +1981,11 @@ def make_graph_figure(
 
   for row in range(1, data_dir_grid.shape[0] + 1):
     for col in range(1, data_dir_grid.shape[1] + 1):
-      show_legend = True
+      legend_show = True
       if not legend_plotly_show:
-        show_legend = False
+        legend_show = False
       elif legend_common:
-        show_legend = (row == 1) and (col == 1)
+        legend_show = (row == 1) and (col == 1)
 
       data_info = file_utils.read_tsv_dict(
         file_names.data_info(data_dir_grid[row - 1, col - 1])
@@ -1997,7 +2005,11 @@ def make_graph_figure(
         edge_show = edge_show,
         edge_types_show = edge_show_types,
         edge_labels_show = edge_show_labels,
+        edge_width_scale = edge_width_scale,
         graph_layout_type = graph_layout_type,
+        graph_layout_common_dir = graph_layout_common_dir,
+        graph_layout_separate_components = graph_layout_separate_components,
+        sequence_reverse_complement = sequence_reverse_complement,
         node_labels_show = node_labels_show,
         node_label_columns = node_label_columns,
         node_label_position = node_label_position,
@@ -2008,21 +2020,18 @@ def make_graph_figure(
         node_size_min_freq = node_size_min_freq,
         node_size_max_freq = node_size_max_freq,
         node_filter_variation_types = node_filter_variation_types,
+        node_outline_width_scale = node_outline_width_scale,
         plot_range_x = plot_range_x,
         plot_range_y = plot_range_y,
         subplot_width_px = col_widths_px[col - 1],
         subplot_height_px = row_heights_px[row - 1],
-        axis_show = axis_show,
-        legend_show = show_legend,
+        legend_show = legend_show,
         legend_group_title_show = legend_plotly_show and (not legend_common),
         font_size_scale = font_size_scale,
         line_width_scale = line_width_scale,
-        edge_width_scale = edge_width_scale,
-        node_outline_width_scale = node_outline_width_scale,
+        axis_show = axis_show,
         axis_font_size_scale = axis_font_size_scale,
         axis_tick_modulo = axis_tick_modulo,
-        graph_layout_common_dir = graph_layout_common_dir,
-        graph_layout_separate_components = graph_layout_separate_components,
       )
 
       if (
@@ -2169,6 +2178,7 @@ def get_plot_args(
   data_info,
   plot_type,
   title_show = False,
+  sequence_reverse_complement = False,
   node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
   node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
@@ -2196,6 +2206,7 @@ def get_plot_args(
 
   plot_args = {}
   plot_args['data_dir_grid'] = np.array([[data_info['dir']]])
+  plot_args['sequence_reverse_complement'] = sequence_reverse_complement
   plot_args['node_type'] = 'sequence_data'
   plot_args['node_size_min_freq'] = node_size_min_freq
   plot_args['node_size_max_freq'] = node_size_max_freq
@@ -2251,6 +2262,7 @@ def plot_graph(
   data_info,
   plot_type,
   title_show = False,
+  sequence_reverse_complement = False,
   node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
   node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
@@ -2275,6 +2287,7 @@ def plot_graph(
     data_info = data_info,
     plot_type = plot_type,
     title_show = title_show,
+    sequence_reverse_complement = sequence_reverse_complement,
     node_size_max_freq = node_size_max_freq,
     node_size_min_freq = node_size_min_freq,
     node_size_max_px = node_size_max_px,
@@ -2463,6 +2476,15 @@ def parse_args():
     )
   )
   parser.add_argument(
+    '--reverse_complement',
+    action = 'store_true',
+    help = (
+      'If present, uses the reverse complement of sequences when determining the'
+      ' node positions, and displaying labels and hover text.' +
+      'This affects the precomputed layout, universal layout, and fractal layout.'
+    )
+  )
+  parser.add_argument(
     '--crop_x',
     type = common_utils.check_comma_separated_floats,
     default = '0,1',
@@ -2521,6 +2543,7 @@ def main():
     data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
     plot_type = args.layout + '_layout',
     title_show = args.title,
+    sequence_reverse_complement = args.reverse_complement,
     node_size_max_freq = args.node_max_freq,
     node_size_min_freq = args.node_min_freq,
     node_size_max_px = args.node_max_px,
