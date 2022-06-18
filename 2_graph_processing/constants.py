@@ -52,6 +52,8 @@ def get_ref_variation_pos_labels(data_info):
     )
 
 
+# Substitution edges not being shown
+# indel edges being show solid
 EDGE_TYPES = {
   'substitution': {
     'label': 'Substitution',

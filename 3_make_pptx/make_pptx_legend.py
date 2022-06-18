@@ -164,19 +164,22 @@ def make_edge_legend_pptx(
   orientation = 'v',
 ):
   items = []
-  items.append({
-    'type': 'line',
-    'text': 'Substitution',
-    'color': '000000',
-    'line_dash': 'solid',
-    'line_width': line_width_pt,
-    'size': line_size_pt,
-  })
+
+  # Substitution edges not being shown,
+  # indel edges being show solid
+  # items.append({
+  #   'type': 'line',
+  #   'text': 'Substitution',
+  #   'color': '000000',
+  #   'line_dash': 'solid',
+  #   'line_width': line_width_pt,
+  #   'size': line_size_pt,
+  # })
   items.append({
     'type': 'line',
     'text': 'In/del',
     'color': '000000',
-    'line_dash': 'dashed',
+    'line_dash': 'solid',
     'line_width': line_width_pt,
     'size': line_size_pt,
   })
@@ -283,7 +286,7 @@ def make_outline_legend_pptx(
   })
   return make_legend_pptx(
     slide = slide,
-    title = 'Vertex Outline',
+    title = 'Outline',
     items = items,
     x_pt = x_pt,
     y_pt = y_pt,
@@ -460,67 +463,3 @@ def make_freq_ratio_legend_pptx(
 
   return y_pt
 
-if __name__ == '__main__':
-  # OLD THIS NEEDS TO BE FIXED. STRIDE/ETC ARGUMENTS HAVE BEEN ADDED.
-  prs = pptx.Presentation()
-  slide = prs.slides.add_slide(prs.slide_layouts[0])
-
-  x_pt = 0
-  y_pt = 0
-  y_pt = make_edge_legend_pptx(
-    slide = slide,
-    x_pt = x_pt,
-    y_pt = y_pt,
-    title_width_pt = 200,
-    title_height_pt = 50,
-    item_width_pt = 100,
-    item_height_pt = 50,
-    label_width_pt = 100,
-    line_size_pt = 50,
-    line_width_pt = 1,
-  )
-
-  y_pt = make_variation_color_legend_pptx(
-    slide = slide,
-    x_pt = x_pt,
-    y_pt = y_pt,
-    title_width_pt = 200,
-    title_height_pt = 50,
-    label_width_pt = 100,
-    item_width_pt = 100,
-    item_height_pt = 50,
-    variation_types = ['insertion', 'deletion', 'none'],
-    node_size_pt = 40,
-    line_width_pt = 1,
-  )
-
-  y_pt = make_outline_legend_pptx(
-    slide = slide,
-    x_pt = x_pt,
-    y_pt = y_pt,
-    title_width_pt = 200,
-    title_height_pt = 50,
-    label_width_pt = 100,
-    item_width_pt = 100,
-    item_height_pt = 50,
-    node_size_pt = 40,
-    line_width_pt = 1,
-  )
-
-  y_pt = make_size_legend_pptx(
-    slide = slide,
-    x_pt = x_pt,
-    y_pt = y_pt,
-    title_width_pt = 200,
-    title_height_pt = 50,
-    label_width_pt = 100,
-    item_width_pt = 100,
-    item_height_pt = 60,
-    node_size_min_freq = 1e-5,
-    node_size_max_freq = 1,
-    node_size_min_pt = 5,
-    node_size_max_pt = 50,
-    line_width_pt = 1,
-  )
-
-  prs.save('temp.pptx')
