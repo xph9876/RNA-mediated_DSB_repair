@@ -305,9 +305,11 @@ def make_radial_layout(data_info, graph):
     if var_type == 'insertion':
       y_sign = 1
       dist_scale = 2
+      zig_zag_angle = 15
     elif var_type == 'deletion':
       y_sign = -1
       dist_scale = 1
+      zig_zag_angle = 30
     else:
       raise Exception('Impossible: ' + str(var_type))
     for dist_ref in bucket_dict[var_type]:
@@ -317,7 +319,8 @@ def make_radial_layout(data_info, graph):
         reverse = True,
       ))
 
-      delta_angle = dist_ref + 30 * (-1)**dist_ref / dist_ref
+
+      delta_angle = dist_ref + zig_zag_angle * (-1)**dist_ref / dist_ref
       delta_dist = 0
       angle_list = np.linspace(((180 - delta_angle) / 180) * np.pi, (delta_angle / 180) * np.pi, len(bucket))
 
