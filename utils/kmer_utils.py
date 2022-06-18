@@ -21,5 +21,6 @@ def reverse_complement(nucleotides):
     'G': 'C',
     'T': 'A',
     '-': '-',
+    'N': 'N',
   }
   return ''.join(reversed([rev_map[x] for x in nucleotides]))

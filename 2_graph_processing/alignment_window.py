@@ -1,3 +1,4 @@
+import kmer_utils
 import numpy as np
 
 def get_alignment_window(
@@ -7,19 +8,22 @@ def get_alignment_window(
   window_size,
   anchor_size,
   anchor_mismatch_limit,
+  reverse_complement,
 ):
   """
     Get the part of the alignment in a window around the DSB.
 
     Parameters
     ----------
-    ref_align : the reference sequence alignment.
-    read_align : the read sequence alignment.
-    dsb_pos : the 1-based DSB position on the reference.
-    window_size : size of the window to extract.
-    anchor_size : the size of the anchors that must match on the left and right of the DSB.
-    anchor_mismatch_limit : the maximum number of mismatches allowed on the left and right anchors.
+    ref_align: the reference sequence alignment.
+    read_align: the read sequence alignment.
+    dsb_pos: the 1-based DSB position on the reference.
+    window_size: size of the window to extract.
+    anchor_size: the size of the anchors that must match on the left and right of the DSB.
+    anchor_mismatch_limit: the maximum number of mismatches allowed on the left and right anchors.
       The mismatch limit is checked separately on the left or right anchors.
+    reverse_complement: boolean, whether to reverse complement result or not.
+      Should be set to true for the revsere strand data.
     
     Returns
     -------
@@ -83,4 +87,7 @@ def get_alignment_window(
   ):
     return None, None
 
+  if reverse_complement:
+    ref_align_window = kmer_utils.reverse_complement(ref_align_window)
+    read_align = kmer_utils.reverse_complement(read_align_window)
   return ref_align_window, read_align_window

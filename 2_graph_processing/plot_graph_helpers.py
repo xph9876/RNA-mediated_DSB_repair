@@ -19,9 +19,9 @@ def format_hover_html(data_info, the_dict, format_type):
     return f'<b>{name}:</b> {value}'
 
   def create_mismatch_htmls(ref_align, read_align):
-    if data_info['strand'] == constants.STRAND_R2:
-      ref_align = kmer_utils.reverse_complement(ref_align)
-      read_align = kmer_utils.reverse_complement(read_align)
+    # if data_info['strand'] == constants.STRAND_R2:
+    #   ref_align = kmer_utils.reverse_complement(ref_align)
+    #   read_align = kmer_utils.reverse_complement(read_align)
     ref_html = ''
     read_html = ''
     for i in range(len(ref_align)):

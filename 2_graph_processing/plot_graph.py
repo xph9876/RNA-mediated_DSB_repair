@@ -1,4 +1,3 @@
-#!/usr/bin env python3
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
@@ -43,7 +42,7 @@ LAYOUT_PROPERTIES = {
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    'plot_range': {'x': (-10, 10), 'y': (-10, 10)},
+    'plot_range': {'x': (-20, 20), 'y': (-20, 16)},
   },
  'universal_layout': {
     'only_2d': True,
@@ -376,9 +375,9 @@ def make_fractal_layout(data_info, graph):
         ref_align = data['ref_align']
         read_align = data['read_align']
 
-        if data_info['strand'] == constants.STRAND_R2:
-          ref_align = kmer_utils.reverse_complement(ref_align)
-          read_align = kmer_utils.reverse_complement(read_align)
+        # if data_info['strand'] == constants.STRAND_R2:
+        #   ref_align = kmer_utils.reverse_complement(ref_align)
+        #   read_align = kmer_utils.reverse_complement(read_align)
 
         if var_type == 'insertion':
           x, y = get_kmer_fractal_x_y(
@@ -444,9 +443,9 @@ def make_universal_layout(data_info, graph):
         ref_align = data['ref_align']
         read_align = data['read_align']
 
-        if data_info['strand'] == constants.STRAND_R2:
-          ref_align = kmer_utils.reverse_complement(ref_align)
-          read_align = kmer_utils.reverse_complement(read_align)
+        # if data_info['strand'] == constants.STRAND_R2:
+        #   ref_align = kmer_utils.reverse_complement(ref_align)
+        #   read_align = kmer_utils.reverse_complement(read_align)
 
         if var_type == 'insertion':
           # Place the x coordinate alphabetically so that A is left most

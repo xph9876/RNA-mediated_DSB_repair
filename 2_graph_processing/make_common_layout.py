@@ -32,6 +32,18 @@ def parse_args():
     ),
     required = True,
   )
+  # parser.add_argument(
+  #   '-s',
+  #   '--strand',
+  #   choices = ['+', '-'],
+  #   nargs = '+',
+  #   help = (
+  #     'The strands of each data set.' +
+  #     ' If present, the number of values must be the same as the number of input directories.' +
+  #     ' If the strand of a data set is "-" the sequences in that data set are reverse complemented,'
+  #     ' otherwise no action is taken.'
+  #   ),
+  # )
   parser.add_argument(
     '-o',
     '--output',
@@ -55,6 +67,13 @@ def parse_args():
   args = parser.parse_args()
   args.subst_type += 'Subst'
   args.layout += '_layout'
+  # if args.strand is None:
+  #   args.strand = ['+'] * len(args.input)
+  # if len(args.strand) != len(args.input):
+  #   raise Exception(
+  #     f'Incorrect number of input strands: {len(args.strand)}.' +
+  #     f' Expected {len(args.input)}.'
+  #   )
   return args
 
 def get_common_layout(
@@ -91,6 +110,7 @@ def get_common_layout(
 
 def make_common_layout(
   data_dir_list,
+  # strand_list,
   output_dir,
   subst_type,
   layout_type,
@@ -116,6 +136,8 @@ def make_common_layout(
     )
     for data_dir in data_dir_list
   ]
+
+  ### Reverse complement the reverse strand sequences ###
 
   ### Remove id's from edge data ###
   edge_data_list = [
@@ -201,6 +223,7 @@ def main():
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv -o layouts/2DSB_R1 --subst_type without".split(" ")
   # sys.argv += "-i libraries_4/WT_sgCD_R1_antisense libraries_4/WT_sgCD_R1_splicing -o layouts/2DSBanti_R1 --subst_type without".split(" ")
   args = parse_args()
+  # make_common_layout(args.input, args.strands, args.output, args.subst_type, args.layout) 
   make_common_layout(args.input, args.output, args.subst_type, args.layout) 
 
 
