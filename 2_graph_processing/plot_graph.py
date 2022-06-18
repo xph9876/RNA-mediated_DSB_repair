@@ -738,14 +738,16 @@ def make_graph_layout(
   if common_layout_dir is not None:
     separate_components = False
     node_groups = None
+    node_data = pd.DataFrame.from_dict(
+      dict(graph.nodes(data=True)),
+      orient = 'index',
+    )
     layout_list = [
       make_common_layout.get_common_layout(
         common_layout_dir,
-        node_data = pd.DataFrame.from_dict(
-          dict(graph.nodes(data=True)),
-          orient = 'index',
-        ),
+        node_data = node_data,
         node_subst_type = node_subst_type,
+        reverse_complement = reverse_complement,
       )
     ]
   else:

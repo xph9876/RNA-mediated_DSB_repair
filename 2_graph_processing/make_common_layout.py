@@ -35,15 +35,16 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '-s',
-    '--strand',
-    choices = [constants.STRAND_R1, constants.STRAND_R2],
+    '-rc',
+    '--reverse_complement',
+    choices = ['0', '1'],
     nargs = '+',
     help = (
-      'The strands of each data set.' +
+      'Whether to reverse complement the sequence in the data sets.' +
       ' If present, the number of values must be the same as the number of input directories.' +
-      ' If the strand of a data set is "R2" the sequences in that data set are reverse complemented,'
-      ' otherwise no action is taken.'
+      ' "1" mean reverse complement the sequence and "0" means do not.'
+      ' Used for making a common layout for data sets that have reference sequences'
+      ' that are the reverse complements of each other.'
     ),
   )
   parser.add_argument(
@@ -69,13 +70,14 @@ def parse_args():
   args = parser.parse_args()
   args.subst_type += 'Subst'
   args.layout += '_layout'
-  if args.strand is None:
-    args.strand = ['+'] * len(args.input)
-  if len(args.strand) != len(args.input):
+  if args.reverse_complement is None:
+    args.reverse_complement = ['0'] * len(args.input)
+  if len(args.reverse_complement) != len(args.input):
     raise Exception(
-      f'Incorrect number of input strands: {len(args.strand)}.' +
-      f' Expected {len(args.input)}.'
+      'Incorrect number of reverse complement flags: '
+      f'{len(args.reverse_complement)}. Expected {len(args.input)}.'
     )
+  args.reverse_complement = [x == '1' for x in args.reverse_complement]
   return args
 
 def get_common_layout(
@@ -121,7 +123,7 @@ def get_common_layout(
 
 def make_common_layout(
   data_dir_list,
-  strand_list,
+  reverse_complement_list,
   output_dir,
   subst_type,
   layout_type,
@@ -149,11 +151,12 @@ def make_common_layout(
   ]
 
   ### Reverse complement the reverse strand sequences ###
-  for i in range(len(seq_data_list)):
-    seq_data_list[i] = seq_data_list[i].assign(
-      ref_align = seq_data_list[i]['ref_align'].apply(kmer_utils.reverse_complement),
-      read_align = seq_data_list[i]['read_align'].apply(kmer_utils.reverse_complement),
-    )
+  for i in range(len(data_dir_list)):
+    if reverse_complement_list[i]:
+      seq_data_list[i] = seq_data_list[i].assign(
+        ref_align = seq_data_list[i]['ref_align'].apply(kmer_utils.reverse_complement),
+        read_align = seq_data_list[i]['read_align'].apply(kmer_utils.reverse_complement),
+      )
 
   ### Remove id's from edge data ###
   edge_data_list = [
@@ -239,7 +242,13 @@ def main():
   # sys.argv += "-i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv -o layouts/2DSB_R1 --subst_type without".split(" ")
   # sys.argv += "-i libraries_4/WT_sgCD_R1_antisense libraries_4/WT_sgCD_R1_splicing -o layouts/2DSBanti_R1 --subst_type without".split(" ")
   args = parse_args()
-  make_common_layout(args.input, args.strand, args.output, args.subst_type, args.layout) 
+  make_common_layout(
+    args.input,
+    args.reverse_complement,
+    args.output,
+    args.subst_type,
+    args.layout,
+  ) 
 
 if __name__ == '__main__':
   main()
