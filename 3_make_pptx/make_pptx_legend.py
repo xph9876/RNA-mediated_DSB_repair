@@ -180,6 +180,7 @@ def make_edge_legend_pptx(
     'text': 'In/del',
     'color': '000000',
     'line_dash': 'solid',
+    # 'line_dash': 'dash',
     'line_width': line_width_pt,
     'size': line_size_pt,
   })

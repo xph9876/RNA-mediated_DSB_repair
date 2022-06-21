@@ -2199,6 +2199,8 @@ def get_plot_args(
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   legend_show = False,
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
+  plot_range_x = None,
+  plot_range_y = None,
 ):
   if plot_type not in [
     'kamada_layout',
@@ -2238,6 +2240,8 @@ def get_plot_args(
   plot_args['margin_bottom_min_px'] = 0
   plot_args['margin_left_min_px'] = 0
   plot_args['margin_right_min_px'] = 0
+  plot_args['plot_range_x'] = plot_range_x
+  plot_args['plot_range_y'] = plot_range_y
 
   if title_show:
     plot_title = constants.get_data_label(data_info)
@@ -2285,6 +2289,8 @@ def plot_graph(
   legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
   crop_x = None,
   crop_y = None,
+  plot_range_x = None,
+  plot_range_y = None,
   interactive = False,
 ):
   data_label = constants.get_data_label(data_info)
@@ -2308,6 +2314,8 @@ def plot_graph(
     font_size_scale = font_size_scale,
     legend_show = legend_show,
     legend_colorbar_scale = legend_colorbar_scale,
+    plot_range_x = plot_range_x,
+    plot_range_y = plot_range_y,
   )
   
   figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
@@ -2489,6 +2497,7 @@ def parse_args():
       'This affects the precomputed layout, universal layout, and fractal layout.'
     )
   )
+  # FIXME: MAKE THIS USE NARGS LIKE RANGE_X/Y INSTEAD OF COMMA SEPARATED!!!
   parser.add_argument(
     '--crop_x',
     type = common_utils.check_comma_separated_floats,
@@ -2502,6 +2511,26 @@ def parse_args():
     '--crop_y',
     type = common_utils.check_comma_separated_floats,
     default = '0,1',
+    help = (
+      'Range of x-axis for plotting.'
+      'If not specified chosen automatically to either show all nodes or a preset value'
+      ' for the layout.'
+    )
+  )
+  parser.add_argument(
+    '--range_x',
+    type = float,
+    nargs = '*',
+    help = (
+      'Range of x-axis for plotting.'
+      'If not specified chosen automatically to either show all nodes or a preset value'
+      ' for the layout.'
+    )
+  )
+  parser.add_argument(
+    '--range_y',
+    type = float,
+    nargs = '*',
     help = (
       'Range of the vertical dimension to crop.' +
       ' Specified in normalized coords in range [0, 1].'
@@ -2532,7 +2561,20 @@ def parse_args():
     ),
   )
   
-  return parser.parse_args()
+  args = parser.parse_args()
+  if args.crop_x is not None:
+    if len(args.crop_x) != 2:
+      raise Exception(f'Need 2 values for crop_x. Got {len(args.crop_x)}')
+  if args.crop_y is not None:
+    if len(args.crop_y) != 2:
+      raise Exception(f'Need 2 values for crop_y. Got {len(args.crop_y)}')
+  if args.range_x is not None:
+    if len(args.range_x) != 2:
+      raise Exception(f'Need 2 values for range_x. Got {len(args.range_x)}')
+  if args.range_y is not None:
+    if len(args.range_y) != 2:
+      raise Exception(f'Need 2 values for range_y. Got {len(args.range_y)}')
+  return args
 
 def main():
   # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout fractal --title --interactive'.split(' ')
@@ -2566,6 +2608,8 @@ def main():
     legend_colorbar_scale = args.legend_color_bar_scale,
     crop_x = args.crop_x,
     crop_y = args.crop_y,
+    plot_range_x = args.range_x,
+    plot_range_y = args.range_y,
     interactive = args.interactive,
   )
 
