@@ -549,6 +549,94 @@ def make_universal_layout(data_info, graph, reverse_complement=False):
         #   raise Exception('Impossible.')
   return xy_dict
 
+def make_universal_layout_legend(
+  figure,
+  x_pos,
+  row,
+  col,
+  ref_length,
+  cut_pos_ref, # should be 1 based!
+  tick_length = 0.25,
+  label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE,
+  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  max_dist_insertion = 8,
+  max_dist_deletion = 10,
+  line_width_px = 4,
+):
+  tick_list = [{'dist_ref': 0, 'y_pos': 0}]
+  for dist_ref in range(1, max(max_dist_insertion, max_dist_deletion) + 1):
+    fake_ref_align = (
+      ('A' * cut_pos_ref) +
+      ('-' * dist_ref) +
+      ('A' * (ref_length - cut_pos_ref))
+    )
+    fake_read_align = 'A' * (ref_length + dist_ref)
+
+    for var_type in ['insertion', 'deletion']:
+      if var_type == 'deletion':
+        fake_ref_align, fake_read_align = fake_read_align, fake_ref_align
+
+      if (
+        ((var_type == 'insertion') and (dist_ref > max_dist_insertion)) or
+        ((var_type == 'deletion') and (dist_ref > max_dist_deletion))
+      ):
+        continue
+
+      y_pos = get_pos_universal_layout(
+        fake_ref_align,
+        fake_read_align,
+        dist_ref,
+        var_type,
+        cut_pos_ref,
+      )[1]
+
+      tick_list.append(
+        {
+          'dist_ref': dist_ref,
+          'y_pos': y_pos,
+        }
+      )
+
+  y_min = 0
+  y_max = 0
+  for tick in tick_list:
+    # tick line
+    figure.add_shape(
+      type = 'line',
+      x0 = x_pos,
+      x1 = x_pos + tick_length,
+      y0 = tick['y_pos'],
+      y1 = tick['y_pos'],
+      row = row,
+      col = col,
+      line_width = line_width_px,
+    )
+
+    # tick label
+    figure.add_annotation(
+      x = x_pos + 1.5 * tick_length,
+      y = tick['y_pos'],
+      text = str(tick['dist_ref']),
+      showarrow = False,
+      row = row,
+      col = col,
+      font_size = label_font_size * font_size_scale,
+    )
+
+    y_min = min(y_min, tick['y_pos'])
+    y_max = max(y_max, tick['y_pos'])
+
+  figure.add_shape(
+    type = 'line',
+    x0 = x_pos,
+    x1 = x_pos,
+    y0 = y_min,
+    y1 = y_max,
+    row = row,
+    col = col,
+    line_width = line_width_px,
+  )
+    
 # idea to make the nodes a reasonable distance from the reference
 def get_kamada_initial_layout(graph):
   bucket_list = {}
@@ -2226,6 +2314,7 @@ def get_plot_args(
   plot_type,
   title_show = False,
   sequence_reverse_complement = False,
+  node_subst_type = constants.SUBST_WITHOUT,
   node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
   node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
@@ -2314,6 +2403,7 @@ def plot_graph(
   plot_type,
   title_show = False,
   sequence_reverse_complement = False,
+  node_subst_type = constants.SUBST_WITHOUT,
   node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
   node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
@@ -2341,6 +2431,7 @@ def plot_graph(
     plot_type = plot_type,
     title_show = title_show,
     sequence_reverse_complement = sequence_reverse_complement,
+    node_subst_type = node_subst_type,
     node_size_max_freq = node_size_max_freq,
     node_size_min_freq = node_size_min_freq,
     node_size_max_px = node_size_max_px,
@@ -2362,6 +2453,38 @@ def plot_graph(
   
   figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
 
+  sequence_data = file_utils.read_tsv(
+    file_names.sequence_data(data_info['dir'], node_subst_type)
+  )
+  try:
+    max_dist_insertion = sequence_data.loc[
+      sequence_data['variation_type'] == 'insertion',
+      'dist_ref'
+    ].max()
+  except:
+    # incase no insertions
+    max_dist_insertion = 1
+  try:
+    max_dist_deletion = sequence_data.loc[
+      sequence_data['variation_type'] == 'deletion',
+      'dist_ref'
+    ].max()
+  except:
+    # incase no insertions
+    max_dist_deletion = 1
+
+  # FIXME: MAKE THIS CONFIGURABLE WITH AN ARGUMENT!
+  # FIXME: COMBINE THIS WITH MAIN, NO NEED FOR SEPARATE!!
+  make_universal_layout_legend(
+    figure = figure,
+    x_pos = 11,
+    row = 1,
+    col = 1,
+    ref_length = len(data_info['ref_seq']),
+    cut_pos_ref = len(data_info['ref_seq']) // 2,
+    max_dist_deletion = max_dist_deletion,
+    max_dist_insertion = max_dist_insertion,
+  )
   if interactive:
     log_utils.log('Opening interactive version in browser.')
     figure.show()
@@ -2433,6 +2556,14 @@ def parse_args():
     choices = ['kamada', 'radial', 'mds', 'universal', 'fractal'],
     default = 'radial',
     help = 'The algorithm to use for laying out the graph.'
+  )
+  parser.add_argument(
+    '--subst_type',
+    choices = ['with', 'without'],
+    help = (
+      'Whether to plot data with or without substitutions.'
+    ),
+    default = 'without',
   )
   parser.add_argument(
     '--node_max_freq',
@@ -2602,7 +2733,6 @@ def parse_args():
       ' Uses the Ploty library figure.show() function to do so.'
     ),
   )
-  
   args = parser.parse_args()
   if args.crop_x is not None:
     if len(args.crop_x) != 2:
@@ -2616,10 +2746,12 @@ def parse_args():
   if args.range_y is not None:
     if len(args.range_y) != 2:
       raise Exception(f'Need 2 values for range_y. Got {len(args.range_y)}')
+  args.subst_type += 'Subst'
   return args
 
 def main():
   # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout fractal --title --interactive'.split(' ')
@@ -2633,6 +2765,7 @@ def main():
     plot_type = args.layout + '_layout',
     title_show = args.title,
     sequence_reverse_complement = args.reverse_complement,
+    node_subst_type = args.subst_type,
     node_size_max_freq = args.node_max_freq,
     node_size_min_freq = args.node_min_freq,
     node_size_max_px = args.node_max_px,
