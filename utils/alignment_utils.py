@@ -159,7 +159,6 @@ def get_cigar(ref_align, read_align):
   cigar += str(curr_count) + last_type
   return cigar
 
-
 # This assigns insertions to the left flanking position.
 def get_variation_info(ref_align, read_align):
   """

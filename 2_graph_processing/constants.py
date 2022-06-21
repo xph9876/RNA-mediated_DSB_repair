@@ -342,3 +342,15 @@ GRAPH_MARGIN_RIGHT_MIN_PX = 300
 GRAPH_MARGIN_FONT_SIZES_TOP = [30, 30]
 GRAPH_MARGIN_FONT_SIZES_LEFT = [30, 30, 20]
 GRAPH_KAMADA_CUSTOM_INIT = False
+
+# Universal layout constants
+GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC = {
+  1: {'rows': 1, 'cols': 4, 'row_space': 2},
+  2: {'rows': 1, 'cols': 16, 'row_space': 2},
+  3: {'rows': 2, 'cols': 32, 'row_space': 1},
+  4: {'rows': 2, 'cols': 128, 'row_space': 0.5},
+  5: {'rows': 4, 'cols': 256, 'row_space': 0.25},
+  6: {'rows': 8, 'cols': 512, 'row_space': 0.25},
+  7: {'rows': 8, 'cols': 2048, 'row_space': 0.25},
+  8: {'rows': 8, 'cols': 8192, 'row_space': 0.25},
+}
