@@ -51,7 +51,6 @@ def get_ref_variation_pos_labels(data_info):
       labels,
     )
 
-
 # Substitution edges not being shown
 # indel edges being show solid
 EDGE_TYPES = {
@@ -90,13 +89,13 @@ VARIATION_TYPES = {
   'deletion': {
     'label': 'Deletion',
     'short_label': 'D',
-    'color': '#0000FF',
+    'color': '#8080FF',
     'color_3d': '#8080FF',
   },
   'insertion': {
     'label': 'Insertion',
     'short_label': 'I',
-    'color': '#FF0000',
+    'color': '#FF8080',
     'color_3d': '#FF8080',
   },
 }
@@ -135,30 +134,16 @@ STRAND_R2 = 'R2'
 CELL_WT = 'WT'
 CELL_KO = 'KO'
 
-POSTER_COLORS = False
-if POSTER_COLORS:
-  # The poster colors
-  TREATMENT_COLOR = {
-    'sense': '#bf0041',
-    'branch': '#158466',
-    'cmv': '#158466',
-
-    'sense_branch': '#ffffff',
-    'sense_cmv': '#ffffff',
-  }
-else:
-  # The main paper colors
-  TREATMENT_COLOR = {
-    'sense': '#CF191B', 
-    'branch': '#33A02C',
-    'cmv': '#FFE669',
-    'antisense': '#CF191B',
-    'splicing': '#33A02C',
-
-    'sense_branch': '#ffffff',
-    'sense_cmv': '#ffffff',
-    'antisense_splicing': '#ffffff',
-  }
+TREATMENT_COLOR = {
+  'sense': '#CF191B', 
+  'branch': '#33A02C',
+  'cmv': '#FFE669',
+  'antisense': '#CF191B',
+  'splicing': '#33A02C',
+  'sense_branch': '#ffffff',
+  'sense_cmv': '#ffffff',
+  'antisense_splicing': '#ffffff',
+}
 
 SIMILAR_FREQ_COLOR = '#ffffff'
 
