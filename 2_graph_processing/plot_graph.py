@@ -621,6 +621,7 @@ def make_universal_layout_legend(
       row = row,
       col = col,
       font_size = label_font_size * font_size_scale,
+      xanchor = 'left',
     )
 
     y_min = min(y_min, tick['y_pos'])
@@ -2558,6 +2559,15 @@ def parse_args():
     help = 'The algorithm to use for laying out the graph.'
   )
   parser.add_argument(
+    '--universal_layout_legend',
+    action = 'store_true',
+    default = 'radial',
+    help = (
+      'If present, shows a y-axis legend on the universal layout'
+      ' showing the distances to the reference.'
+    )
+  )
+  parser.add_argument(
     '--subst_type',
     choices = ['with', 'without'],
     help = (
@@ -2670,25 +2680,23 @@ def parse_args():
       'This affects the precomputed layout, universal layout, and fractal layout.'
     )
   )
-  # FIXME: MAKE THIS USE NARGS LIKE RANGE_X/Y INSTEAD OF COMMA SEPARATED!!!
   parser.add_argument(
     '--crop_x',
-    type = common_utils.check_comma_separated_floats,
-    default = '0,1',
+    nargs = '+',
+    type = float,
     help = (
       'Range of the horizontal dimension to crop.' +
       ' Specified with normalized coords in range [0, 1].'
-    )
+    ),
   )
   parser.add_argument(
     '--crop_y',
-    type = common_utils.check_comma_separated_floats,
-    default = '0,1',
+    nargs = '+',
+    type = float,
     help = (
-      'Range of x-axis for plotting.'
-      'If not specified chosen automatically to either show all nodes or a preset value'
-      ' for the layout.'
-    )
+      'Range of the vertical dimension to crop.' +
+      ' Specified in normalized coords in range [0, 1].'
+    ),
   )
   parser.add_argument(
     '--range_x',
@@ -2698,16 +2706,17 @@ def parse_args():
       'Range of x-axis for plotting.'
       'If not specified chosen automatically to either show all nodes or a preset value'
       ' for the layout.'
-    )
+    ),
   )
   parser.add_argument(
     '--range_y',
     type = float,
     nargs = '*',
     help = (
-      'Range of the vertical dimension to crop.' +
-      ' Specified in normalized coords in range [0, 1].'
-    )
+      'Range of y-axis for plotting.'
+      'If not specified chosen automatically to either show all nodes or a preset value'
+      ' for the layout.'
+    ),
   )
   parser.add_argument(
     '--legend',
@@ -2750,18 +2759,47 @@ def parse_args():
   return args
 
 def main():
-  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive'.split(' ')
-  sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgB_R2_sense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout fractal --title --interactive'.split(' ')
   args = parse_args()
-  plot_graph(
-    output_dir = args.output,
-    output_ext = args.ext,
-    data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
+  # plot_graph(
+  #   output_dir = args.output,
+  #   output_ext = args.ext,
+  #   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
+  #   plot_type = args.layout + '_layout',
+  #   title_show = args.title,
+  #   sequence_reverse_complement = args.reverse_complement,
+  #   node_subst_type = args.subst_type,
+  #   node_size_max_freq = args.node_max_freq,
+  #   node_size_min_freq = args.node_min_freq,
+  #   node_size_max_px = args.node_max_px,
+  #   node_size_min_px = args.node_min_px,
+  #   node_outline_width_scale = args.node_outline_scale,
+  #   node_filter_variation_types = args.variation_types,
+  #   edge_width_scale = args.edge_scale,
+  #   graph_width_px = args.width_px,
+  #   graph_height_px = args.height_px,
+  #   graph_layout_common_dir = args.layout_dir,
+  #   graph_layout_separate_components = args.separate_components,
+  #   line_width_scale = args.line_width_scale,
+  #   font_size_scale = args.font_size_scale,
+  #   legend_show = args.legend,
+  #   legend_colorbar_scale = args.legend_color_bar_scale,
+  #   crop_x = args.crop_x,
+  #   crop_y = args.crop_y,
+  #   plot_range_x = args.range_x,
+  #   plot_range_y = args.range_y,
+  #   interactive = args.interactive,
+  # )
+  data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
+  data_label = constants.get_data_label(data_info)
+  plot_args = get_plot_args(
+    data_info = data_info,
     plot_type = args.layout + '_layout',
     title_show = args.title,
     sequence_reverse_complement = args.reverse_complement,
@@ -2770,8 +2808,8 @@ def main():
     node_size_min_freq = args.node_min_freq,
     node_size_max_px = args.node_max_px,
     node_size_min_px = args.node_min_px,
+    node_filter_variation_types = args.variation_types, # FIXME: MAKE THIS NARGS ALSO
     node_outline_width_scale = args.node_outline_scale,
-    node_filter_variation_types = args.variation_types,
     edge_width_scale = args.edge_scale,
     graph_width_px = args.width_px,
     graph_height_px = args.height_px,
@@ -2781,12 +2819,68 @@ def main():
     font_size_scale = args.font_size_scale,
     legend_show = args.legend,
     legend_colorbar_scale = args.legend_color_bar_scale,
-    crop_x = args.crop_x,
-    crop_y = args.crop_y,
     plot_range_x = args.range_x,
     plot_range_y = args.range_y,
-    interactive = args.interactive,
   )
+  
+  figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
+
+  sequence_data = file_utils.read_tsv(
+    file_names.sequence_data(data_info['dir'], args.subst_type)
+  )
+  try:
+    max_dist_insertion = sequence_data.loc[
+      sequence_data['variation_type'] == 'insertion',
+      'dist_ref'
+    ].max()
+  except:
+    # incase no insertions
+    max_dist_insertion = 1
+  try:
+    max_dist_deletion = sequence_data.loc[
+      sequence_data['variation_type'] == 'deletion',
+      'dist_ref'
+    ].max()
+  except:
+    # incase no insertions
+    max_dist_deletion = 1
+
+  if args.universal_layout_legend:
+    make_universal_layout_legend(
+      figure = figure,
+      x_pos = 11,
+      row = 1,
+      col = 1,
+      ref_length = len(data_info['ref_seq']),
+      cut_pos_ref = len(data_info['ref_seq']) // 2,
+      max_dist_deletion = max_dist_deletion,
+      max_dist_insertion = max_dist_insertion,
+    )
+  if args.interactive:
+    log_utils.log('Opening interactive version in browser.')
+    figure.show()
+
+  if args.output is not None:
+    file_out = os.path.join(args.output, file_names.graph_figure(data_label, args.ext))
+    log_utils.log(file_out)
+    file_utils.write_plotly(figure, file_out)
+
+  if ((args.crop_x is not None)) or ((args.crop_y is not None)):
+    if args.ext == 'html':
+      raise Exception('Cannot use crop setting with HTML output')
+    if args.crop_x is None:
+      crop_x = (0, 1)
+    if args.crop_y is None:
+      crop_y = (0, 1)
+
+    image = PIL.Image.open(file_out)
+    width_px, height_px = image.size
+
+    left = crop_x[0] * width_px
+    right = crop_x[1] * width_px
+    top = crop_y[0] * height_px
+    bottom = crop_y[1] * height_px
+    image.crop((left, top, right, bottom)).save(file_out)
 
 if __name__ == '__main__':
   main()

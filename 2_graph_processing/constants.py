@@ -95,8 +95,10 @@ VARIATION_TYPES = {
   'insertion': {
     'label': 'Insertion',
     'short_label': 'I',
-    'color': '#FF8080',
-    'color_3d': '#FF8080',
+    # 'color': '#FF8080',
+    # 'color_3d': '#FF8080',
+    'color': '#FFA500',
+    'color_3d': '#FFA500',
   },
 }
 
