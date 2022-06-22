@@ -2462,20 +2462,16 @@ def plot_graph(
       sequence_data['variation_type'] == 'insertion',
       'dist_ref'
     ].max()
-  except:
-    # incase no insertions
+  except: # incase no insertions
     max_dist_insertion = 1
   try:
     max_dist_deletion = sequence_data.loc[
       sequence_data['variation_type'] == 'deletion',
       'dist_ref'
     ].max()
-  except:
-    # incase no insertions
+  except: # incase no insertions
     max_dist_deletion = 1
 
-  # FIXME: MAKE THIS CONFIGURABLE WITH AN ARGUMENT!
-  # FIXME: COMBINE THIS WITH MAIN, NO NEED FOR SEPARATE!!
   make_universal_layout_legend(
     figure = figure,
     x_pos = 11,
@@ -2616,13 +2612,12 @@ def parse_args():
   )
   parser.add_argument(
     '--variation_types',
-    type = common_utils.check_comma_separated_enum(['insertion', 'deletion', 'substitution']),
+    nargs = '+',
     help = (
       'The variation types that should be included in the graph.'
-      ' This should be a comma separate list (no spaces) of the types:'
-      ' "insertion", "deletion", "substitution". Default value: "insertion,deletion".',
+      ' This should be a list of the types:'
+      ' "insertion", "deletion", "substitution". Default value: "insertion", "deletion".',
     ),
-    default = 'insertion,deletion',
   )
   parser.add_argument(
     '--edge_scale',
@@ -2755,6 +2750,12 @@ def parse_args():
   if args.range_y is not None:
     if len(args.range_y) != 2:
       raise Exception(f'Need 2 values for range_y. Got {len(args.range_y)}')
+  if args.variation_types is None:
+    args.variation_types = ['insertion', 'deletion']
+  else:
+    for var_type in args.variation_types:
+      if not(var_type in ['insertion', 'deletion', 'substitution']):
+        raise Exception(f'Unknown variation type: {var_type}')
   args.subst_type += 'Subst'
   return args
 
