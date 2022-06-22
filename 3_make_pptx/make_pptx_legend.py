@@ -177,7 +177,7 @@ def make_edge_legend_pptx(
   # })
   items.append({
     'type': 'line',
-    'text': 'In/del',
+    'text': '1 nt. in/del',
     'color': '000000',
     'line_dash': 'solid',
     # 'line_dash': 'dash',
@@ -186,7 +186,7 @@ def make_edge_legend_pptx(
   })
   return make_legend_pptx(
     slide = slide,
-    title = 'Edge Types',
+    title = 'Edges',
     items = items,
     x_pt = x_pt,
     y_pt = y_pt,
@@ -292,6 +292,66 @@ def make_outline_legend_pptx(
     x_pt = x_pt,
     y_pt = y_pt,
     stride_pt = stride_pt,
+    title_width_pt = title_width_pt,
+    title_height_pt = title_height_pt,
+    title_x_offset_pt = title_x_offset_pt,
+    item_width_pt = item_width_pt,
+    item_height_pt = item_height_pt,
+    label_width_pt = label_width_pt,
+    label_height_pt = label_height_pt,
+    legend_title_font_size_pt = legend_title_font_size_pt,
+    legend_label_font_size_pt = legend_label_font_size_pt,
+    orientation = orientation,
+  )
+
+def make_node_legend_pptx(
+  slide,
+  x_pt,
+  y_pt,
+  stride_pt,
+  title_width_pt,
+  title_height_pt,
+  title_x_offset_pt,
+  item_width_pt,
+  item_height_pt,
+  label_width_pt,
+  label_height_pt,
+  node_size_pt,
+  line_width_pt,
+  legend_title_font_size_pt = 10,
+  legend_label_font_size_pt = 8,
+  orientation = 'v',
+):
+  items = [
+    {
+      'type': 'circle',
+      'size': node_size_pt,
+      'text': constants.VARIATION_TYPES['insertion']['label'],
+      'color': constants.VARIATION_TYPES['insertion']['color'],
+      'line_width': line_width_pt,
+    },
+    {
+      'type': 'circle',
+      'size': node_size_pt,
+      'text': constants.VARIATION_TYPES['deletion']['label'],
+      'color': constants.VARIATION_TYPES['deletion']['color'],
+      'line_width': line_width_pt,
+    },
+    {
+      'type': 'circle',
+      'size': node_size_pt,
+      'text': constants.REFERENCE_DESCRIPTION,
+      'color': constants.REFERENCE_OUTLINE_COLOR,
+      'line_width': 2 * line_width_pt,
+    },
+  ]
+  return make_legend_pptx(
+    slide = slide,
+    title = 'Vertex',
+    items = items,
+    stride_pt = stride_pt,
+    x_pt = x_pt,
+    y_pt = y_pt,
     title_width_pt = title_width_pt,
     title_height_pt = title_height_pt,
     title_x_offset_pt = title_x_offset_pt,
