@@ -2615,7 +2615,9 @@ def parse_args():
     help = (
       'The variation types that should be included in the graph.'
       ' This should be a list of the types:'
-      ' "insertion", "deletion", "substitution". Default value: "insertion", "deletion".',
+      ' "insertion", "deletion", "substitution", "none".' +
+      ' Default value: "insertion", "deletion", "none".' +
+      ' "none" means the reference sequence.',
     ),
   )
   parser.add_argument(
@@ -2671,7 +2673,7 @@ def parse_args():
     help = (
       'If present, uses the reverse complement of sequences when determining the'
       ' node positions, and displaying labels and hover text.' +
-      'This affects the precomputed layout, universal layout, and fractal layout.'
+      ' This affects the precomputed layout, universal layout, and fractal layout.'
     )
   )
   parser.add_argument(
@@ -2750,10 +2752,10 @@ def parse_args():
     if len(args.range_y) != 2:
       raise Exception(f'Need 2 values for range_y. Got {len(args.range_y)}')
   if args.variation_types is None:
-    args.variation_types = ['insertion', 'deletion']
+    args.variation_types = ['insertion', 'deletion', 'none']
   else:
     for var_type in args.variation_types:
-      if not(var_type in ['insertion', 'deletion', 'substitution']):
+      if not(var_type in ['insertion', 'deletion', 'substitution', 'none']):
         raise Exception(f'Unknown variation type: {var_type}')
   args.subst_type += 'Subst'
   return args
