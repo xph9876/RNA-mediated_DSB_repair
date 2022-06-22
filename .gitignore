@@ -154,5 +154,5 @@ plots/
 layouts/
 
 # PPTX files
-pptx/
+pptx*
 *.pptx
