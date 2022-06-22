@@ -348,7 +348,7 @@ def make_node_legend_pptx(
   ]
   return make_legend_pptx(
     slide = slide,
-    title = 'Vertex',
+    title = 'Vertices',
     items = items,
     stride_pt = stride_pt,
     x_pt = x_pt,
