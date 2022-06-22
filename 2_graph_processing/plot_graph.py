@@ -2555,12 +2555,11 @@ def parse_args():
     help = 'The algorithm to use for laying out the graph.'
   )
   parser.add_argument(
-    '--universal_layout_legend',
-    action = 'store_true',
-    default = 'radial',
+    '--universal_layout_legend_pos_x',
+    type = float,
     help = (
-      'If present, shows a y-axis legend on the universal layout'
-      ' showing the distances to the reference.'
+      'If present, shows a y-axis legend at the given x position' +
+      ' on the universal layout showing the distances to the reference.'
     )
   )
   parser.add_argument(
@@ -2760,7 +2759,7 @@ def parse_args():
   return args
 
 def main():
-  sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
@@ -2846,10 +2845,10 @@ def main():
     # incase no insertions
     max_dist_deletion = 1
 
-  if args.universal_layout_legend:
+  if args.universal_layout_legend_pos_x is not None:
     make_universal_layout_legend(
       figure = figure,
-      x_pos = 11,
+      x_pos = args.universal_layout_legend_pos_x,
       row = 1,
       col = 1,
       ref_length = len(data_info['ref_seq']),
