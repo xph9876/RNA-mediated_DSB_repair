@@ -67,6 +67,7 @@ LEGENDS = {
   'node_outline': {'type': 'node_outline'},
   'edge_type': {'type': 'edge_type'},
   'variation_type': {'type': 'variation_type'},
+  'node_type': {'type': 'node_type'},
   'freq_ratio_sense_branch': {
    'type': 'freq_ratio',
    'treatment_1': 'sense',
@@ -178,7 +179,6 @@ def make_slide(
   
   slide_width_pt = prs.slide_width / pptx.util.Pt(1)
 
-  
   y_pt = 0
   x_pt = 0
   y_legend_pt = 0
@@ -208,6 +208,16 @@ def make_slide(
         'label_height_pt': 10,
       },
       'variation_type': {
+        'stride_pt': 12,
+        'title_width_pt': 80,
+        'title_height_pt': 10,
+        'title_x_offset_pt': -10,
+        'item_width_pt': 10,
+        'label_width_pt': 50,
+        'item_height_pt': 20,
+        'label_height_pt': 20,
+      },
+      'node_type': {
         'stride_pt': 12,
         'title_width_pt': 80,
         'title_height_pt': 10,
@@ -260,6 +270,16 @@ def make_slide(
         'label_height_pt': 10,
       },
       'variation_type': {
+        'stride_pt': 30,
+        'title_width_pt': 90,
+        'title_height_pt': 10,
+        'title_x_offset_pt': 0,
+        'item_width_pt': 30,
+        'label_width_pt': 50,
+        'item_height_pt': 10,
+        'label_height_pt': 10,
+      },
+      'node_type': {
         'stride_pt': 30,
         'title_width_pt': 90,
         'title_height_pt': 10,
@@ -500,6 +520,25 @@ def make_slide(
           legend_label_font_size_pt = legend_label_font_size_pt,
           orientation = orientation,
         )
+      elif legend['type'] == 'node_type':
+        y_legend_new_pt = make_pptx_legend.make_node_legend_pptx(
+          slide = slide,
+          x_pt = x_pt + legend_x_offset_pt[orientation],
+          y_pt = y_legend_pt,
+          stride_pt = legend_const[orientation]['variation_type']['stride_pt'],
+          title_width_pt = legend_const[orientation]['variation_type']['title_width_pt'],
+          title_height_pt = legend_const[orientation]['variation_type']['title_height_pt'],
+          title_x_offset_pt = legend_const[orientation]['variation_type']['title_x_offset_pt'],
+          item_width_pt = legend_const[orientation]['variation_type']['item_width_pt'],
+          item_height_pt = legend_const[orientation]['variation_type']['item_height_pt'],
+          label_width_pt = legend_const[orientation]['variation_type']['label_width_pt'],
+          label_height_pt = legend_const[orientation]['variation_type']['label_height_pt'],
+          node_size_pt = LEGEND_NODE_SIZE_PT,
+          line_width_pt = LEGEND_NODE_OUTLINE_WIDTH_PT,
+          legend_title_font_size_pt = legend_title_font_size_pt,
+          legend_label_font_size_pt = legend_label_font_size_pt,
+          orientation = orientation,
+        )
       elif legend['type'] == 'freq_ratio':
         treatment_1 = legend['treatment_1']
         treatment_2 = legend['treatment_2']
@@ -645,26 +684,8 @@ def parse_args():
     default = os.path.join(os.path.dirname(__file__), 'template.pptx'),
     help = 'The PPTX file to use as a template. Controls the page size.',
   )
-  return parser.parse_args()
-
-# legend_list = [
-#     {
-#       'type': 'freq_ratio',
-#       'treatment_1': 'sense',
-#       'treatment_2': 'branch',
-#       'color_bar_file': 'images/freq_ratio_sense_cmv.png',
-#     },
-#     {
-#       'type': 'variation_type',
-#     },
-#     {
-#       'type': 'node_outline',
-#     },
-#     {
-#       'type': 'edge_type',
-#     },
-#   ]
-
+  args = parser.parse_args()
+  return args
 
 if __name__ == '__main__':
   # argv = [
@@ -706,6 +727,15 @@ if __name__ == '__main__':
   # for i in range(len(argv)):
   #   if argv[i].startswith("WT"):
   #     argv[i] = "plots/histogram_3d/" + argv[i]
+  # sys.argv += argv
+
+  # argv = [
+  #   "-i", "plots/graphs/universal/individual/png/WT_sgA_R1_sense.png",
+  #   "-ng", "1",
+  #   "-nc", "1",
+  #   "-nr", "1",
+  #   "-o", "hello.pptx"
+  # ]
   # sys.argv += argv
   args = parse_args()
 

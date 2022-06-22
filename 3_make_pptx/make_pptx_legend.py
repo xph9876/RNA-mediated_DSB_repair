@@ -341,8 +341,9 @@ def make_node_legend_pptx(
       'type': 'circle',
       'size': node_size_pt,
       'text': constants.REFERENCE_DESCRIPTION,
-      'color': constants.REFERENCE_OUTLINE_COLOR,
+      'color': constants.DEFAULT_NODE_COLOR,
       'line_width': 2 * line_width_pt,
+      'line_color': constants.REFERENCE_OUTLINE_COLOR,
     },
   ]
   return make_legend_pptx(
