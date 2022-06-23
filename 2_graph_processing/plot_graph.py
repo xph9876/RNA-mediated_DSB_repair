@@ -501,52 +501,6 @@ def make_universal_layout(data_info, graph, reverse_complement=False):
           var_type,
           cut_pos_ref,
         )
-        # if var_type == 'insertion':
-        #   # Place the x coordinate alphabetically so that A is left most
-        #   # and T is right most. This is intended to place the insertions
-        #   # in a tree based on the common prefix of the insertion nucleotides.
-        #   # To prevent overlapping the nodes are placed in multiple rows for
-        #   # higher numbers of insertions.
-        #   kmer_index = kmer_utils.get_kmer_index(alignment_utils.get_insertion_str(
-        #     ref_align,
-        #     read_align,
-        #   ))
-          
-        #   row_spec = constants.GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC
-        #   num_rows = row_spec[dist_ref]['rows']
-        #   num_cols = row_spec[dist_ref]['cols']
-        #   row = kmer_index % num_rows
-        #   col = kmer_index // num_rows
-        #   prev_rows_offset = sum(
-        #     1 + row_spec[i]['rows'] * row_spec[i]['row_space']
-        #     for i in row_spec
-        #     if i < dist_ref
-        #   )
-        #   curr_row_offset = row * row_spec[dist_ref]['row_space']
-        #   y = 1 + prev_rows_offset + curr_row_offset
-        #   x = ((col / num_cols) - 0.5 * (1 - 1 / num_cols))
-        #   if LAYOUT_PROPERTIES['universal_layout']['radial']:
-        #     angle = np.pi / 2 - np.pi * x
-        #     xy_dict[data['id']] = (y * np.cos(angle), y * np.sin(angle))
-        #   else:
-        #     xy_dict[data['id']] = (x * 22, y + 1)
-        # elif var_type == 'deletion':
-        #   # Place the x coordinate so that the most upstream deletion
-        #   # is the left most, and most downstream deletion is right most.
-        #   # A deletion with equal number of deletions on either side of the
-        #   # cut position should be placed at x = 0.
-        #   first_del_pos = alignment_utils.get_first_deletion_pos(read_align)
-        #   last_del_pos = first_del_pos + dist_ref - 1
-        #   avg_del_pos = (first_del_pos + last_del_pos) / 2
-        #   x = avg_del_pos - (cut_pos_ref + 0.5)
-        #   y = dist_ref
-        #   if LAYOUT_PROPERTIES['universal_layout']['radial']:
-        #     angle = np.pi / 2 - 2 * (np.pi / 2) * (x / (dist_ref + 1))
-        #     xy_dict[data['id']] = (2 * y * np.cos(angle), -0.25 - 0.5 * (y * np.sin(angle)))
-        #   else:
-        #     xy_dict[data['id']] = (x * 2, -(y + 1))
-        # else:
-        #   raise Exception('Impossible.')
   return xy_dict
 
 def make_universal_layout_legend(
@@ -2397,120 +2351,6 @@ def get_plot_args(
 
   return plot_args
 
-def plot_graph(
-  output_dir,
-  output_ext,
-  data_info,
-  plot_type,
-  title_show = False,
-  sequence_reverse_complement = False,
-  node_subst_type = constants.SUBST_WITHOUT,
-  node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
-  node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
-  node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
-  node_size_min_px = constants.GRAPH_NODE_SIZE_MIN_PX,
-  node_outline_width_scale = constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
-  node_filter_variation_types = constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
-  edge_width_scale = constants.GRAPH_EDGE_WIDTH_SCALE,
-  graph_width_px = constants.GRAPH_WIDTH_PX,
-  graph_height_px = constants.GRAPH_HEIGHT_PX,
-  graph_layout_common_dir = None,
-  graph_layout_separate_components = False,
-  line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
-  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
-  legend_show = False,
-  legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
-  crop_x = None,
-  crop_y = None,
-  plot_range_x = None,
-  plot_range_y = None,
-  interactive = False,
-):
-  data_label = constants.get_data_label(data_info)
-  plot_args = get_plot_args(
-    data_info = data_info,
-    plot_type = plot_type,
-    title_show = title_show,
-    sequence_reverse_complement = sequence_reverse_complement,
-    node_subst_type = node_subst_type,
-    node_size_max_freq = node_size_max_freq,
-    node_size_min_freq = node_size_min_freq,
-    node_size_max_px = node_size_max_px,
-    node_size_min_px = node_size_min_px,
-    node_filter_variation_types = node_filter_variation_types,
-    node_outline_width_scale = node_outline_width_scale,
-    edge_width_scale = edge_width_scale,
-    graph_width_px = graph_width_px,
-    graph_height_px = graph_height_px,
-    graph_layout_common_dir = graph_layout_common_dir,
-    graph_layout_separate_components = graph_layout_separate_components,
-    line_width_scale = line_width_scale,
-    font_size_scale = font_size_scale,
-    legend_show = legend_show,
-    legend_colorbar_scale = legend_colorbar_scale,
-    plot_range_x = plot_range_x,
-    plot_range_y = plot_range_y,
-  )
-  
-  figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
-
-  sequence_data = file_utils.read_tsv(
-    file_names.sequence_data(data_info['dir'], node_subst_type)
-  )
-  try:
-    max_dist_insertion = sequence_data.loc[
-      sequence_data['variation_type'] == 'insertion',
-      'dist_ref'
-    ].max()
-  except: # incase no insertions
-    max_dist_insertion = 1
-  try:
-    max_dist_deletion = sequence_data.loc[
-      sequence_data['variation_type'] == 'deletion',
-      'dist_ref'
-    ].max()
-  except: # incase no insertions
-    max_dist_deletion = 1
-
-  make_universal_layout_legend(
-    figure = figure,
-    x_pos = 11,
-    row = 1,
-    col = 1,
-    ref_length = len(data_info['ref_seq']),
-    cut_pos_ref = len(data_info['ref_seq']) // 2,
-    max_dist_deletion = max_dist_deletion,
-    max_dist_insertion = max_dist_insertion,
-  )
-  if interactive:
-    log_utils.log('Opening interactive version in browser.')
-    figure.show()
-
-  if output_dir is not None:
-    file_out = os.path.join(output_dir, file_names.graph_figure(data_label, output_ext))
-    log_utils.log(file_out)
-    file_utils.write_plotly(figure, file_out)
-
-  if (
-    ((crop_x is not None) and (tuple(crop_x) != (0, 1))) or
-    ((crop_y is not None) and (tuple(crop_y) != (0, 1)))
-  ):
-    if output_ext == 'html':
-      raise Exception('Cannot use crop setting with HTML output')
-    if crop_x is None:
-      crop_x = (0, 1)
-    if crop_y is None:
-      crop_y = (0, 1)
-
-    image = PIL.Image.open(file_out)
-    width_px, height_px = image.size
-
-    left = crop_x[0] * width_px
-    right = crop_x[1] * width_px
-    top = crop_y[0] * height_px
-    bottom = crop_y[1] * height_px
-    image.crop((left, top, right, bottom)).save(file_out)
-
 def parse_args():
   parser = argparse.ArgumentParser(
     description = 'Plot graph-theory graphs.'
@@ -2769,35 +2609,6 @@ def main():
   # sys.argv += '-i libraries_4/WT_sgB_R2_sense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout fractal --title --interactive'.split(' ')
   args = parse_args()
-  # plot_graph(
-  #   output_dir = args.output,
-  #   output_ext = args.ext,
-  #   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input)),
-  #   plot_type = args.layout + '_layout',
-  #   title_show = args.title,
-  #   sequence_reverse_complement = args.reverse_complement,
-  #   node_subst_type = args.subst_type,
-  #   node_size_max_freq = args.node_max_freq,
-  #   node_size_min_freq = args.node_min_freq,
-  #   node_size_max_px = args.node_max_px,
-  #   node_size_min_px = args.node_min_px,
-  #   node_outline_width_scale = args.node_outline_scale,
-  #   node_filter_variation_types = args.variation_types,
-  #   edge_width_scale = args.edge_scale,
-  #   graph_width_px = args.width_px,
-  #   graph_height_px = args.height_px,
-  #   graph_layout_common_dir = args.layout_dir,
-  #   graph_layout_separate_components = args.separate_components,
-  #   line_width_scale = args.line_width_scale,
-  #   font_size_scale = args.font_size_scale,
-  #   legend_show = args.legend,
-  #   legend_colorbar_scale = args.legend_color_bar_scale,
-  #   crop_x = args.crop_x,
-  #   crop_y = args.crop_y,
-  #   plot_range_x = args.range_x,
-  #   plot_range_y = args.range_y,
-  #   interactive = args.interactive,
-  # )
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
   data_label = constants.get_data_label(data_info)
   plot_args = get_plot_args(
@@ -2810,7 +2621,7 @@ def main():
     node_size_min_freq = args.node_min_freq,
     node_size_max_px = args.node_max_px,
     node_size_min_px = args.node_min_px,
-    node_filter_variation_types = args.variation_types, # FIXME: MAKE THIS NARGS ALSO
+    node_filter_variation_types = args.variation_types,
     node_outline_width_scale = args.node_outline_scale,
     edge_width_scale = args.edge_scale,
     graph_width_px = args.width_px,
