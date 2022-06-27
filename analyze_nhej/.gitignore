@@ -1,0 +1,25 @@
+
+# VS Code files
+.vscode/
+
+# log files
+log*.txt
+
+# SAM files
+*.sam
+
+# Library files
+libraries*
+
+# Plots
+plots/
+
+# Temp files
+*~*
+
+# Layout files
+layouts/
+
+# PPTX files
+pptx*
+*.pptx

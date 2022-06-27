@@ -131,28 +131,5 @@ dmypy.json
 # VS Code files
 .vscode/
 
-# log files
-log*.txt
-
-# SAM files
-*.sam
-
-# Library files
-libraries_0/
-libraries_1/
-libraries_2/
-libraries_3/
-libraries_4/
-
-# Plots
-plots/
-
 # Temp files
 *~*
-
-# Layout files
-layouts/
-
-# PPTX files
-pptx*
-*.pptx
