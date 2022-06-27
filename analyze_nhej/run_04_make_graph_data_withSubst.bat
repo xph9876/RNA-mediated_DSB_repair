@@ -22,10 +22,6 @@ python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/KO_sgB_R2_sense
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/KO_sgB_R2_branch
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/KO_sgB_R2_cmv
-python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R1_antisense
-python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R1_splicing
-python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R2_antisense
-python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R2_splicing
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgA_R1_sense_30bpDown
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgA_R1_branch_30bpDown
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgA_R1_cmv_30bpDown
@@ -38,7 +34,10 @@ python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/KO_sgB_R2_sense_30bpDown
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/KO_sgB_R2_branch_30bpDown
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/KO_sgB_R2_cmv_30bpDown
-
+python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R1_antisense
+python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R1_splicing
+python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R2_antisense
+python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgCD_R2_splicing
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgA_R1_sense_nodsb
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgA_R1_branch_nodsb
 python 2_graph_processing/make_graph_data.py --subst_type with -dir libraries_4/WT_sgA_R1_cmv_nodsb
