@@ -1,9 +1,8 @@
-@echo off
 set layout=universal
-
-for %%x in (A, B, C) do (
-  echo %%x%layout%
-  if %%x==A echo AAA
+chcp 65001
+for %%G in (A, B, C) do (
+  echo %%G%layout%
+  if %%G==A echo AAA
 )
 
 if %layout%==universal (
@@ -11,3 +10,5 @@ if %layout%==universal (
 ) else (
   echo bye
 )
+
+echo "Δ"

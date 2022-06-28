@@ -102,7 +102,7 @@ def get_variation_data(data_info, variation_type, format):
   if format == 'long':
     return data_sub_long
   
-  # else format == 'grid'
+  # otherwise format is grid
 
   data_sub_grid = data_sub_long.copy()
   data_sub_grid['variation_pos'] = (
@@ -312,6 +312,7 @@ def plot_histogram_3d(
       fontsize = constants.HISTOGRAM_3D_TITLE_FONT_SIZE * font_size_scale,
     )
 
+  log_utils.log(file_out)
   file_utils.write_pyplot(figure, file_out)
 
 
