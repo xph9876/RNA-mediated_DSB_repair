@@ -1,0 +1,16 @@
+#!/bin/bash
+bash run_01_process_nhej.sh
+bash run_02_combine_repeats.sh
+bash run_03_make_main_data_withoutSubst.sh
+bash run_03_make_main_data_withSubst.sh
+bash run_04_make_graph_data_withoutSubst.sh
+bash run_04_make_graph_data_withSubst.sh
+bash run_05_make_main_data_combined_withoutSubst.sh
+bash run_05_make_main_data_combined_withSubst.sh
+bash run_06_make_graph_data_combined_withoutSubst.sh
+bash run_06_make_graph_data_combined_withSubst.sh
+bash run_07_make_histogram_3d.sh
+bash run_08_common_layout.sh
+bash run_09_plot_graph.sh
+bash run_10_make_pptx_graph.sh
+bash run_11_make_pptx_histogram_3d.sh

@@ -22,8 +22,8 @@ for library_file in glob.glob('libraries_2/*'):
     raise Exception('Cannot parse strand: ' + library_file)
   if '30bpDown' in library_file:
     control = '30bpDown'
-  elif 'nodsb' in library_file:
-    control = 'nodsb'
+  elif 'noDSB' in library_file:
+    control = 'noDSB'
   else:
     control = 'none'
   if ('sgA' in library_file) or ('sgB' in library_file):

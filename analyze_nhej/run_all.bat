@@ -1,0 +1,15 @@
+call run_01_process_nhej.bat
+call run_02_combine_repeats.bat
+call run_03_make_main_data_withoutSubst.bat
+call run_03_make_main_data_withSubst.bat
+call run_04_make_graph_data_withoutSubst.bat
+call run_04_make_graph_data_withSubst.bat
+call run_05_make_main_data_combined_withoutSubst.bat
+call run_05_make_main_data_combined_withSubst.bat
+call run_06_make_graph_data_combined_withoutSubst.bat
+call run_06_make_graph_data_combined_withSubst.bat
+call run_07_make_histogram_3d.bat
+call run_08_common_layout.bat
+call run_09_plot_graph.bat
+call run_10_make_pptx_graph.bat
+call run_11_make_pptx_histogram_3d.bat
