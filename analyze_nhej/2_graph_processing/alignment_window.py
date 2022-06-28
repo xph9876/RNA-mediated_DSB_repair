@@ -71,11 +71,7 @@ def get_alignment_window(
       break
 
   if ref_i <= right_anchor_end:
-    print(
-      'Warning: read did not align across window and anchor:\n' +
-      ref_align + '\n' +
-      read_align + '\n'
-    )
+    # read was not long enough to align across window and anchor
     return None, None
 
   if (
