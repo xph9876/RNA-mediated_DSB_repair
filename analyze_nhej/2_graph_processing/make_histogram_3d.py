@@ -63,71 +63,65 @@ def get_figure_args_pyplot(
     }
   }
 
-def get_variation_data(data_info, variation_type, format):
-  if format not in ['long', 'grid']:
-    raise Exception('Invalid value for format: ' + str(format))
-  
-  ref_pos_type, ref_pos_labels = constants.get_ref_variation_pos_labels(data_info)
+def get_position_labels(label_type, ref_length):
+  if label_type == 'relative':
+    return (
+      [str(-x) for x in range(1, 1 + ref_length // 2)][::-1] +
+      [str(x) for x in range(1, 1 + ref_length // 2)]
+    )
+  elif label_type == 'absolute':
+    return [str(x) for x in range(1, ref_length + 1)]
+  else:
+    raise Exception('Unknown label type: ' + str(label_type))
 
-  data = file_utils.read_tsv(
+def get_variation_data(
+  data_info,
+  variation_type,
+  format,
+  y_axis_column = 'dist_ref',
+  reverse_pos = False,
+):
+  ref_length = len(data_info['ref_seq'])
+
+  data_long = file_utils.read_tsv(
     file_names.variation_grouped(data_info['dir'], constants.SUBST_WITH)
   )
-        
-  data_sub_long = data.loc[data['variation_type'] == variation_type]
-  data_sub_long = data_sub_long.groupby([
-    'variation_pos',
-    constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN,
-  ])['freq_mean'].sum()
-
-
-  data_sub_long = data_sub_long.reindex(pd.MultiIndex.from_product(
-    [
-      range(
-        constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[0],
-        constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[1] + 1,
-      ),
-      range(
-        constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
-        constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
-      ),
-    ],
-    names = [
-      'variation_pos',
-      constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN,
-    ],
+  data_long = data_long.loc[data_long['variation_type'] == variation_type]
+  if reverse_pos:
+    data_long['variation_pos'] = ref_length + 1 - data_long['variation_pos']
+  data_long = data_long.groupby(['variation_pos', y_axis_column])['freq_mean'].sum()
+  data_long = data_long.reindex(pd.MultiIndex.from_product(
+    [list(range(ref_length + 1)), list(range(ref_length + 1))],
+    names = ['variation_pos', y_axis_column],
   ))
-  data_sub_long = data_sub_long.reset_index()
-  data_sub_long = data_sub_long.fillna(0)
+  data_long = data_long.reset_index()
+  data_long = data_long.fillna(0)
 
   if format == 'long':
-    return data_sub_long
-  
-  # otherwise format is grid
-
-  data_sub_grid = data_sub_long.copy()
-  data_sub_grid['variation_pos'] = (
-    data_sub_grid['variation_pos'].apply(lambda x: ref_pos_labels[x])
-  )
-  data_sub_grid = data_sub_grid.pivot(
-    index = constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN,
-    columns = 'variation_pos',
-    values = 'freq_mean',
-  )
-  data_sub_grid = data_sub_grid.rename_axis(
-    index = None,
-    columns = None,
-  )
-  data_sub_grid.index = pd.MultiIndex.from_product(
-    [
-      [constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN],
-      data_sub_grid.index,
-    ],
-  )
-  data_sub_grid.columns = pd.MultiIndex.from_product(
-    [['variation_pos'], data_sub_grid.columns],
-  )
-
-  return data_sub_grid
+    return data_long
+  elif format == 'grid':
+    data_grid = data_long.copy()
+    data_grid = data_grid.pivot(
+      index = y_axis_column,
+      columns = 'variation_pos',
+      values = 'freq_mean',
+    )
+    data_grid = data_grid.rename_axis(
+      index = None,
+      columns = None,
+    )
+    data_grid.index = pd.MultiIndex.from_product(
+      [
+        [y_axis_column],
+        data_grid.index,
+      ],
+    )
+    data_grid.columns = pd.MultiIndex.from_product(
+      [['variation_pos'], data_grid.columns],
+    )
+    return data_grid
+  else:
+    raise Exception('Invalid value for format: ' + str(format))
 
 def plot_histogram_3d_impl(
   data_info,
@@ -137,14 +131,17 @@ def plot_histogram_3d_impl(
   freq_log,
   axis,
   show_title,
+  label_type,
   tick_modulus = constants.HISTOGRAM_3D_AXIS_TICK_MODULUS,
   axis_label_font_size = constants.HISTOGRAM_3D_AXIS_LABEL_FONT_SIZE,
   axis_tick_font_size = constants.HISTOGRAM_3D_AXIS_TICK_FONT_SIZE,
   font_size_scale = constants.HISTOGRAM_3D_TITLE_FONT_SIZE,
   label_pad_px = 10,
+  reverse_pos = False,
 ):
 
-  ref_pos_type, ref_pos_labels = constants.get_ref_variation_pos_labels(data_info)
+  ref_length = len(data_info['ref_seq'])
+  ref_pos_labels = get_position_labels(label_type, ref_length)
 
   if freq_log:
     freq_min_axis = np.log10(freq_min)
@@ -157,6 +154,7 @@ def plot_histogram_3d_impl(
     data_info,
     variation_type,
     'long',
+    reverse_pos = reverse_pos,
   )
 
   color = constants.VARIATION_TYPES[variation_type]['color_3d']
@@ -184,30 +182,26 @@ def plot_histogram_3d_impl(
     color = color,
   )
 
-  if ref_pos_type == 'ref_cut_pos_offset':
+  if label_type == 'relative':
     x_label = 'Position (from cut)'
-  elif ref_pos_type == 'ref_pos':
+  elif label_type == 'absolute':
     x_label = 'Position'
-  ref_pos_labels_keys = list(ref_pos_labels.keys())
-  ref_pos_labels_keys = [
-    x for x in ref_pos_labels_keys
-    if (int(ref_pos_labels[x]) % tick_modulus) == 0
-  ]
+  else:
+    raise Exception('Impossible')
+  x_tick_list = list(zip(range(1, ref_length + 1), ref_pos_labels))
+  x_tick_list = [x for x in x_tick_list if (int(x[1]) % tick_modulus) == 0]
   axis.set_xlabel(
     x_label,
     labelpad = label_pad_px * font_size_scale,
     fontsize = axis_label_font_size * font_size_scale,
   )
   axis.set_xticks(
-    ticks = ref_pos_labels_keys,
-    labels = [ref_pos_labels[x] for x in ref_pos_labels_keys],
+    ticks = [x[0] for x in x_tick_list],
+    labels = [x[1] for x in x_tick_list],
   )
   y_ticks = [
     y for y in
-    range(
-      constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
-      constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
-    )
+    range(0, ref_length + 1)
     if (y % tick_modulus) == 0
   ]
   axis.set_yticks(
@@ -259,7 +253,6 @@ def plot_histogram_3d_impl(
       fontsize = constants.HISTOGRAM_3D_TITLE_FONT_SIZE * font_size_scale,
     )
 
-
 def plot_histogram_3d(
   file_out,
   data_info,
@@ -267,7 +260,9 @@ def plot_histogram_3d(
   freq_min,
   freq_max,
   freq_log,
+  label_type,
   show_title = False,
+  reverse_pos = False,
 ):
   if data_info['format'] != 'individual':
     raise Exception('Only applicable for individual data sets')
@@ -302,8 +297,10 @@ def plot_histogram_3d(
     freq_log = freq_log,
     axis = axis,
     show_title = False,
+    label_type = label_type,
     tick_modulus = constants.HISTOGRAM_3D_AXIS_TICK_MODULUS,
     font_size_scale = font_size_scale,
+    reverse_pos = reverse_pos,
   )
 
   if show_title:
@@ -334,17 +331,38 @@ def parse_args():
     help = 'Output directory.',
     required = True,
   )
+  parser.add_argument(
+    '-rp',
+    '--reverse_pos',
+    action = 'store_true',
+    help = (
+      'Whether to reverse the x-axis positions.' +
+      ' Useful if comparing reverse strand data with forward strand data.'
+    )
+  )
+  parser.add_argument(
+    '-lt',
+    '--label_type',
+    choices = ['relative', 'absolute'],
+    help = (
+      'Whether to index the x-axis by absolute positions on the reference sequence'
+      ' from 1 to ref_length, or relative positions from -ref_length / 2 to ref_length / 2'
+      ' (skipping 0).'
+    ),
+    required = True
+  )
   return parser.parse_args()
 
 def main():
   # sys.argv += [
   #   '-i', 'libraries_4\\WT_sgA_R1_sense',
-  #   '-o', 'plots\\histogram_3d'
+  #   '-o', './',
+  #   '-rp',
+  #   '-lt', 'relative'
   # ]
   args = parse_args()
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
   data_label = constants.get_data_label(data_info)
-  log_utils.log('3D histogram: ' + data_label)
   for variation_type in ['substitution', 'insertion', 'deletion']:
     plot_histogram_3d(
       os.path.join(args.output, file_names.histogram_3d(data_label, variation_type)),
@@ -353,7 +371,9 @@ def main():
       freq_min = constants.HISTOGRAM_3D_FREQ_MIN,
       freq_max = constants.HISTOGRAM_3D_FREQ_MAX,
       freq_log = True,
+      label_type = args.label_type,
       show_title = False,
+      reverse_pos = args.reverse_pos,
     )
 
 if __name__ == '__main__':

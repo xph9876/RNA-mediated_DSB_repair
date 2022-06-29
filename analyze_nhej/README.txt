@@ -11,7 +11,7 @@ Pipeline stages
 5. run_05_make_main_data_combined_withSubst, run_05_make_main_data_combined_withoutSubst - Makes the combined data files for comparing 2 experiments.
 6. run_05_make_graph_data_combined_withSubst, run_05_make_graph_data_combined_withoutSubst - Makes the combined data files for comparing 2 experiments.
 7. run_07_make_historam_3d - Plots the 3D variation-position histograms.
-8. run_08_common_layout - Create the common layouts for the plotting the variation-positino graphs. This insure that comparable experiments have vertices with the same variation placed in the same position.
+8. run_08_common_layout - Create the common layouts for the plotting the variation-position graphs. This insure that comparable experiments have vertices with the same variation placed in the same position.
 9. run_09_plot_graph - Plots the variation-position graphs.
 10. run_10_make_pptx_graph - Arranges the variation-position graphs in a grid in PPTX files.
 11. run_11_make_ppts_histograms - Arranges the variation-position histograms in a grid in PPTX files.
