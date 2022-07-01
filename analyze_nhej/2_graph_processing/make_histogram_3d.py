@@ -63,17 +63,6 @@ def get_figure_args_pyplot(
     }
   }
 
-def get_position_labels(label_type, ref_length):
-  if label_type == 'relative':
-    return (
-      [str(-x) for x in range(1, 1 + ref_length // 2)][::-1] +
-      [str(x) for x in range(1, 1 + ref_length // 2)]
-    )
-  elif label_type == 'absolute':
-    return [str(x) for x in range(1, ref_length + 1)]
-  else:
-    raise Exception('Unknown label type: ' + str(label_type))
-
 def get_variation_data(
   data_info,
   variation_type,
@@ -141,7 +130,7 @@ def plot_histogram_3d_impl(
 ):
 
   ref_length = len(data_info['ref_seq'])
-  ref_pos_labels = get_position_labels(label_type, ref_length)
+  ref_pos_labels = constants.get_position_labels(label_type, ref_length)
 
   if freq_log:
     freq_min_axis = np.log10(freq_min)

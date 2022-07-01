@@ -17,40 +17,27 @@ VARIATION_POSITION_LAYOUT_DISTANCE_LABEL = {
     'In/Dels'
   ),
 }
-# VARIATION_POSITION_LAYOUT_POSITION_RANGE = (-1, 19)
 VARIATION_POSITION_LAYOUT_POSITION_RANGE = (0, 20)
 VARIATION_POSITION_LAYOUT_DISTANCE_RANGE = {
   'indel': (0, 20),
   'dist_ref': (0, 20),
 }[VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN]
 
-VARIATION_POSITION_LAYOUT_POSITION_LABEL = {
-  'ref_pos': 'Position',
-  'ref_cut_pos_offset': 'Position (from cut)',
-}
-
-
-def get_ref_variation_pos_labels(data_info):
-  if data_info['control'] == CONTROL_30BPDOWN:
+def get_position_labels(label_type, ref_length):
+  if label_type == 'relative':
     return (
-      'ref_pos',
-      dict(zip(
-        range(-1, len(data_info['ref_seq'])),
-        range(0, len(data_info['ref_seq']) + 1),
-      )),
+      [str(-x) for x in range(1, 1 + ref_length // 2)][::-1] +
+      [str(x) for x in range(1, 1 + ref_length // 2)]
     )
+  elif label_type == 'absolute':
+    return [str(x) for x in range(1, ref_length + 1)]
   else:
-    pos_before_cut = len(data_info['ref_seq']) // 2
-    labels = {}
-    for i in range(-1, len(data_info['ref_seq'])):
-      if i <= pos_before_cut:
-        labels[i] = i - pos_before_cut - 1
-      else:
-        labels[i] = i - pos_before_cut
-    return (
-      'ref_cut_pos_offset',
-      labels,
-    )
+    raise Exception('Unknown label type: ' + str(label_type))
+
+POSITION_TITLE = {
+  'relative': 'Position (from cut)',
+  'absolute': 'Position',
+}
 
 # Substitution edges not being shown
 # indel edges being show solid

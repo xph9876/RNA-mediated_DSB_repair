@@ -503,7 +503,7 @@ def make_universal_layout(data_info, graph, reverse_complement=False):
         )
   return xy_dict
 
-def make_universal_layout_legend(
+def make_universal_layout_y_axis(
   figure,
   x_pos,
   row,
@@ -591,7 +591,118 @@ def make_universal_layout_legend(
     col = col,
     line_width = line_width_px,
   )
+
+
+def make_universal_layout_x_axes(
+  figure,
+  y_pos_insertion,
+  y_pos_deletion,
+  row,
+  col,
+  ref_length,
+  cut_pos_ref, # should be 1 based!
+  deletion_label_type,
+  tick_length = 0.25,
+  label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE,
+  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  line_width_px = 4,
+):
+  insertion_tick_list = []
+  for insertion_letter in 'ACGT':
+    fake_ref_align = (
+      ('A' * cut_pos_ref) +
+      '-'
+      ('A' * (ref_length - cut_pos_ref))
+    )
+    fake_read_align = (
+      ('A' * cut_pos_ref) +
+      insertion_letter
+      ('A' * (ref_length - cut_pos_ref))
+    )
+    x_pos = get_pos_universal_layout(
+      fake_ref_align,
+      fake_read_align,
+      1,
+      'insertion',
+      cut_pos_ref,
+    )[0]
+    insertion_tick_list.append({'x_pos': x_pos, 'text': insertion_letter})
+
+  deletion_tick_list = []
+  deletion_pos_labels = constants.get_position_labels(
+    deletion_label_type, ref_length
+  )
+  for deletion_pos in range(1, ref_length + 1):
+    fake_ref_align = 'A' * ref_length
+    fake_read_align = (
+      'A' * (deletion_pos - 1) +
+      '-' +
+      'A' * (ref_length - deletion_pos)
+    )
+
+    x_pos = get_pos_universal_layout(
+      fake_ref_align,
+      fake_read_align,
+      1,
+      'deletion',
+      cut_pos_ref,
+    )[0]
+
+    deletion_tick_list.append({
+      'x_pos': x_pos,
+      'text': deletion_pos_labels[deletion_pos - 1]
+    })
+
+  for axis_type in ['insertion', 'deletion']:
+    if axis_type == 'insertion':
+      tick_list = insertion_tick_list
+      y_pos = y_pos_insertion
+    elif axis_type == 'deletion':
+      y_pos = y_pos_deletion
+    else:
+      raise Exception('Impossible.')
+    x_min = 0
+    x_max = 0
+    for tick in tick_list:
+      # tick line
+      figure.add_shape(
+        type = 'line',
+        x0 = tick['x_pos'],
+        x1 = tick['x_pos'],
+        y0 = y_pos,
+        y1 = y_pos + tick_length,
+        row = row,
+        col = col,
+        line_width = line_width_px,
+      )
+
+      # tick label
+      figure.add_annotation(
+        x = tick['x_pos'],
+        y = y_pos + 1.5 * tick_length,
+        text = str(tick['dist_ref']),
+        showarrow = False,
+        row = row,
+        col = col,
+        font_size = label_font_size * font_size_scale,
+        xanchor = 'center',
+      )
+
+      x_min = min(x_min, tick['x_pos'])
+      x_max = max(x_max, tick['x_pos'])
+
+    figure.add_shape(
+      type = 'line',
+      x0 = x_min,
+      x1 = x_max,
+      y0 = y_pos,
+      y1 = y_pos,
+      row = row,
+      col = col,
+      line_width = line_width_px,
+    )
     
+
 # idea to make the nodes a reasonable distance from the reference
 def get_kamada_initial_layout(graph):
   bucket_list = {}
@@ -1761,23 +1872,29 @@ def make_graph_single_panel(
       'variation_position_layout_vertical',
       'variation_position_layout_circle_pack',
     ]:
-      ref_pos_type, x_axis_label_dict = constants.get_ref_variation_pos_labels(data_info)
+      position_label_type = (
+        'absolute' if data_info['control'] == '30bpDown' else 'relative'
+      )
+      x_axis_tick_text = constants.get_position_labels(
+        position_label_type,
+        len(data_info['ref_seq'])
+      )
       y_axis_tick_vals = list(range(
         constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
         constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
       ))
 
       x_axis_tick_vals = [
-        key for key, value in x_axis_label_dict.items()
-        if ((value % axis_tick_modulo) == 0)
+        i for i in range(1, len(x_axis_tick_text) + 1)
+        if (int(x_axis_tick_text[i - 1]) % axis_tick_modulo) == 0
       ]
       y_axis_tick_vals = [i for i in y_axis_tick_vals if ((i % axis_tick_modulo) == 0)]
 
-      x_axis_tick_text = [x_axis_label_dict[i] for i in x_axis_tick_vals]
+      x_axis_tick_text = [x_axis_tick_text[i - 1] for i in x_axis_tick_vals]
       y_axis_tick_text = [str(i) for i in y_axis_tick_vals]
 
       figure.update_xaxes(
-        title = constants.VARIATION_POSITION_LAYOUT_POSITION_LABEL[ref_pos_type],
+        title = constants.POSITION_TITLE[position_label_type],
         showgrid = True,
         showline = True,
         zeroline = True,
@@ -2659,7 +2776,7 @@ def main():
     max_dist_deletion = 1
 
   if args.universal_layout_legend_pos_x is not None:
-    make_universal_layout_legend(
+    make_universal_layout_y_axis(
       figure = figure,
       x_pos = args.universal_layout_legend_pos_x,
       row = 1,
