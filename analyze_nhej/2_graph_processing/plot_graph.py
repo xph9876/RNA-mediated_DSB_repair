@@ -564,6 +564,7 @@ def make_universal_layout_y_axis(
       row = row,
       col = col,
       line_width = line_width_px,
+      line_color = 'black',
     )
 
     # tick label
@@ -590,6 +591,7 @@ def make_universal_layout_y_axis(
     row = row,
     col = col,
     line_width = line_width_px,
+    line_color = 'black',
   )
 
 
@@ -603,7 +605,8 @@ def make_universal_layout_x_axes(
   cut_pos_ref, # should be 1 based!
   deletion_label_type,
   tick_length = 0.25,
-  label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE,
+  insertion_label_font_size =  2 * constants.GRAPH_AXES_TICK_FONT_SIZE,
+  deletion_label_font_size = 1 * constants.GRAPH_AXES_TICK_FONT_SIZE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   line_width_px = 4,
 ):
@@ -611,12 +614,12 @@ def make_universal_layout_x_axes(
   for insertion_letter in 'ACGT':
     fake_ref_align = (
       ('A' * cut_pos_ref) +
-      '-'
+      '-' +
       ('A' * (ref_length - cut_pos_ref))
     )
     fake_read_align = (
       ('A' * cut_pos_ref) +
-      insertion_letter
+      insertion_letter +
       ('A' * (ref_length - cut_pos_ref))
     )
     x_pos = get_pos_universal_layout(
@@ -628,65 +631,91 @@ def make_universal_layout_x_axes(
     )[0]
     insertion_tick_list.append({'x_pos': x_pos, 'text': insertion_letter})
 
-  deletion_tick_list = []
+  deletion_tick_list_negative = []
   deletion_pos_labels = constants.get_position_labels(
-    deletion_label_type, ref_length
+    deletion_label_type,ref_length,
   )
-  for deletion_pos in range(1, ref_length + 1):
+  for deletion_pos in range(1, (ref_length // 2) + 1):
+    if (int(deletion_pos_labels[deletion_pos - 1]) % 1) != 0:
+      # in case want to keep only certain ticks
+      continue
     fake_ref_align = 'A' * ref_length
+    dist_ref = 1 + (ref_length // 2) - deletion_pos
     fake_read_align = (
       'A' * (deletion_pos - 1) +
-      '-' +
-      'A' * (ref_length - deletion_pos)
+      '-' * dist_ref +
+      'A' * (ref_length // 2)
     )
-
     x_pos = get_pos_universal_layout(
       fake_ref_align,
       fake_read_align,
-      1,
+      dist_ref,
       'deletion',
       cut_pos_ref,
     )[0]
 
-    deletion_tick_list.append({
+    deletion_tick_list_negative.append({
       'x_pos': x_pos,
-      'text': deletion_pos_labels[deletion_pos - 1]
+      'text': deletion_pos_labels[deletion_pos - 1],
+      'deletion_pos': deletion_pos,
     })
+  
+  deletion_tick_list_positive = [
+    {
+      'x_pos': -tick['x_pos'],
+      'text': deletion_pos_labels[ref_length - tick['deletion_pos']]
+    }
+    for tick in deletion_tick_list_negative
+  ]
+
+  deletion_tick_list = (
+    deletion_tick_list_negative +
+    # [{'x_pos': 0, 'text': 'DSB'}] + # in case want tick at 0
+    deletion_tick_list_positive
+  )
 
   for axis_type in ['insertion', 'deletion']:
     if axis_type == 'insertion':
       tick_list = insertion_tick_list
       y_pos = y_pos_insertion
+      label_font_size = insertion_label_font_size
+      tick_sign = -1
     elif axis_type == 'deletion':
+      tick_list = deletion_tick_list
       y_pos = y_pos_deletion
+      label_font_size = deletion_label_font_size
+      tick_sign = -1
     else:
       raise Exception('Impossible.')
     x_min = 0
     x_max = 0
     for tick in tick_list:
       # tick line
-      figure.add_shape(
-        type = 'line',
-        x0 = tick['x_pos'],
-        x1 = tick['x_pos'],
-        y0 = y_pos,
-        y1 = y_pos + tick_length,
-        row = row,
-        col = col,
-        line_width = line_width_px,
-      )
+      if axis_type == 'insertion':
+        figure.add_shape(
+          type = 'line',
+          x0 = tick['x_pos'],
+          x1 = tick['x_pos'],
+          y0 = y_pos,
+          y1 = y_pos + tick_sign * tick_length,
+          row = row,
+          col = col,
+          line_width = line_width_px,
+          line_color = 'black',
+        )
 
-      # tick label
-      figure.add_annotation(
-        x = tick['x_pos'],
-        y = y_pos + 1.5 * tick_length,
-        text = str(tick['dist_ref']),
-        showarrow = False,
-        row = row,
-        col = col,
-        font_size = label_font_size * font_size_scale,
-        xanchor = 'center',
-      )
+        # tick label
+        figure.add_annotation(
+          x = tick['x_pos'],
+          y = y_pos + 1.5 * tick_sign * tick_length,
+          text = str(tick['text']),
+          showarrow = False,
+          row = row,
+          col = col,
+          font_size = label_font_size * font_size_scale,
+          xanchor = 'center',
+          yshift = label_font_size * tick_sign,
+        )
 
       x_min = min(x_min, tick['x_pos'])
       x_max = max(x_max, tick['x_pos'])
@@ -700,8 +729,8 @@ def make_universal_layout_x_axes(
       row = row,
       col = col,
       line_width = line_width_px,
+      line_color = 'black',
     )
-    
 
 # idea to make the nodes a reasonable distance from the reference
 def get_kamada_initial_layout(graph):
@@ -2511,6 +2540,8 @@ def parse_args():
     default = 'radial',
     help = 'The algorithm to use for laying out the graph.'
   )
+  # FIXME: ADD COMMAND LINE ARGS FOR THE X AXES AS WELL
+  # ALSO RENAME THIS TO universal_layout_x_axis, universal_layout_y_axis, etc.
   parser.add_argument(
     '--universal_layout_legend_pos_x',
     type = float,
@@ -2718,7 +2749,7 @@ def parse_args():
   return args
 
 def main():
-  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive'.split(' ')
+  sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive --universal_layout_legend_pos_x 13'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
@@ -2785,6 +2816,18 @@ def main():
       cut_pos_ref = len(data_info['ref_seq']) // 2,
       max_dist_deletion = max_dist_deletion,
       max_dist_insertion = max_dist_insertion,
+    )
+    make_universal_layout_x_axes(
+      figure = figure,
+      y_pos_insertion = 18,
+      y_pos_deletion = -18,
+      row = 1,
+      col = 1,
+      ref_length = len(data_info['ref_seq']),
+      cut_pos_ref = len(data_info['ref_seq']) // 2,
+      deletion_label_type = (
+        'absolute' if data_info['control'] == '30bpDown' else 'relative'
+      )
     )
   if args.interactive:
     log_utils.log('Opening interactive version in browser.')
