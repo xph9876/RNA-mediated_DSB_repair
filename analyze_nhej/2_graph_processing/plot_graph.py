@@ -595,142 +595,131 @@ def make_universal_layout_y_axis(
   )
 
 
-def make_universal_layout_x_axes(
+def make_universal_layout_x_axis(
   figure,
-  y_pos_insertion,
-  y_pos_deletion,
+  var_type,
+  y_pos,
   row,
   col,
   ref_length,
   cut_pos_ref, # should be 1 based!
-  deletion_label_type,
+  deletion_label_type = 'relative',
   tick_length = 0.25,
-  insertion_label_font_size =  2 * constants.GRAPH_AXES_TICK_FONT_SIZE,
-  deletion_label_font_size = 1 * constants.GRAPH_AXES_TICK_FONT_SIZE,
+  label_font_size = None,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   line_width_px = 4,
 ):
-  insertion_tick_list = []
-  for insertion_letter in 'ACGT':
-    fake_ref_align = (
-      ('A' * cut_pos_ref) +
-      '-' +
-      ('A' * (ref_length - cut_pos_ref))
-    )
-    fake_read_align = (
-      ('A' * cut_pos_ref) +
-      insertion_letter +
-      ('A' * (ref_length - cut_pos_ref))
-    )
-    x_pos = get_pos_universal_layout(
-      fake_ref_align,
-      fake_read_align,
-      1,
-      'insertion',
-      cut_pos_ref,
-    )[0]
-    insertion_tick_list.append({'x_pos': x_pos, 'text': insertion_letter})
-
-  deletion_tick_list_negative = []
-  deletion_pos_labels = constants.get_position_labels(
-    deletion_label_type,ref_length,
-  )
-  for deletion_pos in range(1, (ref_length // 2) + 1):
-    if (int(deletion_pos_labels[deletion_pos - 1]) % 1) != 0:
-      # in case want to keep only certain ticks
-      continue
-    fake_ref_align = 'A' * ref_length
-    dist_ref = 1 + (ref_length // 2) - deletion_pos
-    fake_read_align = (
-      'A' * (deletion_pos - 1) +
-      '-' * dist_ref +
-      'A' * (ref_length // 2)
-    )
-    x_pos = get_pos_universal_layout(
-      fake_ref_align,
-      fake_read_align,
-      dist_ref,
-      'deletion',
-      cut_pos_ref,
-    )[0]
-
-    deletion_tick_list_negative.append({
-      'x_pos': x_pos,
-      'text': deletion_pos_labels[deletion_pos - 1],
-      'deletion_pos': deletion_pos,
-    })
-  
-  deletion_tick_list_positive = [
-    {
-      'x_pos': -tick['x_pos'],
-      'text': deletion_pos_labels[ref_length - tick['deletion_pos']]
-    }
-    for tick in deletion_tick_list_negative
-  ]
-
-  deletion_tick_list = (
-    deletion_tick_list_negative +
-    # [{'x_pos': 0, 'text': 'DSB'}] + # in case want tick at 0
-    deletion_tick_list_positive
-  )
-
-  for axis_type in ['insertion', 'deletion']:
-    if axis_type == 'insertion':
-      tick_list = insertion_tick_list
-      y_pos = y_pos_insertion
-      label_font_size = insertion_label_font_size
-      tick_sign = -1
-    elif axis_type == 'deletion':
-      tick_list = deletion_tick_list
-      y_pos = y_pos_deletion
-      label_font_size = deletion_label_font_size
-      tick_sign = -1
+  if label_font_size is None:
+    if var_type == 'insertion':
+      label_font_size = 2 * constants.GRAPH_AXES_TICK_FONT_SIZE
+    elif var_type == 'deletion':
+      label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE
     else:
-      raise Exception('Impossible.')
-    x_min = 0
-    x_max = 0
-    for tick in tick_list:
-      # tick line
-      if axis_type == 'insertion':
-        figure.add_shape(
-          type = 'line',
-          x0 = tick['x_pos'],
-          x1 = tick['x_pos'],
-          y0 = y_pos,
-          y1 = y_pos + tick_sign * tick_length,
-          row = row,
-          col = col,
-          line_width = line_width_px,
-          line_color = 'black',
-        )
+      raise Exception('Unknown variation type: ' + str(var_type))
+  tick_list = []
+  if var_type == 'insertion':
+    for insertion_letter in 'ACGT':
+      fake_ref_align = (
+        ('A' * cut_pos_ref) +
+        '-' +
+        ('A' * (ref_length - cut_pos_ref))
+      )
+      fake_read_align = (
+        ('A' * cut_pos_ref) +
+        insertion_letter +
+        ('A' * (ref_length - cut_pos_ref))
+      )
+      x_pos = get_pos_universal_layout(
+        fake_ref_align,
+        fake_read_align,
+        1,
+        'insertion',
+        cut_pos_ref,
+      )[0]
+      tick_list.append({'x_pos': x_pos, 'text': insertion_letter})
+  elif var_type == 'deletion':
+    tick_list_negative = []
+    pos_labels = constants.get_position_labels(
+      deletion_label_type,ref_length,
+    )
+    for deletion_start in range(1, (ref_length // 2) + 1):
+      dist_ref = 1 + (ref_length // 2) - deletion_start
+      if (dist_ref % 2) != 1:
+        continue # do only odd deletions so mid point is on an integer
+      deletion_mid = deletion_start + (dist_ref - 1) // 2
+      fake_ref_align = 'A' * ref_length
+      fake_read_align = (
+        'A' * (deletion_start - 1) +
+        '-' * dist_ref +
+        'A' * (ref_length // 2)
+      )
+      x_pos = get_pos_universal_layout(
+        fake_ref_align,
+        fake_read_align,
+        dist_ref,
+        'deletion',
+        cut_pos_ref,
+      )[0]
 
-        # tick label
-        figure.add_annotation(
-          x = tick['x_pos'],
-          y = y_pos + 1.5 * tick_sign * tick_length,
-          text = str(tick['text']),
-          showarrow = False,
-          row = row,
-          col = col,
-          font_size = label_font_size * font_size_scale,
-          xanchor = 'center',
-          yshift = label_font_size * tick_sign,
-        )
+      tick_list_negative.append({
+        'x_pos': x_pos,
+        'text': pos_labels[deletion_mid - 1],
+        'deletion_pos': deletion_mid,
+      })
+    
+    tick_list_positive = [
+      {
+        'x_pos': -tick['x_pos'],
+        'text': pos_labels[ref_length - tick['deletion_pos']]
+      }
+      for tick in tick_list_negative
+    ]
 
-      x_min = min(x_min, tick['x_pos'])
-      x_max = max(x_max, tick['x_pos'])
+    tick_list = tick_list_negative + tick_list_positive
 
+  x_min = 0
+  x_max = 0
+  for tick in tick_list:
+    # tick line
     figure.add_shape(
       type = 'line',
-      x0 = x_min,
-      x1 = x_max,
+      x0 = tick['x_pos'],
+      x1 = tick['x_pos'],
       y0 = y_pos,
-      y1 = y_pos,
+      y1 = y_pos - tick_length,
       row = row,
       col = col,
       line_width = line_width_px,
       line_color = 'black',
     )
+
+    # tick label
+    figure.add_annotation(
+      x = tick['x_pos'],
+      y = y_pos - 1.5 * tick_length,
+      text = str(tick['text']),
+      showarrow = False,
+      row = row,
+      col = col,
+      font_size = label_font_size * font_size_scale,
+      xanchor = 'center',
+      yshift = -label_font_size,
+    )
+
+    x_min = min(x_min, tick['x_pos'])
+    x_max = max(x_max, tick['x_pos'])
+
+  figure.add_shape(
+    type = 'line',
+    x0 = x_min,
+    x1 = x_max,
+    y0 = y_pos,
+    y1 = y_pos,
+    row = row,
+    col = col,
+    line_width = line_width_px,
+    line_color = 'black',
+  )
 
 # idea to make the nodes a reasonable distance from the reference
 def get_kamada_initial_layout(graph):
@@ -2540,14 +2529,28 @@ def parse_args():
     default = 'radial',
     help = 'The algorithm to use for laying out the graph.'
   )
-  # FIXME: ADD COMMAND LINE ARGS FOR THE X AXES AS WELL
-  # ALSO RENAME THIS TO universal_layout_x_axis, universal_layout_y_axis, etc.
   parser.add_argument(
-    '--universal_layout_legend_pos_x',
+    '--universal_layout_y_axis_x_pos',
     type = float,
     help = (
-      'If present, shows a y-axis legend at the given x position' +
+      'If present, shows a y-axis at the given x position' +
       ' on the universal layout showing the distances to the reference.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_x_axis_deletion_y_pos',
+    type = float,
+    help = (
+      'If present, shows a x-axis for deletions at the given y position' +
+      ' on the universal layout showing the midpoints of the deleted ranges.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_x_axis_insertion_y_pos',
+    type = float,
+    help = (
+      'If present, shows a x-axis legend at the given y position' +
+      ' on the universal layout showing the first nucleotide of inserted sequences.'
     )
   )
   parser.add_argument(
@@ -2749,7 +2752,7 @@ def parse_args():
   return args
 
 def main():
-  sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive --universal_layout_legend_pos_x 13'.split(' ')
+  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive --universal_layout_y_axis_x_pos 13 --universal_layout_x_axis_deletion_y_pos -18 --universal_layout_x_axis_insertion_y_pos 18'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
@@ -2806,10 +2809,10 @@ def main():
     # incase no insertions
     max_dist_deletion = 1
 
-  if args.universal_layout_legend_pos_x is not None:
+  if args.universal_layout_y_axis_x_pos is not None:
     make_universal_layout_y_axis(
       figure = figure,
-      x_pos = args.universal_layout_legend_pos_x,
+      x_pos = args.universal_layout_y_axis_x_pos,
       row = 1,
       col = 1,
       ref_length = len(data_info['ref_seq']),
@@ -2817,17 +2820,28 @@ def main():
       max_dist_deletion = max_dist_deletion,
       max_dist_insertion = max_dist_insertion,
     )
-    make_universal_layout_x_axes(
+  if args.universal_layout_x_axis_deletion_y_pos is not None:
+    make_universal_layout_x_axis(
       figure = figure,
-      y_pos_insertion = 18,
-      y_pos_deletion = -18,
+      var_type = 'deletion',
+      y_pos = args.universal_layout_x_axis_deletion_y_pos,
       row = 1,
       col = 1,
       ref_length = len(data_info['ref_seq']),
       cut_pos_ref = len(data_info['ref_seq']) // 2,
       deletion_label_type = (
         'absolute' if data_info['control'] == '30bpDown' else 'relative'
-      )
+      ),
+    )
+  if args.universal_layout_x_axis_insertion_y_pos is not None:
+    make_universal_layout_x_axis(
+      figure = figure,
+      var_type = 'insertion',
+      y_pos = args.universal_layout_x_axis_insertion_y_pos,
+      row = 1,
+      col = 1,
+      ref_length = len(data_info['ref_seq']),
+      cut_pos_ref = len(data_info['ref_seq']) // 2,
     )
   if args.interactive:
     log_utils.log('Opening interactive version in browser.')
