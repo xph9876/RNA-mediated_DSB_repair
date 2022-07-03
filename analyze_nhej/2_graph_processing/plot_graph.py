@@ -510,6 +510,8 @@ def make_universal_layout_y_axis(
   col,
   ref_length,
   cut_pos_ref, # should be 1 based!
+  y_min = None,
+  y_max = None,
   tick_length = 0.25,
   label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
@@ -551,8 +553,6 @@ def make_universal_layout_y_axis(
         }
       )
 
-  y_min = 0
-  y_max = 0
   for tick in tick_list:
     # tick line
     figure.add_shape(
@@ -579,8 +579,10 @@ def make_universal_layout_y_axis(
       xanchor = 'left',
     )
 
-    y_min = min(y_min, tick['y_pos'])
-    y_max = max(y_max, tick['y_pos'])
+  if y_min is None:
+    y_min = min(tick['y_pos'] for tick in tick_list)
+  if y_max is None:
+    y_max = max(tick['y_pos'] for tick in tick_list)
 
   figure.add_shape(
     type = 'line',
@@ -603,7 +605,10 @@ def make_universal_layout_x_axis(
   col,
   ref_length,
   cut_pos_ref, # should be 1 based!
+  x_min = None,
+  x_max = None,
   deletion_label_type = 'relative',
+  deletion_tick_type = 'start',
   tick_length = 0.25,
   label_font_size = None,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
@@ -644,8 +649,9 @@ def make_universal_layout_x_axis(
     )
     for deletion_start in range(1, (ref_length // 2) + 1):
       dist_ref = 1 + (ref_length // 2) - deletion_start
-      if (dist_ref % 2) != 1:
-        continue # do only odd deletions so mid point is on an integer
+      if (deletion_tick_type == 'midpoint') and ((dist_ref % 2) != 1):
+        # only odd deletions so mid point is on an integer
+        continue
       deletion_mid = deletion_start + (dist_ref - 1) // 2
       fake_ref_align = 'A' * ref_length
       fake_read_align = (
@@ -661,10 +667,19 @@ def make_universal_layout_x_axis(
         cut_pos_ref,
       )[0]
 
+      if deletion_tick_type == 'midpoint':
+        final_pos = deletion_mid
+      elif deletion_tick_type == 'start':
+        final_pos = deletion_start
+      else:
+        raise Exception(
+          'Unsupported deletion tick type: ' +
+          str(deletion_tick_type)
+        )
       tick_list_negative.append({
         'x_pos': x_pos,
-        'text': pos_labels[deletion_mid - 1],
-        'deletion_pos': deletion_mid,
+        'text': pos_labels[final_pos - 1],
+        'deletion_pos': final_pos,
       })
     
     tick_list_positive = [
@@ -675,10 +690,12 @@ def make_universal_layout_x_axis(
       for tick in tick_list_negative
     ]
 
-    tick_list = tick_list_negative + tick_list_positive
+    tick_list = (
+      tick_list_negative +
+      [{'x_pos': 0, 'text': '0'}] +
+      tick_list_positive
+    )
 
-  x_min = 0
-  x_max = 0
   for tick in tick_list:
     # tick line
     figure.add_shape(
@@ -706,9 +723,10 @@ def make_universal_layout_x_axis(
       yshift = -label_font_size,
     )
 
-    x_min = min(x_min, tick['x_pos'])
-    x_max = max(x_max, tick['x_pos'])
-
+  if x_min is None:
+    x_min = min(tick['x_pos'] for tick in tick_list)
+  if x_max is None:
+    x_max = max(tick['x_pos'] for tick in tick_list)
   figure.add_shape(
     type = 'line',
     x0 = x_min,
@@ -2549,8 +2567,26 @@ def parse_args():
     '--universal_layout_x_axis_insertion_y_pos',
     type = float,
     help = (
-      'If present, shows a x-axis legend at the given y position' +
+      'If present, shows a x-axis for insertions at the given y position' +
       ' on the universal layout showing the first nucleotide of inserted sequences.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_y_axis_y_range',
+    nargs = '+',
+    type = float,
+    help = (
+      'If showing an y-axis for the universal layout,' +
+      ' the min and max y-position of the line.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_x_axis_x_range',
+    nargs = '+',
+    type = float,
+    help = (
+      'If showing an x-axis for the universal layout,' +
+      ' the min and max x-position of the line.'
     )
   )
   parser.add_argument(
@@ -2748,11 +2784,32 @@ def parse_args():
     for var_type in args.variation_types:
       if not(var_type in ['insertion', 'deletion', 'substitution', 'none']):
         raise Exception(f'Unknown variation type: {var_type}')
+  if args.universal_layout_y_axis_y_range is not None:
+    if len(args.universal_layout_y_axis_y_range) != 2:
+      raise Exception(
+        'Need exactly 2 values for universal_layout_y_axis_y_range.' +
+        ' Got ' + str(args.universal_layout_y_axis_y_range) + '.'
+      )
+  else:
+    args.universal_layout_y_axis_y_range = [None, None]
+  if args.universal_layout_x_axis_x_range is not None:
+    if len(args.universal_layout_x_axis_x_range) != 2:
+      raise Exception(
+        'Need exactly 2 values for universal_layout_x_axis_x_range.' +
+        ' Got ' + str(args.universal_layout_x_axis_x_range) + '.'
+      )
+  else:
+    args.universal_layout_x_axis_x_range = [None, None]
   args.subst_type += 'Subst'
   return args
 
 def main():
-  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive --universal_layout_y_axis_x_pos 13 --universal_layout_x_axis_deletion_y_pos -18 --universal_layout_x_axis_insertion_y_pos 18'.split(' ')
+  # sys.argv += (
+  #   '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive' +
+  #   ' --universal_layout_y_axis_x_pos 13 --universal_layout_x_axis_deletion_y_pos -18' +
+  #   ' --universal_layout_y_axis_y_range -16 18' +
+  #   ' --universal_layout_x_axis_insertion_y_pos 19 --universal_layout_x_axis_x_range -11 11'
+  # ).split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
   # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
@@ -2817,6 +2874,8 @@ def main():
       col = 1,
       ref_length = len(data_info['ref_seq']),
       cut_pos_ref = len(data_info['ref_seq']) // 2,
+      y_min = args.universal_layout_y_axis_y_range[0],
+      y_max = args.universal_layout_y_axis_y_range[1],
       max_dist_deletion = max_dist_deletion,
       max_dist_insertion = max_dist_insertion,
     )
@@ -2829,6 +2888,8 @@ def main():
       col = 1,
       ref_length = len(data_info['ref_seq']),
       cut_pos_ref = len(data_info['ref_seq']) // 2,
+      x_min = args.universal_layout_x_axis_x_range[0],
+      x_max = args.universal_layout_x_axis_x_range[1],
       deletion_label_type = (
         'absolute' if data_info['control'] == '30bpDown' else 'relative'
       ),
@@ -2842,6 +2903,8 @@ def main():
       col = 1,
       ref_length = len(data_info['ref_seq']),
       cut_pos_ref = len(data_info['ref_seq']) // 2,
+      x_min = args.universal_layout_x_axis_x_range[0],
+      x_max = args.universal_layout_x_axis_x_range[1],
     )
   if args.interactive:
     log_utils.log('Opening interactive version in browser.')
