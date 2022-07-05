@@ -515,12 +515,12 @@ def make_universal_layout_y_axis(
   tick_length = 0.25,
   label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
-  max_dist_insertion = 8,
-  max_dist_deletion = 10,
+  max_tick_insertion = 8,
+  max_tick_deletion = 10,
   line_width_px = 4,
 ):
   tick_list = [{'dist_ref': 0, 'y_pos': 0}]
-  for dist_ref in range(1, max(max_dist_insertion, max_dist_deletion) + 1):
+  for dist_ref in range(1, max(max_tick_insertion, max_tick_deletion) + 1):
     fake_ref_align = (
       ('A' * cut_pos_ref) +
       ('-' * dist_ref) +
@@ -533,8 +533,8 @@ def make_universal_layout_y_axis(
         fake_ref_align, fake_read_align = fake_read_align, fake_ref_align
 
       if (
-        ((var_type == 'insertion') and (dist_ref > max_dist_insertion)) or
-        ((var_type == 'deletion') and (dist_ref > max_dist_deletion))
+        ((var_type == 'insertion') and (dist_ref > max_tick_insertion)) or
+        ((var_type == 'deletion') and (dist_ref > max_tick_deletion))
       ):
         continue
 
@@ -2590,6 +2590,22 @@ def parse_args():
     )
   )
   parser.add_argument(
+    '--universal_layout_y_axis_deletion_max_tick',
+    type = int,
+    help = (
+      'If showing an y-axis for the universal layout,' +
+        ' the max tick value for the deletion side.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_y_axis_insertion_max_tick',
+    type = int,
+    help = (
+      'If showing an y-axis for the universal layout,' +
+        ' the max tick value for the insertion side.'
+    )
+  )
+  parser.add_argument(
     '--subst_type',
     choices = ['with', 'without'],
     help = (
@@ -2849,22 +2865,29 @@ def main():
   sequence_data = file_utils.read_tsv(
     file_names.sequence_data(data_info['dir'], args.subst_type)
   )
-  try:
-    max_dist_insertion = sequence_data.loc[
-      sequence_data['variation_type'] == 'insertion',
-      'dist_ref'
-    ].max()
-  except:
-    # incase no insertions
-    max_dist_insertion = 1
-  try:
-    max_dist_deletion = sequence_data.loc[
-      sequence_data['variation_type'] == 'deletion',
-      'dist_ref'
-    ].max()
-  except:
-    # incase no insertions
-    max_dist_deletion = 1
+  if args.universal_layout_y_axis_insertion_max_tick is None:
+    try:
+      max_tick_insertion = sequence_data.loc[
+        sequence_data['variation_type'] == 'insertion',
+        'dist_ref'
+      ].max()
+    except:
+      # incase no insertions
+      max_tick_insertion = 1
+  else:
+    max_tick_insertion = args.universal_layout_y_axis_insertion_max_tick
+  
+  if args.universal_layout_y_axis_deletion_max_tick is None:
+    try:
+      max_tick_deletion = sequence_data.loc[
+        sequence_data['variation_type'] == 'deletion',
+        'dist_ref'
+      ].max()
+    except:
+      # incase no deletions
+      max_tick_deletion = 1
+  else:
+    max_tick_deletion = args.universal_layout_y_axis_deletion_max_tick
 
   if args.universal_layout_y_axis_x_pos is not None:
     make_universal_layout_y_axis(
@@ -2876,8 +2899,8 @@ def main():
       cut_pos_ref = len(data_info['ref_seq']) // 2,
       y_min = args.universal_layout_y_axis_y_range[0],
       y_max = args.universal_layout_y_axis_y_range[1],
-      max_dist_deletion = max_dist_deletion,
-      max_dist_insertion = max_dist_insertion,
+      max_tick_deletion = max_tick_deletion,
+      max_tick_insertion = max_tick_insertion,
     )
   if args.universal_layout_x_axis_deletion_y_pos is not None:
     make_universal_layout_x_axis(
