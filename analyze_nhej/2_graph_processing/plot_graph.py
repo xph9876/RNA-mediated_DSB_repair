@@ -49,14 +49,12 @@ LAYOUT_PROPERTIES = {
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    # 'plot_range': {'x': (-12, 12), 'y': (-22, 18)},
   },
  'fractal_layout': {
     'only_2d': True,
     'do_pca': False,
     'normalize': False,
     'has_edges': True,
-    # 'plot_range': {'x': (-12, 12), 'y': (-22, 18)},
     'radial': False,
   },
  'kamada_layout': {
@@ -399,7 +397,7 @@ def make_fractal_layout(data_info, graph, reverse_complement=False):
           avg_del_pos = (first_del_pos + last_del_pos) / 2
           x = avg_del_pos - (cut_pos_ref + 0.5)
           y = dist_ref
-          if LAYOUT_PROPERTIES['universal_layout']['radial']:
+          if LAYOUT_PROPERTIES['fractal_layout']['radial']:
             angle = np.pi / 2 - 2 * (np.pi / 2) * (x / (dist_ref + 1))
             xy_dict[data['id']] = (2 * y * np.cos(angle), -0.25 - 0.5 * (y * np.sin(angle)))
           else:
@@ -607,13 +605,18 @@ def make_universal_layout_x_axis(
   cut_pos_ref, # should be 1 based!
   x_min = None,
   x_max = None,
-  deletion_label_type = 'relative',
+  insertion_axis_type = 'bracket', # tick or bracket
+  deletion_label_type = 'relative', # relative or absolute
   deletion_tick_type = 'start',
-  tick_length = 0.25,
+  base_tick_length = 0.25,
   label_font_size = None,
   font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
   line_width_px = 4,
 ):
+  if insertion_axis_type not in ['tick', 'bracket']:
+    raise Exception('Invalid insertion axis type: ' + str(insertion_axis_type))
+  if deletion_label_type not in ['absolute', 'relative']:
+    raise Exception('Invalid deletion label type: ' + str(deletion_label_type))
   if label_font_size is None:
     if var_type == 'insertion':
       label_font_size = 2 * constants.GRAPH_AXES_TICK_FONT_SIZE
@@ -641,7 +644,24 @@ def make_universal_layout_x_axis(
         'insertion',
         cut_pos_ref,
       )[0]
-      tick_list.append({'x_pos': x_pos, 'text': insertion_letter})
+      tick_list.append({
+        'x_pos': x_pos,
+        'text': insertion_letter,
+        'omit_tick': insertion_axis_type == 'bracket',
+        'tick_length': (
+          base_tick_length / 2 # used only for spacing in bracket mode
+          if insertion_axis_type == 'bracket'
+          else base_tick_length
+        ),
+      })
+    if insertion_axis_type == 'bracket':
+      tick_space = tick_list[1]['x_pos'] - tick_list[0]['x_pos']
+      bracket_x_start = tick_list[0]['x_pos'] - tick_space / 2
+      for i in range(5):
+        tick_list.append({
+          'x_pos': bracket_x_start + tick_space * i,
+          'tick_length': 4 * base_tick_length,
+        })
   elif var_type == 'deletion':
     tick_list_negative = []
     pos_labels = constants.get_position_labels(
@@ -697,36 +717,42 @@ def make_universal_layout_x_axis(
     )
 
   for tick in tick_list:
-    # tick line
-    figure.add_shape(
-      type = 'line',
-      x0 = tick['x_pos'],
-      x1 = tick['x_pos'],
-      y0 = y_pos,
-      y1 = y_pos - tick_length,
-      row = row,
-      col = col,
-      line_width = line_width_px,
-      line_color = 'black',
-    )
+    tick_length = tick.get('tick_length', base_tick_length)
+
+    if not(tick.get('omit_tick', False)):
+      # tick line
+      figure.add_shape(
+        type = 'line',
+        x0 = tick['x_pos'],
+        x1 = tick['x_pos'],
+        y0 = y_pos,
+        y1 = y_pos - tick_length,
+        row = row,
+        col = col,
+        line_width = line_width_px,
+        line_color = 'black',
+      )
 
     # tick label
-    figure.add_annotation(
-      x = tick['x_pos'],
-      y = y_pos - 1.5 * tick_length,
-      text = str(tick['text']),
-      showarrow = False,
-      row = row,
-      col = col,
-      font_size = label_font_size * font_size_scale,
-      xanchor = 'center',
-      yshift = -label_font_size,
-    )
+    if 'text' in tick:
+      figure.add_annotation(
+        x = tick['x_pos'],
+        y = y_pos - 1.5 * tick_length,
+        text = str(tick['text']),
+        showarrow = False,
+        row = row,
+        col = col,
+        font_size = label_font_size * font_size_scale,
+        xanchor = 'center',
+        yshift = -label_font_size,
+      )
 
   if x_min is None:
-    x_min = min(tick['x_pos'] for tick in tick_list)
+    x_min = float('inf')
   if x_max is None:
-    x_max = max(tick['x_pos'] for tick in tick_list)
+    x_max = -float('inf')
+  x_min = min(x_min, min(tick['x_pos'] for tick in tick_list))
+  x_max = max(x_max, max(tick['x_pos'] for tick in tick_list))
   figure.add_shape(
     type = 'line',
     x0 = x_min,
