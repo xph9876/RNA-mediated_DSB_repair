@@ -126,6 +126,7 @@ CONTENT_LEGEND_SPACING_PT = 20
 def make_slide(
   prs,
   image_grid_list,
+  total_width_frac_list = None,
   title = None,
   title_height_pt = TITLE_HEIGHT_PT,
   title_font_size_pt = TITLE_FONT_SIZE_PT,
@@ -151,6 +152,9 @@ def make_slide(
   margin_left_spill_over_pt = MARGIN_LEFT_SPILL_OVER_PT,
 ):
   num_grids = len(image_grid_list)
+
+  if total_width_frac_list is None:
+    total_width_frac_list = [1] * num_grids
 
   image_label_show = image_label_grid_list is not None
   if image_label_show and (len(image_label_grid_list) != num_grids):
@@ -343,7 +347,7 @@ def make_slide(
 
     content_width_px = image_grid_list[i].shape[1] * max_image_width_px
 
-    content_width_pt = slide_width_pt
+    content_width_pt = slide_width_pt * total_width_frac_list[i]
     if margin_show_left:
       content_width_pt -= margin_left_width_pt
 
@@ -638,6 +642,16 @@ def parse_args():
     ),
   )
   parser.add_argument(
+    '-tw',
+    '--total_width',
+    nargs = '+',
+    type = float,
+    help = (
+      'Fraction of the page width to use for each grid .' +
+      ' Number of arguments should match the number of grids.'
+    ),
+  )
+  parser.add_argument(
     '--node_max_freq',
     type = float,
     help = (
@@ -751,6 +765,14 @@ if __name__ == '__main__':
       f' Expected {args.num_grids} values.' 
     )
 
+  if args.total_width is None:
+    args.total_width = [1] * args.num_grids
+  if len(args.total_width) != args.num_grids:
+    raise Exception(
+      f'Incorrect number of total widths: {args.total_width}.' +
+      f' Expected {args.num_grids} values.' 
+    )
+
   num_images_total = sum(r * c for r, c in zip(args.num_rows, args.num_cols))
   if num_images_total != len(args.input):
     raise Exception(
@@ -850,6 +872,7 @@ if __name__ == '__main__':
     node_size_max_px = args.node_max_px,
     node_size_min_px = args.node_min_px,
     legend_list = legend_list,
+    total_width_frac_list = args.total_width,
   )
   
   log_utils.log(args.output)
