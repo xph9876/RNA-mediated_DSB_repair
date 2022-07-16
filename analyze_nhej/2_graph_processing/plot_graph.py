@@ -2480,6 +2480,7 @@ def get_plot_args(
   plot_args['data_dir_grid'] = np.array([[data_info['dir']]])
   plot_args['sequence_reverse_complement'] = sequence_reverse_complement
   plot_args['node_type'] = 'sequence_data'
+  plot_args['node_subst_type'] = node_subst_type
   plot_args['node_size_min_freq'] = node_size_min_freq
   plot_args['node_size_max_freq'] = node_size_max_freq
   plot_args['node_filter_variation_types'] = node_filter_variation_types
