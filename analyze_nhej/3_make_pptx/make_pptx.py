@@ -108,7 +108,7 @@ MARGIN_RIGHT_WIDTH_PT = 100
 
 LEGEND_TITLE_HEIGHT_PT = 20
 LEGEND_ITEM_HEIGHT_PT = 20
-LEGEND_SIZE_NODE_OUTLINE_WIDTH_PT = 0.1
+LEGEND_SIZE_NODE_OUTLINE_WIDTH_PT = 0.5
 LEGEND_NODE_SIZE_PT = 10
 LEGEND_NODE_OUTLINE_WIDTH_PT = 0.5
 LEGEND_EDGE_LINE_SIZE_PT = 10
@@ -656,7 +656,7 @@ def parse_args():
     type = float,
     help = (
       'Max frequency to determine node size.' +
-      'Higher frequencies are clipped to this value.'
+      ' Higher frequencies are clipped to this value.'
     ),
     default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
   )
@@ -665,7 +665,7 @@ def parse_args():
     type = float,
     help = (
       'Min frequency to determine node size.' +
-      'Lower frequencies are clipped to this value.'
+      ' Lower frequencies are clipped to this value.'
     ),
     default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
   )

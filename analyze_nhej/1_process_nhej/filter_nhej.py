@@ -160,7 +160,9 @@ def check_dsb_touches_indel(dsb_pos, ins_pos, del_pos):
   )
 
 def main():
-  parser = argparse.ArgumentParser(description = 'Filter sequences having mutations near DSB site')
+  parser = argparse.ArgumentParser(
+    description = 'Filter sequences having mutations near DSB site.'
+  )
   parser.add_argument(
     '-ref',
     type = argparse.FileType(mode='r'),
@@ -171,9 +173,9 @@ def main():
     '-sam',
     type = argparse.FileType(mode='r'),
     help = (
-      'Aligned SAM file.\n'
-      'Must be created with Bowtie2 (specific flags from Bowtie2 are used).\n'
-      'Every read must be aligned with exactly the same reference sequence.'
+      'Aligned SAM file.' +
+      ' Must be created with Bowtie2 (specific flags from Bowtie2 are used).'
+      ' Every read must be aligned with exactly the same reference sequence.'
     ),
     required = True,
   )
@@ -181,22 +183,25 @@ def main():
     '-o',
     '--output',
     type = common_utils.check_file_output,
-    default = sys.stdout,
-    help = 'output file. Defaults to standard output.'
+    required = True,
+    help = 'Output file.'
   )
   parser.add_argument(
     '--min_length',
     type = int,
     required = True,
-    help = 'minimum length of reads',
+    help = (
+      'Minimum length of reads.' +
+      ' Reads shorted than this are discarded.'
+    )
   )
   parser.add_argument(
     '-dsb',
     type = int,
     required = True,
     help = (
-      'position on reference sequence immediately upstream of DSB site.\n'
-      'Ie. the DSB is between position DSB_POS and DSB_POS + 1.'
+      'Position on reference sequence immediately upstream of DSB site.' +
+      ' Ie. the DSB is between position DSB_POS and DSB_POS + 1.'
     ),
   )
   parser.add_argument(
@@ -251,8 +256,11 @@ def main():
       continue
 
     read_seq = mandatory['SEQ']
-    num_indel_sam = int(optional['XG']['VALUE']) # number of gap-extends (aka in/dels), should always be present for aligned reads
-    num_subst_sam = int(optional['XM']['VALUE']) # number of mismatches, should always be present for aligned reads
+    # XG is the number of gap-extends (aka in/dels). 
+    # XM if number of mismatches.
+    # Both should always be present for aligned reads.
+    num_indel_sam = int(optional['XG']['VALUE'])
+    num_subst_sam = int(optional['XM']['VALUE'])
 
     if len(read_seq) < args.min_length:
       rejected_too_short += 1
@@ -273,8 +281,12 @@ def main():
       if not dsb_touches:
         if num_ins > 0:
           # insertions special case
-          new_ref_align, new_read_align = \
-            check_insertion_special_case(ref_align, read_align, args.dsb, num_subst = num_subst)
+          new_ref_align, new_read_align = check_insertion_special_case(
+            ref_align,
+            read_align,
+            args.dsb,
+            num_subst = num_subst,
+          )
           if new_ref_align is not None:
             ref_align = new_ref_align
             read_align = new_read_align
@@ -287,8 +299,13 @@ def main():
             accepted_insertion_special += 1
         elif num_del > 0:
           # deletions and no insertions special case
-          new_read_align = \
-            check_deletion_special_case(ref_align, read_align, args.dsb, num_del = num_del, num_subst = num_subst)
+          new_read_align = check_deletion_special_case(
+            ref_align,
+            read_align,
+            args.dsb,
+            num_del = num_del,
+            num_subst = num_subst,
+          )
           if new_read_align is not None:
             read_align = new_read_align
             cigar = alignment_utils.get_cigar(ref_align, read_align)
