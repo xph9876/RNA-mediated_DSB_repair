@@ -172,7 +172,7 @@ def plot_histogram_3d_impl(
   )
 
   if label_type == 'relative':
-    x_label = 'Position (from cut)'
+    x_label = 'Position (from DSB)'
   elif label_type == 'absolute':
     x_label = 'Position'
   else:
