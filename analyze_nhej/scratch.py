@@ -10,3 +10,5 @@ for x in glob.glob("libraries_3/*"):
       freq.append(dat.loc[dat[col] <= 1e-5, col].sum())
 
 print(max(freq))
+
+x = pd.read_csv("analyze_nhej/layouts/universal/2DSBanti_CD/sequence_data_withoutSubst.tsv", sep = "\t")
