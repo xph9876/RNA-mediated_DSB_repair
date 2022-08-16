@@ -702,55 +702,6 @@ def parse_args():
   return args
 
 if __name__ == '__main__':
-  # argv = [
-  #   "-i",
-  #   "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
-  #   "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
-  #   "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
-  #   "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
-  #   "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
-  #   "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
-  #   "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
-  #   "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
-  #   "-ng", "1", "-nr", "4", "-nc", "3",
-  #   "-o", "hello.pptx",
-  #   "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
-  #   "-lmlab", "A", "B", "C", "D",
-  #   "-tmlab", "A", "B", "C",
-  # ]
-  # argv = [
-  #   "-i",
-  #   "plots/graphs/individual/WT_sgAB_R1_sense.png", "plots/graphs/individual/WT_sgAB_R1_branch.png", "plots/graphs/individual/WT_sgAB_R1_cmv.png",
-  #   "plots/graphs/individual/WT_sgAB_R2_sense.png", "plots/graphs/individual/WT_sgAB_R2_branch.png", "plots/graphs/individual/WT_sgAB_R2_cmv.png",
-  #   "plots/graphs/individual/WT_sgA_R1_sense.png", "plots/graphs/individual/WT_sgA_R1_branch.png", "plots/graphs/individual/WT_sgA_R1_cmv.png",
-  #   "plots/graphs/individual/WT_sgB_R2_sense.png", "plots/graphs/individual/WT_sgB_R2_branch.png", "plots/graphs/individual/WT_sgB_R2_cmv.png",
-  #   "-lab", "sgRNA A & B\nForward strand\nSense", "sgRNA A & B\nForward strand\nBranchΔ", "sgRNA A & B\nForward strand\nCMVΔ",
-  #   "sgRNA A & B\nReverse strand\nSense", "sgRNA A & B\nReverse strand\nBranchΔ", "sgRNA A & B\nReverse strand\nCMVΔ",
-  #   "sgRNA A\nForward strand\nSense", "sgRNA A\nForward strand\nBranchΔ", "sgRNA A\nForward strand\nCMVΔ",
-  #   "sgRNA B\nReverse strand\nSense", "sgRNA B\nReverse strand\nBranchΔ", "sgRNA B\nReverse strand\nCMVΔ",
-  #   "-ng", "1", "-nr", "4", "-nc", "3",
-  #   "-o", "hello.pptx",
-  #   "--legends", "freq_ratio_sense_cmv", "variation_type", "node_outline", "edge_type",
-  #   "-lmlab", "A", "B", "C", "D",
-  #   "-tmlab", "A", "B", "C",
-  # ]
-  # argv = [
-  #   "-i", "WT_sgA_R1_sense_insertion.png", "WT_sgA_R1_sense_deletion.png", "WT_sgA_R1_sense_substitution.png", "WT_sgA_R1_branch_insertion.png", "WT_sgA_R1_branch_deletion.png", "WT_sgA_R1_branch_substitution.png", "WT_sgA_R1_cmv_insertion.png", "WT_sgA_R1_cmv_deletion.png", "WT_sgA_R1_cmv_substitution.png", "WT_sgB_R2_sense_insertion.png", "WT_sgB_R2_sense_deletion.png", "WT_sgB_R2_sense_substitution.png", "WT_sgB_R2_branch_insertion.png", "WT_sgB_R2_branch_deletion.png", "WT_sgB_R2_branch_substitution.png", "WT_sgB_R2_cmv_insertion.png", "WT_sgB_R2_cmv_deletion.png", "WT_sgB_R2_cmv_substitution.png", "WT_sgAB_R1_sense_insertion.png", "WT_sgAB_R1_sense_deletion.png", "WT_sgAB_R1_sense_substitution.png", "WT_sgAB_R1_branch_insertion.png", "WT_sgAB_R1_branch_deletion.png", "WT_sgAB_R1_branch_substitution.png", "WT_sgAB_R1_cmv_insertion.png", "WT_sgAB_R1_cmv_deletion.png", "WT_sgAB_R1_cmv_substitution.png", "WT_sgAB_R2_sense_insertion.png", "WT_sgAB_R2_sense_deletion.png", "WT_sgAB_R2_sense_substitution.png", "WT_sgAB_R2_branch_insertion.png", "WT_sgAB_R2_branch_deletion.png", "WT_sgAB_R2_branch_substitution.png", "WT_sgAB_R2_cmv_insertion.png", "WT_sgAB_R2_cmv_deletion.png", "WT_sgAB_R2_cmv_substitution.png", "WT_sgA_R1_branch_noDSB_insertion.png", "WT_sgA_R1_branch_noDSB_deletion.png", "WT_sgA_R1_branch_noDSB_substitution.png", "WT_sgA_R1_cmv_noDSB_insertion.png", "WT_sgA_R1_cmv_noDSB_deletion.png", "WT_sgA_R1_cmv_noDSB_substitution.png", "WT_sgA_R1_sense_noDSB_insertion.png", "WT_sgA_R1_sense_noDSB_deletion.png", "WT_sgA_R1_sense_noDSB_substitution.png", "WT_sgB_R2_branch_noDSB_insertion.png", "WT_sgB_R2_branch_noDSB_deletion.png", "WT_sgB_R2_branch_noDSB_substitution.png", "WT_sgB_R2_cmv_noDSB_insertion.png", "WT_sgB_R2_cmv_noDSB_deletion.png", "WT_sgB_R2_cmv_noDSB_substitution.png", "WT_sgB_R2_sense_noDSB_insertion.png", "WT_sgB_R2_sense_noDSB_deletion.png", "WT_sgB_R2_sense_noDSB_substitution.png", "WT_sgA_R1_branch_30bpDown_insertion.png", "WT_sgA_R1_branch_30bpDown_deletion.png", "WT_sgA_R1_branch_30bpDown_substitution.png", "WT_sgA_R1_cmv_30bpDown_insertion.png", "WT_sgA_R1_cmv_30bpDown_deletion.png", "WT_sgA_R1_cmv_30bpDown_substitution.png", "WT_sgA_R1_sense_30bpDown_insertion.png", "WT_sgA_R1_sense_30bpDown_deletion.png", "WT_sgA_R1_sense_30bpDown_substitution.png", "WT_sgB_R2_branch_30bpDown_insertion.png", "WT_sgB_R2_branch_30bpDown_deletion.png", "WT_sgB_R2_branch_30bpDown_substitution.png", "WT_sgB_R2_cmv_30bpDown_insertion.png", "WT_sgB_R2_cmv_30bpDown_deletion.png", "WT_sgB_R2_cmv_30bpDown_substitution.png", "WT_sgB_R2_sense_30bpDown_insertion.png", "WT_sgB_R2_sense_30bpDown_deletion.png", "WT_sgB_R2_sense_30bpDown_substitution.png", "WT_sgCD_R1_antisense_insertion.png", "WT_sgCD_R1_antisense_deletion.png", "WT_sgCD_R1_antisense_substitution.png", "WT_sgCD_R1_splicing_insertion.png", "WT_sgCD_R1_splicing_deletion.png", "WT_sgCD_R1_splicing_substitution.png", "WT_sgCD_R2_antisense_insertion.png", "WT_sgCD_R2_antisense_deletion.png", "WT_sgCD_R2_antisense_substitution.png", "WT_sgCD_R2_splicing_insertion.png", "WT_sgCD_R2_splicing_deletion.png", "WT_sgCD_R2_splicing_substitution.png", "-ng", "2", "-nr", "8", "2", "-nc", "9", "6", "--left_margin_labels", "sgRNA A", "sgRNA B", "sgRNA A & B\nForward strand", "sgRNA A & B\nReverse strand", "sgRNA A\nNo DSB", "sgRNA B\nNo DSB", "sgRNA A\n30bp Down", "sgRNA B\n30bp Down", "sgRNA C/C' & D\nForward strand", "sgRNA C/C' & D\nReverse strand", "--top_margin_labels", "Sense\Insertion", "Sense\Deletion", "Sense\Substituton", "Branch∆\Insertion", "Branch∆\Deletion", "Branch∆\Substituton", "pCMV∆\Insertion", "pCMV∆\Deletion", "pCMV∆\Substituton", "Antisense\nInsertion", "Antisense\nDeletion", "Antisense\nSubstitution", "5'-Splicing∆\nInsertion", "5'-Splicing∆\nDeletion", "5'-Splicing∆\nSubstitution", "-o", "hello.pptx", "--title", "Wild Type"
-  # ]
-  # print(' '.join(map(lambda x: '"' + x.replace('\n', '\\n') + '"' if not x.startswith("-") else x, argv)))
-  # for i in range(len(argv)):
-  #   if argv[i].startswith("WT"):
-  #     argv[i] = "plots/histogram_3d/" + argv[i]
-  # sys.argv += argv
-
-  # argv = [
-  #   "-i", "plots/graphs/universal/individual/png/WT_sgA_R1_sense.png",
-  #   "-ng", "1",
-  #   "-nc", "1",
-  #   "-nr", "1",
-  #   "-o", "hello.pptx"
-  # ]
-  # sys.argv += argv
   args = parse_args()
 
   if args.num_grids != len(args.num_rows):
