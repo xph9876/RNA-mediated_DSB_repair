@@ -85,7 +85,7 @@ def analysis_3():
         common_seq.append(set(data_list[-1]['Sequence']))
       common_seq = common_seq[0] & common_seq[1] & common_seq[2] & common_seq[3]
       for k in range(4):
-        printf(file_list[k])
+        print(file_list[k])
         data_list[k] = data_list[k].loc[data_list[k]['Sequence'].isin(common_seq)]
         count_nhej = data_list[k]['Count'].sum()
         data_common_freq.append([file_list[k], count_nhej, total_count_list[k], count_nhej / total_count_list[k]])
