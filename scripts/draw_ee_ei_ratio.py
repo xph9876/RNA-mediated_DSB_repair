@@ -11,7 +11,7 @@ from statannotations.Annotator import Annotator
 def draw(data, output, annotated=False):
     # parameters
     palette = {'Sense':'#CF191B', 'BranchΔ':'#33A02C', 'pCMVΔ':'#FFE669',\
-        'Antisense':'#CF191B', '5\' SplicingΔ':'#33A02C'}
+        'Antisense':'#CF191B', '5\' -SplicingΔ':'#33A02C'}
     fig, ax = plt.subplots(figsize=(5,5))
     sns.boxplot(x='Label', y='Ratio', data=data, palette=palette, ax=ax)
     sns.swarmplot(x='Label', y='Ratio', color='k', data=data, ax=ax)
@@ -25,9 +25,9 @@ def draw(data, output, annotated=False):
             annotator.configure(test='Mann-Whitney', text_format='star')
             annotator.verbose = False
             annotator.apply_and_annotate()
-        elif '5\' SplicingΔ' in data.Label.unique():
-            annotator = Annotator(ax, [('Antisense', '5\' SplicingΔ')],\
-                data=data, x='Label', y='Ratio', order=['Antisense', '5\' SplicingΔ'])
+        elif '5\' -SplicingΔ' in data.Label.unique():
+            annotator = Annotator(ax, [('Antisense', '5\' -SplicingΔ')],\
+                data=data, x='Label', y='Ratio', order=['Antisense', '5\' -SplicingΔ'])
             annotator.configure(test='Mann-Whitney', text_format='star')
             annotator.verbose = False
     plt.xlabel('')
@@ -50,7 +50,7 @@ def main():
     celllines = df.Cell_line.unique()
     breaks = df.Breaks.unique()
     orders = {'wt':1, 'db':2, 'dcmv':3, 'awt':4, 'd5':5}
-    labels = {'wt':'Sense', 'db':'BranchΔ', 'dcmv':'pCMVΔ', 'awt':'Antisense', 'd5':'5\' SplicingΔ'}
+    labels = {'wt':'Sense', 'db':'BranchΔ', 'dcmv':'pCMVΔ', 'awt':'Antisense', 'd5':'5\' -SplicingΔ'}
     df['Label'] = df.Genotype.map(labels)
     df['Genotype_order'] = df.Genotype.map(orders)
     df = df.sort_values(by='Genotype_order')
