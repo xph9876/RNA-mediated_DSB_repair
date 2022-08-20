@@ -7,28 +7,26 @@ import file_utils
 DSB_TYPES = ['1DSB', '2DSB', '2DSBanti']
 STRANDS = ['R1', 'R2']
 CONSTRUCTS = ['sense', 'branch', 'cmv', 'antisense', 'splicing']
-VERSIONS = [1, 2, 3]
 CONTROL_TYPES = ['30bpDown', 'noDSB']
 
 def get_name(info):
   return (
     ((info['library'] + '_') if ('library' in info) else '') +
-    info['cell_line'] + '_' +
-    info['guide_rna'] + '_' +
-    info['strand'] + '_' +
-    info['construct'] + '_' +
-    ((info['control_type']  + '_') if (info['control_type'] != 'none') else '') +
-    str(info['version'])
+    info['cell_line'] +
+    '_' + info['guide_rna'] +
+    '_' + info['strand'] +
+    '_' + info['construct'] +
+    (('_' + info['control_type']) if (info['control_type'] != 'none') else '') +
+    (('_' + str(info['version'])) if (info['version'] != 'none') else '')
   )
 
 def get_ref_seq_file(info):
   return (
-    info['dsb_type'] + '_' +
-    info['strand'] + '_' +
-    info['construct'] + '_' +
-    str(info['version']) +
-    os.path.extsep +
-    'fa'
+    info['dsb_type'] +
+    '_' + info['strand'] +
+    '_' + info['construct'] +
+    (('_' + str(info['version'])) if (info['version'] != 'none') else '') +
+    os.path.extsep + 'fa'
   )
 
 DSB_POS = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'dsb_pos.tsv'))
@@ -92,7 +90,7 @@ for library_1, library_2 in ANTISENSE_MERGED_PAIRS:
     info_merged = info_1.copy()
     info_merged['total_reads'] += info_2['total_reads']
     info_merged['library'] += '_' + info_2['library']
-    info_merged['version'] = 3
+    info_merged['version'] = 'merged'
     info_merged['name'] = get_name(info_merged)
     info_merged['dsb_pos'] = None
     info_merged['ref_seq_file'] = None
