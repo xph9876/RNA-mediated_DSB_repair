@@ -33,16 +33,6 @@ def main():
     required = True,
   )
   parser.add_argument(
-    '--total_reads',
-    type = int,
-    help = (
-      'Total reads for each file.'
-      ' Must be the same number of arguments as the input files.'
-    ),
-    nargs = '+',
-    required = True,
-  )
-  parser.add_argument(
     '-o',
     '--output',
     type = common_utils.check_file_output,
@@ -56,12 +46,6 @@ def main():
     action = 'store_true',
   )
   args = parser.parse_args()
-
-  if len(args.input) != len(args.total_reads):
-    raise Exception(
-      f'Must have the same number of arguments for input and total_reads.' +
-      f' Got {len(args.input)} and {len(args.total_reads)}'
-    )
 
   num_repeats = len(args.input)
 
@@ -99,9 +83,6 @@ def main():
     index = data.index,
   )
 
-  for i in range(num_repeats):
-    data_combined['Freq_' + names[i]] = data['Count_' + names[i]] / args.total_reads[i]
-  
   log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
   file_utils.write_tsv(data_combined, args.output)
   
