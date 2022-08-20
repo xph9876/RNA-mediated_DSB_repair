@@ -1,4 +1,4 @@
-dsb_type	strand	version dsb_pos
+dsb_type	strand	version	dsb_pos
 2DSB	R1	1	67
 2DSB	R2	1	46
 1DSB	R1	1	67

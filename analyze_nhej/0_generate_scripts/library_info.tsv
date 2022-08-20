@@ -1,4 +1,4 @@
-library	id	cell_line	control	dsb_type	guide_rna	construct	strand version
+library	id	cell_line	control_type	dsb_type	guide_rna	construct	strand	version
 yjl89	89	WT	none	2DSBanti	sgCD	antisense	R1	1
 yjl89	89	WT	none	2DSBanti	sgCD	antisense	R2	1
 yjl90	90	WT	none	2DSBanti	sgCD	antisense	R1	1
