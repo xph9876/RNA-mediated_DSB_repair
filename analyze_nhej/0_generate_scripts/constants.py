@@ -44,11 +44,17 @@ def get_dsb_pos(info):
   return dsb_pos
 
 TOTAL_READS = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'total_reads.tsv'))
-
 def get_total_reads(info):
   return TOTAL_READS.loc[
     (TOTAL_READS['library'] == info['library']),
     info['strand']
+  ].iloc[0]
+
+MIN_READ_LENGTH = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'min_read_length.tsv'))
+def get_min_read_length(info):
+  return MIN_READ_LENGTH.loc[
+    (MIN_READ_LENGTH['dsb_type'] == info['dsb_type']),
+    'min_read_length'
   ].iloc[0]
 
 LIBRARY_INFO = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'library_info.tsv'))
@@ -56,6 +62,7 @@ LIBRARY_INFO['name'] = LIBRARY_INFO.apply(get_name, axis='columns')
 LIBRARY_INFO['ref_seq_file'] = LIBRARY_INFO.apply(get_ref_seq_file, axis='columns')
 LIBRARY_INFO['dsb_pos'] = LIBRARY_INFO.apply(get_dsb_pos, axis='columns')
 LIBRARY_INFO['total_reads'] = LIBRARY_INFO.apply(get_total_reads, axis='columns')
+LIBRARY_INFO['min_read_length'] = LIBRARY_INFO.apply(get_min_read_length, axis='columns')
 
 def get_library_info(**args):
   library_info = LIBRARY_INFO
@@ -106,6 +113,7 @@ EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   dsb_pos = ('dsb_pos', 'first'),
   ref_seq_file = ('ref_seq_file', 'first'),
   total_reads_list = ('total_reads', list),
+  min_read_length = ('min_read_length', 'first'),
 ).reset_index()
 
 EXPERIMENT_INFO['name'] = EXPERIMENT_INFO.apply(get_name, axis='columns')
