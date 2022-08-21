@@ -22,11 +22,12 @@ def parse_args():
     )
   )
   parser.add_argument(
-    '-i',
     '--input',
     type = argparse.FileType(mode='r'),
     help = (
       'Table of sequences produced with get_windows.py.' +
+      ' There must be the same number of count columns in all' +
+      ' input data sets.' +
       ' The count columns in thes must be in the same' +
       ' order they should be merged in.'
     ),
@@ -34,7 +35,6 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '-o',
     '--output',
     type = common_utils.check_dir_output,
     help = 'Output directory.',
@@ -53,9 +53,17 @@ def main():
   if args.quiet:
     log_utils.set_log_file(None)
 
-  data = [pd.read_csv(x.name, sep='\t') for x in args.input]
+  data_list = [pd.read_csv(x.name, sep='\t') for x in args.input]
+  num_columns = data_list[0].shape[1]
+  num_count_columns = num_columns - 2
+  for data in data_list:
+    if data.shape[1] != num_columns:
+      raise Exception('Different number of columns in data sets')
+    data.columns[2:] = ['count_' + str(i) for i in range(num_columns)]
+    # CONTINUE HERE BRO!!!!
+  
   data = pd.concat(data, axis='index')
-  data = data.groupby('Sequence').aggregate(
+  data = data.groupby(['ref_align', 'read_align']).aggregate(
     CIGAR = ('CIGAR', 'first'),
     Count = ('Count', 'sum'),
     Num_Subst = ('Num_Subst', 'first'),

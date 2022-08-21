@@ -10,6 +10,8 @@ import library_constants
 # CONSTRUCTS = ['sense', 'branch', 'cmv', 'antisense', 'splicing']
 # CONTROL_TYPES = ['30bpDown', 'noDSB']
 
+VERSION_NONE = 'versionNone'
+
 def get_name(info):
   return (
     ((info['library'] + '_') if ('library' in info) else '') +
@@ -18,7 +20,7 @@ def get_name(info):
     '_' + info['strand'] +
     '_' + info['construct'] +
     (('_' + info['control_type']) if (info['control_type'] != library_constants.CONTROL_NOT) else '') +
-    (('_' + str(info['version'])) if (info['version'] != 'none') else '')
+    (('_' + str(info['version'])) if (info['version'] != VERSION_NONE) else '')
   )
 
 def get_ref_seq_file(info):
@@ -26,7 +28,7 @@ def get_ref_seq_file(info):
     info['dsb_type'] +
     '_' + info['strand'] +
     '_' + info['construct'] +
-    (('_' + str(info['version'])) if (info['version'] != 'none') else '') +
+    (('_' + str(info['version'])) if (info['version'] != VERSION_NONE) else '') +
     os.path.extsep + 'fa'
   )
 
