@@ -134,5 +134,20 @@ OUTPUT_DIR = {
   'graph_processing': 'libraries_4_graph_processing',
 }
 
+# CONTINUE HERE !!!
+PYTHON_SCRIPTS = {
+  'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
+  'combine_repeats': 'libraries_2_combine_repeats',
+  'get_freqs': 'libraries_3_get_freqs',
+  'graph_processing': 'libraries_4_graph_processing',
+}
+
+RUN_SCRIPTS = {
+  'filter_nhej': 'libraries_1_filter_nhej',
+  'combine_repeats': 'libraries_2_combine_repeats',
+  'get_freqs': 'libraries_3_get_freqs',
+  'graph_processing': 'libraries_4_graph_processing',
+}
+
 LIBRARY_INFO.to_excel('library_info.xlsx')
 EXPERIMENT_INFO.to_excel('experiment_info.xlsx')
