@@ -8,7 +8,7 @@ if __name__ == '__main__':
   input_dir = constants.OUTPUT_DIR['raw']
   output_dir = constants.OUTPUT_DIR['filter_nhej']
   for ext in ['sh', 'ps1']:
-    with open(os.path.join(os.path.join('..', 'run_01_process_nhej' + os.path.extsep + ext)), 'w') as file_out:
+    with open(os.path.join('run_01_process_nhej' + os.path.extsep + ext), 'w') as file_out:
       log_utils.log(file_out.name)
       for info in constants.LIBRARY_INFO.to_dict('records'):
         if not info['version'] == 'merged':
