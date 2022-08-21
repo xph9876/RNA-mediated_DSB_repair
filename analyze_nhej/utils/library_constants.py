@@ -104,27 +104,31 @@ NON_REFERENCE_DESCRIPTION = 'Non-reference'
 CONTROL_NOT = 'notControl'
 CONTROL_NODSB = 'noDSB'
 CONTROL_30BPDOWN = '30bpDown'
+CONTROLS = [CONTROL_NOT, CONTROL_NODSB, CONTROL_30BPDOWN]
 
 ### DSB types ###
 DSB_1 = '1DSB'
 DSB_2 = '2DSB'
 DSB_2anti = '2DSBanti'
+DSBS = [DSB_1, DSB_2, DSB_2anti]
 
 ### Hguide types ###
-HGUIDE_A = 'sgA'
-HGUIDE_B = 'sgB'
-HGUIDE_AB = 'sgAB'
-HGUIDE_CD = 'sgCD'
+GUIDE_RNA_A = 'sgA'
+GUIDE_RNA_B = 'sgB'
+GUIDE_RNA_AB = 'sgAB'
+GUIDE_RNA_CD = 'sgCD'
+GUIDE_RNAS = [GUIDE_RNA_A, GUIDE_RNA_B, GUIDE_RNA_AB, GUIDE_RNA_CD]
 
 ### Strand type ###
 STRAND_R1 = 'R1'
 STRAND_R2 = 'R2'
+STRANDS = [STRAND_R1, STRAND_R2]
 
 ### Cell line ###
 CELL_WT = 'WT'
 CELL_KO = 'KO'
 
-TREATMENT_COLOR = {
+CONSTRUCT_COLOR = {
   'sense': '#CF191B', 
   'branch': '#33A02C',
   'cmv': '#FFE669',
@@ -164,9 +168,9 @@ FREQ_RATIO_COLOR_BAR_TICK_TEXT = [
 
 def get_freq_ratio_color_scale(treatment_1, treatment_2):
   return [
-    [0, TREATMENT_COLOR[treatment_2]],
-    [0.5, TREATMENT_COLOR[treatment_1 + '_' + treatment_2]],
-    [1, TREATMENT_COLOR[treatment_1]],
+    [0, CONSTRUCT_COLOR[treatment_2]],
+    [0.5, CONSTRUCT_COLOR[treatment_1 + '_' + treatment_2]],
+    [1, CONSTRUCT_COLOR[treatment_1]],
   ]
 
 def get_freq_ratio_label(freq_group, treatment_1, treatment_2):
@@ -190,31 +194,38 @@ def get_freq_ratio_label(freq_group, treatment_1, treatment_2):
 
 ### Data formats ###
 DATA_INDIVIDUAL = 'individual'
-DATA_COMBINED = 'combined'
+DATA_COMPARISON = 'combined'
 
 FREQ_COLUMNS = {
   DATA_INDIVIDUAL: ['freq_mean'],
-  DATA_COMBINED: ['freq_mean_1', 'freq_mean_2'],
+  DATA_COMPARISON: ['freq_mean_1', 'freq_mean_2'],
 }
 
 FREQ_RANK_COLUMNS = {
   DATA_INDIVIDUAL: ['freq_mean_rank'],
-  DATA_COMBINED: ['freq_mean_rank_1', 'freq_mean_rank_2'],
+  DATA_COMPARISON: ['freq_mean_rank_1', 'freq_mean_rank_2'],
 }
 
 ### Treatments ###
 
 ## Individual ##
-TREATMENT_SENSE = 'sense'
-TREATMENT_BRANCH = 'branch'
-TREATMENT_CMV = 'cmv'
-TREATMENT_ANTISENSE = 'antisense'
-TREATMENT_SPLICING = 'splicing'
+CONSTRUCT_SENSE = 'sense'
+CONSTRUCT_BRANCH = 'branch'
+CONSTRUCT_CMV = 'cmv'
+CONSTRUCT_ANTISENSE = 'antisense'
+CONSTRUCT_SPLICING = 'splicing'
+CONSTRUCTS_INDIVIDUAL = [
+  CONSTRUCT_SENSE,
+  CONSTRUCT_BRANCH,
+  CONSTRUCT_CMV,
+  CONSTRUCT_ANTISENSE,
+  CONSTRUCT_SPLICING,
+]
 
 ## Combined ##
-TREATMENT_SENSE_BRANCH = [TREATMENT_SENSE, TREATMENT_BRANCH]
-TREATMENT_SENSE_CMV = [TREATMENT_SENSE, TREATMENT_CMV]
-TREATMENT_ANTISENSE_SPLICING = [TREATMENT_ANTISENSE, TREATMENT_SPLICING]
+CONSTRUCT_SENSE_BRANCH = [CONSTRUCT_SENSE, CONSTRUCT_BRANCH]
+CONSTRUCT_SENSE_CMV = [CONSTRUCT_SENSE, CONSTRUCT_CMV]
+CONSTRUCT_ANTISENSE_SPLICING = [CONSTRUCT_ANTISENSE, CONSTRUCT_SPLICING]
 
 ### Labels ###
 LABELS = {

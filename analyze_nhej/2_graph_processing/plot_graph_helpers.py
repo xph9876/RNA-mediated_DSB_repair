@@ -261,10 +261,10 @@ def get_node_color(
     node_freq_group = get_node_freq_group(node_data)
     node_color = pd.Series(library_constants.SIMILAR_FREQ_COLOR, index=node_data.index)
     node_color.loc[node_freq_group == library_constants.FREQ_GROUP_A] = (
-      library_constants.TREATMENT_COLOR[data_info['treatment_1']]
+      library_constants.CONSTRUCT_COLOR[data_info['treatment_1']]
     )
     node_color.loc[node_freq_group == library_constants.FREQ_GROUP_C] = (
-      library_constants.TREATMENT_COLOR[data_info['treatment_2']]
+      library_constants.CONSTRUCT_COLOR[data_info['treatment_2']]
     )
     return node_color
   elif node_color_type == 'freq':

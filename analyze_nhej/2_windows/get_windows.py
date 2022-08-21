@@ -17,14 +17,12 @@ import pandas as pd
 import numpy as np
 import re
 import argparse
-import file_names as file_names
 
 def parse_args():
   parser = argparse.ArgumentParser(
     description = 'Process data for downstream graph and variation-position analysis.'
   )
   parser.add_argument(
-    '-i',
     '--input',
     type = argparse.FileType(mode='r'),
     help = (
@@ -35,32 +33,21 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '--total_reads',
-    type = int,
-    help = (
-      'Total reads for each file.'
-      ' Must be the same number of arguments as the number of Count columns in INPUT.'
-    ),
-    nargs = '+',
-    required = True,
-  )
-  parser.add_argument(
-    '-ref',
+    '--ref_seq_file',
     type = argparse.FileType(mode='r'),
     help = 'Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.',
     required = True,
   )
   parser.add_argument(
-    '-o',
     '--output',
-    type = common_utils.check_dir_output,
+    # type = common_utils.check_dir_output,
+    type = common_utils.check_file_output,
     help = 'Output directory.',
     required = True,
   )
   parser.add_argument(
-    '-dsb',
+    '--dsb_pos',
     type = int,
-    metavar = 'DSB_POS',
     help = (
       'Position on reference sequence immediately upstream of DSB site.\n'
       'The DSB is between position DSB_POS and DSB_POS + 1.'
@@ -68,7 +55,6 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '-f',
     '--filter_min_freq',
     type = float,
     default = 1e-5,
@@ -79,7 +65,6 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-ws',
     '--window_size',
     type = int,
     default = 10,
@@ -90,7 +75,6 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-as',
     '--anchor_size',
     type = int,
     default = 20,
@@ -101,8 +85,7 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-am',
-    '--anchor_mismatch',
+    '--anchor_mismatches',
     type = int,
     default = 1,
     help = (
@@ -112,84 +95,75 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-st',
     '--subst_type',
     type = str,
     default = 'without',
-    choices = ['with', 'without'],
+    choices = [
+      library_constants.SUBST_WITH,
+      library_constants.SUBST_WITHOUT
+    ],
     help = 'Whether to keep or ignore substitutions.',
     required = True,
   )
   parser.add_argument(
-    '--treatment',
+    '--construct',
     type = str,
-    choices = [
-      library_constants.TREATMENT_SENSE,
-      library_constants.TREATMENT_BRANCH,
-      library_constants.TREATMENT_CMV,
-      library_constants.TREATMENT_ANTISENSE,
-      library_constants.TREATMENT_SPLICING
-    ],
-    help = 'Name of treatment.',
+    choices = library_constants.CONSTRUCTS_INDIVIDUAL,
+    help = 'Name of construct.',
     required = True,
   )
   parser.add_argument(
-    '--control',
+    '--control_type',
     type = str,
-    choices = ['none', library_constants.CONTROL_NODSB, library_constants.CONTROL_30BPDOWN],
-    help = 'Whether this data is a control.',
+    choices = library_constants.CONTROLS,
+    help = 'Whether this data is a control experiment and what type.',
     required = True,
   )
   parser.add_argument(
     '--dsb_type',
     type = str,
-    choices = ['1', '2', '2a'],
+    choices = library_constants.DSBS,
     help = 'Whether this data is 1 DSB, 2 DSB, or 2 DSB antisense.',
     required = True,
   )
   parser.add_argument(
-    '--hguide',
+    '--guide_rna',
     type = str,
-    choices = ['A', 'B', 'AB', 'CD'],
+    choices = library_constants.GUIDE_RNAS,
     help = 'Type of guide RNA used in this experiment.',
     required = True,
   )
   parser.add_argument(
     '--strand',
     type = str,
-    choices = [library_constants.STRAND_R1, library_constants.STRAND_R2],
+    choices = library_constants.STRANDS,
     help = 'Strand of the reads in this library.',
     required = True,
   )
   parser.add_argument(
-    '--cell',
+    '--cell_line',
     type = str,
     choices = [library_constants.CELL_WT, library_constants.CELL_KO],
     help = 'Cell in this library.',
     required = True,
   )
   args = parser.parse_args()
-  args.subst_type += 'Subst'
-  args.dsb_type = {
-    '1': library_constants.DSB_1,
-    '2': library_constants.DSB_2,
-    '2a': library_constants.DSB_2anti,
-  }[args.dsb_type]
-  args.hguide = 'sg' + args.hguide
-  if args.control == 'none':
-    args.control = library_constants.CONTROL_NOT
+  # args.subst_type += 'Subst'
+  # args.guide_rna = 'sg' + args.guide_rna
+  # if args.control_type == 'none':
+    # args.control_type = library_constants.CONTROL_NOT
   return args
 
 def make_alignment_windows(
   input_file,
-  output_dir,
+  output_file,
   ref_seq,
   dsb_pos,
   window_size,
   anchor_size,
-  anchor_mismatch_limit,
+  anchor_mismatches,
   subst_type,
-  freq_min_threshold,
+  # freq_min_threshold,
 ):
   """
     Performs preprocessing steps for the NHEJ graphs.
@@ -221,19 +195,19 @@ def make_alignment_windows(
       discarded.
   """
 
-  out_file_name = file_names.main(output_dir, subst_type)
-  log_utils.log(out_file_name)
+  # out_file_name = file_names.main(output_file, subst_type)
+  # log_utils.log(out_file_name)
 
   data = file_utils.read_tsv(input_file)
-  freq_column_list = [x for x in data.columns if x.startswith('Freq_')]
-  library_list = [x[len('Freq_'):] for x in freq_column_list]
+  freq_column_list = [x for x in data.columns if x.startswith('Count_')]
+  library_list = [x.replace('Count_', '') for x in freq_column_list]
   data = data[['Sequence', 'CIGAR'] + freq_column_list]
 
   new_data = {
     'ref_align': [],
     'read_align': [],
     'library': [],
-    'freq': [],
+    'count': [],
   }
     
   for row in data.to_dict('records'):
@@ -247,7 +221,7 @@ def make_alignment_windows(
       dsb_pos,
       window_size,
       anchor_size,
-      anchor_mismatch_limit,
+      anchor_mismatches,
     )
     if ref_align is None:
       continue
@@ -260,11 +234,11 @@ def make_alignment_windows(
       )
     
     # save alignment window to list
-    for name, freq_column in zip(library_list, freq_column_list):
+    for name, count_column in zip(library_list, freq_column_list):
       new_data['ref_align'].append(ref_align)
       new_data['read_align'].append(read_align)
       new_data['library'].append(name)
-      new_data['freq'].append(row[freq_column])
+      new_data['count'].append(row[count_column])
 
   data = pd.DataFrame(new_data)
 
@@ -276,26 +250,28 @@ def make_alignment_windows(
   ).aggregate(
     ref_align = ('ref_align', 'first'),
     read_align = ('read_align', 'first'),
-    freq = ('freq', 'sum'),
+    count = ('count', 'sum'),
   ).reset_index()
   data = data.drop('read_seq', axis='columns').reset_index(drop=True)
 
   # get the min frequency of the repeats
-  data['freq_repeat_min'] = (
-    data.groupby(['ref_align', 'read_align'])['freq'].transform('min')
+  data['count_min'] = (
+    data.groupby(['ref_align', 'read_align'])['count'].transform('min')
   )
   data = data.sort_values(
-    ['freq_repeat_min', 'read_align', 'library'],
+    ['count_min', 'read_align', 'library'],
     ascending = [False, True, True],
   ).reset_index(drop=True)
 
   # save the unfiltered repeat data
-  data_repeats = data.drop('freq_repeat_min', axis='columns')
+  data_repeats = data.drop('count_min', axis='columns')
   # file_utils.write_tsv(data_repeats, file_names.main_repeats(output_dir, subst_type))
-  file_utils.write_tsv(data_repeats, file_names.windows(output_dir, subst_type))
+  file_utils.write_tsv(data_repeats, output_file)
+  log_utils.log(output_file.name)
+  log_utils.new_line()
 
   # # filter the data with the minimum threshold
-  # data = data.loc[data['freq_repeat_min'] > freq_min_threshold]
+  # data = data.loc[data['count_min'] > freq_min_threshold]
 
   # # average over repeats
   # data = data.groupby(['ref_align', 'read_align']).aggregate(
@@ -304,15 +280,18 @@ def make_alignment_windows(
   # data = data.sort_values('freq_mean', ascending = False).reset_index(drop=True)
   # file_utils.write_tsv(data, file_names.main(output_dir, subst_type))
 
+# FIXME: NEED TO MOVE THIS SOMEWHERE
+# FIXME: NEED TO DO THE FILTERING SOMEWHERE
 def make_data_info(
   dir,
   format,
   cell_line,
   dsb_type,
-  hguide,
+  guide_rna,
   strand,
-  treatments,
-  control,
+  constructs,
+  control_type,
+  ref_seq,
   ref_seq_window,
 ):
   data_info = {
@@ -320,20 +299,21 @@ def make_data_info(
     'format': format,
     'cell_line': cell_line,
     'dsb_type': dsb_type,
-    'hguide': hguide,
+    'guide_rna': guide_rna,
     'strand': strand,
-    'control': control,
-    'ref_seq': ref_seq_window,
+    'control_type': control_type,
+    'ref_seq': ref_seq,
+    'ref_seq_window': ref_seq_window,
   }
-  if (format == library_constants.DATA_INDIVIDUAL) and (len(treatments) == 1):
-    data_info['treatment'] = treatments[0]
-  elif (format == library_constants.DATA_COMBINED) and (len(treatments) == 2):
-    data_info['treatment_1'] = treatments[0]
-    data_info['treatment_2'] = treatments[1]
+  if (format == library_constants.DATA_INDIVIDUAL) and (len(constructs) == 1):
+    data_info['construct'] = constructs[0]
+  elif (format == library_constants.DATA_COMPARISON) and (len(constructs) == 2):
+    data_info['construct_1'] = constructs[0]
+    data_info['construct_2'] = constructs[1]
   else:
     raise Exception(
-      'Wrong combination of data format and treatments: ' +
-      str(format) + ', ' + str(treatments)
+      'Wrong combination of data format and constructs: ' +
+      str(format) + ', ' + str(constructs)
     )
   data_info = pd.DataFrame(data_info, index = [0])
   file_out = file_names.data_info(dir)
@@ -363,38 +343,38 @@ def main():
   log_utils.log(args.input.name)
   log_utils.log('------>')
 
-  ref_seq = fasta_utils.read_fasta_seq(args.ref)
+  ref_seq = fasta_utils.read_fasta_seq(args.ref_seq_file)
   make_alignment_windows(
-    args.input, 
-    args.output,
-    ref_seq,
-    args.dsb,
-    args.window_size,
-    args.anchor_size,
-    args.anchor_mismatch,
-    args.subst_type,
-    args.filter_min_freq,
+    input_file = args.input, 
+    output_file = args.output,
+    ref_seq = ref_seq,
+    dsb_pos = args.dsb_pos,
+    window_size = args.window_size,
+    anchor_size = args.anchor_size,
+    anchor_mismatches = args.anchor_mismatches,
+    subst_type = args.subst_type,
   )
-  make_data_info(
-    args.output,
-    library_constants.DATA_INDIVIDUAL,
-    args.cell,
-    args.dsb_type,
-    args.hguide,
-    args.strand,
-    [args.treatment],
-    args.control,
-    get_ref_seq_window(
-      ref_seq,
-      args.dsb,
-      args.window_size,
-    ),
-  )
+  # make_data_info(
+  #   dir = args.output,
+  #   format = library_constants.DATA_INDIVIDUAL,
+  #   cell_line = args.cell_line,
+  #   dsb_type = args.dsb_type,
+  #   guide_rna = args.guide_rna,
+  #   strand = args.strand,
+  #   constructs = [args.construct],
+  #   control_type = args.control_type,
+  #   ref_seq = ref_seq,
+  #   ref_seq_window = get_ref_seq_window(
+  #     ref_seq,
+  #     args.dsb_pos,
+  #     args.window_size,
+  #   ),
+  # )
 
-  ref_file_out = file_names.ref(args.output)
-  log_utils.log(ref_file_out)
-  shutil.copy(args.ref.name, ref_file_out)
-  log_utils.new_line()
+  # ref_file_out = file_names.ref(args.output)
+  # log_utils.log(ref_file_out)
+  # shutil.copy(args.ref.name, ref_file_out)
+  # log_utils.new_line()
 
 if __name__ == '__main__':
   main()

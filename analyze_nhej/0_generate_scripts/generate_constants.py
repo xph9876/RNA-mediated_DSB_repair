@@ -3,11 +3,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 import pandas as pd
 import file_utils
+import library_constants
 
-DSB_TYPES = ['1DSB', '2DSB', '2DSBanti']
-STRANDS = ['R1', 'R2']
-CONSTRUCTS = ['sense', 'branch', 'cmv', 'antisense', 'splicing']
-CONTROL_TYPES = ['30bpDown', 'noDSB']
+# DSB_TYPES = ['1DSB', '2DSB', '2DSBanti']
+# STRANDS = ['R1', 'R2']
+# CONSTRUCTS = ['sense', 'branch', 'cmv', 'antisense', 'splicing']
+# CONTROL_TYPES = ['30bpDown', 'noDSB']
 
 def get_name(info):
   return (
@@ -16,7 +17,7 @@ def get_name(info):
     '_' + info['guide_rna'] +
     '_' + info['strand'] +
     '_' + info['construct'] +
-    (('_' + info['control_type']) if (info['control_type'] != 'none') else '') +
+    (('_' + info['control_type']) if (info['control_type'] != library_constants.CONTROL_NOT) else '') +
     (('_' + str(info['version'])) if (info['version'] != 'none') else '')
   )
 
@@ -84,7 +85,7 @@ ANTISENSE_MERGED_PAIRS = [
 ]
 LIBRARY_INFO_ANTISENSE_MERGED = []
 for library_1, library_2 in ANTISENSE_MERGED_PAIRS:
-  for strand in ['R1', 'R2']:
+  for strand in library_constants.STRANDS:
     info_1 = get_library_info(library = library_1, strand = strand)
     info_2 = get_library_info(library = library_2, strand = strand)
     info_merged = info_1.copy()
@@ -126,6 +127,7 @@ def get_experiment_info(**args):
   else:
     raise Exception(str(experiment_info.shape[0]) + ' experiment info results found')
 
+REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {
   'raw': 'data_0_raw',
   'filter_nhej': 'data_1_filter_nhej',
@@ -135,7 +137,6 @@ OUTPUT_DIR = {
   'histogram_3d': 'data_5_histogram_3d',
 }
 
-# CONTINUE HERE !!!
 PYTHON_SCRIPTS = {
   'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
   'combine_repeats': os.path.join('1_process_nhej', 'combine_repeats.py'),
@@ -145,10 +146,9 @@ PYTHON_SCRIPTS = {
 }
 
 RUN_SCRIPTS = {
-  'filter_nhej': 'libraries_1_filter_nhej',
-  'combine_repeats': 'libraries_2_combine_repeats',
-  'get_freqs': 'libraries_3_get_freqs',
-  'graph_processing': 'libraries_4_graph_processing',
+  'filter_nhej': 'data_1_filter_nhej',
+  'combine_repeats': 'data_2_combine_repeats',
+  'windows': 'data_3_windows',
 }
 
 LIBRARY_INFO.to_excel('library_info.xlsx')

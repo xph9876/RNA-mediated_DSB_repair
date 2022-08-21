@@ -124,7 +124,7 @@ if __name__ == '__main__':
   # Make the combined info
   get_windows.make_data_info(
     args.output,
-    library_constants.DATA_COMBINED,
+    library_constants.DATA_COMPARISON,
     data_info_1['cell_line'],
     data_info_1['dsb_type'],
     data_info_1['hguide'],

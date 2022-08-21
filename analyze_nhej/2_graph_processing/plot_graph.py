@@ -238,13 +238,13 @@ def make_variation_position_layout(
   sequence_data = list(dict(sequence_data).items())
   freq_columns = [
     x for x in sequence_data[0][1]
-    if x in library_constants.FREQ_COLUMNS[data_info['dir']]
+    if x in library_constants.FREQ_COLUMNS[data_info['format']]
   ]
   sequence_data = sorted(
     sequence_data,
     key = lambda x: np.mean([
       x[1][col_name] for col_name in freq_columns
-      if col_name in library_constants.FREQ_COLUMNS[data_info['dir']]
+      if col_name in library_constants.FREQ_COLUMNS[data_info['format']]
     ]),
   )
 
@@ -1371,7 +1371,7 @@ def make_freq_group_legend(
     'text': library_constants.get_freq_ratio_label(
       library_constants.FREQ_GROUP_A, treatment_1, treatment_2
     ),
-    'color': library_constants.TREATMENT_COLOR[treatment_1],
+    'color': library_constants.CONSTRUCT_COLOR[treatment_1],
   })
   legend_items.append({
     'type': 'circle',
@@ -1387,7 +1387,7 @@ def make_freq_group_legend(
     'text': library_constants.get_freq_ratio_label(
       library_constants.FREQ_GROUP_C, treatment_1, treatment_2
     ),
-    'color': library_constants.TREATMENT_COLOR[treatment_2],
+    'color': library_constants.CONSTRUCT_COLOR[treatment_2],
   })
   return make_legend(
     figure = figure,
@@ -1519,11 +1519,11 @@ def make_custom_legends(
   elif node_color_type == 'freq_group':
     treatment_1_list = list(set(
       data_info['treatment_1'] for data_info in data_info_grid.ravel()
-      if data_info['format'] == library_constants.DATA_COMBINED
+      if data_info['format'] == library_constants.DATA_COMPARISON
     ))
     treatment_2_list = list(set(
       data_info['treatment_2'] for data_info in data_info_grid.ravel()
-      if data_info['format'] == library_constants.DATA_COMBINED
+      if data_info['format'] == library_constants.DATA_COMPARISON
     ))
     for treatment_1 in treatment_1_list:
       for treatment_2 in treatment_2_list:
