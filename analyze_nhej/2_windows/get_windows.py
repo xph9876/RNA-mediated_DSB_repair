@@ -199,16 +199,16 @@ def make_alignment_windows(
   # log_utils.log(out_file_name)
 
   data = file_utils.read_tsv(input_file)
-  freq_column_list = [x for x in data.columns if x.startswith('Count_')]
-  library_list = [x.replace('Count_', '') for x in freq_column_list]
-  data = data[['Sequence', 'CIGAR'] + freq_column_list]
+  count_columns_old = [x for x in data.columns if x.startswith('Count_')]
+  data = data[['Sequence', 'CIGAR'] + count_columns_old]
 
-  new_data = {
+  data_new = {
     'ref_align': [],
     'read_align': [],
-    'library': [],
-    'count': [],
   }
+  count_columns_new = [x.lower() for x in count_columns_old]
+  for column in count_columns_new:
+    data_new[column] = []
     
   for row in data.to_dict('records'):
     # convert CIGAR to alignment
@@ -233,40 +233,35 @@ def make_alignment_windows(
         read_align,
       )
     
-    # save alignment window to list
-    for name, count_column in zip(library_list, freq_column_list):
-      new_data['ref_align'].append(ref_align)
-      new_data['read_align'].append(read_align)
-      new_data['library'].append(name)
-      new_data['count'].append(row[count_column])
+    data_new['ref_align'].append(ref_align)
+    data_new['read_align'].append(read_align)
 
-  data = pd.DataFrame(new_data)
+    for col_old, col_new in zip(count_columns_old, count_columns_new):
+      data_new[col_new].append(row[col_old])
+
+  data = pd.DataFrame(data_new)
 
   # Sum rows with identical sequences
   # Note: we make an arbitrary choice of which alignment is kept
   data['read_seq'] = data['read_align'].apply(alignment_utils.get_orig_seq)
-  data = data.groupby(
-    ['read_seq', 'library']
-  ).aggregate(
+  data = data.groupby('read_seq').aggregate(
     ref_align = ('ref_align', 'first'),
     read_align = ('read_align', 'first'),
-    count = ('count', 'sum'),
+    **{col: (col, 'sum') for col in count_columns_new}
   ).reset_index()
   data = data.drop('read_seq', axis='columns').reset_index(drop=True)
 
   # get the min frequency of the repeats
-  data['count_min'] = (
-    data.groupby(['ref_align', 'read_align'])['count'].transform('min')
-  )
+  data['count_min'] = data[count_columns_new].min(axis='columns')
   data = data.sort_values(
-    ['count_min', 'read_align', 'library'],
-    ascending = [False, True, True],
+    ['count_min', 'read_align'],
+    ascending = [False, True],
   ).reset_index(drop=True)
 
   # save the unfiltered repeat data
-  data_repeats = data.drop('count_min', axis='columns')
-  # file_utils.write_tsv(data_repeats, file_names.main_repeats(output_dir, subst_type))
-  file_utils.write_tsv(data_repeats, output_file)
+  data = data.drop('count_min', axis='columns')
+  # file_utils.write_tsv(data, file_names.main_repeats(output_dir, subst_type))
+  file_utils.write_tsv(data, output_file)
   log_utils.log(output_file.name)
   log_utils.new_line()
 
