@@ -11,5 +11,5 @@ if __name__ == '__main__':
     with open(os.path.join('run_01_process_nhej' + os.path.extsep + ext), 'w') as file_out:
       log_utils.log(file_out.name)
       for info in constants.LIBRARY_INFO.to_dict('records'):
-        if not info['version'] == 'merged':
+        if info['version'] != 'merged':
           file_out.write(f"python 1_process_nhej/filter_nhej.py -sam {input_dir}/{info['name']}.sam -ref ref_seq/{info['ref_seq_file']} -o {output_dir}/{info['name']}.tsv --min_length {info['min_read_length']} -dsb {info['dsb_pos']} --quiet\n")
