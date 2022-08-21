@@ -8,8 +8,8 @@ log*.txt
 # SAM files
 *.sam
 
-# Library files
-libraries*
+# Data files
+data*
 
 # Plots
 plots/

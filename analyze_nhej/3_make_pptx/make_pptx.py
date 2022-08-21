@@ -14,7 +14,7 @@ import common_utils
 import file_utils
 import file_names
 import log_utils
-import constants
+import library_constants
 import make_pptx_helpers
 import make_pptx_legend
 
@@ -547,9 +547,9 @@ def make_slide(
         treatment_1 = legend['treatment_1']
         treatment_2 = legend['treatment_2']
         if orientation == 'v':
-          title = f'Ratio\n[{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
+          title = f'Ratio\n[{library_constants.LABELS[treatment_1]} / {library_constants.LABELS[treatment_2]}]'
         elif orientation == 'h':
-          title = f'Ratio [{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
+          title = f'Ratio [{library_constants.LABELS[treatment_1]} / {library_constants.LABELS[treatment_2]}]'
         else:
           raise Exception('Impossible')
         color_bar_file = legend['color_bar_file']
@@ -658,7 +658,7 @@ def parse_args():
       'Max frequency to determine node size.' +
       ' Higher frequencies are clipped to this value.'
     ),
-    default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+    default = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
   )
   parser.add_argument(
     '--node_min_freq',
@@ -667,19 +667,19 @@ def parse_args():
       'Min frequency to determine node size.' +
       ' Lower frequencies are clipped to this value.'
     ),
-    default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+    default = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
   )
   parser.add_argument(
     '--node_max_px',
     type = float,
     help = 'Largest node size as determined by the frequency.',
-    default = constants.GRAPH_NODE_SIZE_MAX_PX,
+    default = library_constants.GRAPH_NODE_SIZE_MAX_PX,
   )
   parser.add_argument(
     '--node_min_px',
     type = float,
     help = 'Smallest node size as determined by the frequency.',
-    default = constants.GRAPH_NODE_SIZE_MIN_PX,
+    default = library_constants.GRAPH_NODE_SIZE_MIN_PX,
   )
   parser.add_argument(
     '--title',

@@ -10,7 +10,7 @@ import networkx as nx
 import plotly.graph_objects as go
 import plotly.subplots as ps
 
-import constants
+import library_constants
 import common_utils
 import log_utils
 import kmer_utils

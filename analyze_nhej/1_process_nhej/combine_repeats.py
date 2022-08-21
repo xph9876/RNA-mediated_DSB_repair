@@ -82,6 +82,8 @@ def main():
     },
     index = data.index,
   )
+  for i in range(num_repeats):
+    data_combined['Count_' + names[i]] = data['Count_' + names[i]]
 
   log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
   file_utils.write_tsv(data_combined, args.output)

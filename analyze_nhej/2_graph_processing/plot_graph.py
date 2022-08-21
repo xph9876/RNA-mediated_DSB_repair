@@ -18,7 +18,7 @@ import circlify
 
 import PIL
 
-import constants
+import library_constants
 import common_utils
 import log_utils
 import graph_utils
@@ -238,13 +238,13 @@ def make_variation_position_layout(
   sequence_data = list(dict(sequence_data).items())
   freq_columns = [
     x for x in sequence_data[0][1]
-    if x in constants.FREQ_COLUMNS[data_info['dir']]
+    if x in library_constants.FREQ_COLUMNS[data_info['dir']]
   ]
   sequence_data = sorted(
     sequence_data,
     key = lambda x: np.mean([
       x[1][col_name] for col_name in freq_columns
-      if col_name in constants.FREQ_COLUMNS[data_info['dir']]
+      if col_name in library_constants.FREQ_COLUMNS[data_info['dir']]
     ]),
   )
 
@@ -252,7 +252,7 @@ def make_variation_position_layout(
     xy_dict = {
       id: [
         data['variation_pos'],
-        int(data[constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN]),
+        int(data[library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN]),
       ]
       for id, data in sequence_data
     }
@@ -312,7 +312,7 @@ def make_radial_layout(data_info, graph):
     for dist_ref in bucket_dict[var_type]:
       bucket = list(sorted(
         bucket_dict[var_type][dist_ref],
-        key = lambda x: max(x[col] for col in constants.FREQ_COLUMNS[data_info['format']]),
+        key = lambda x: max(x[col] for col in library_constants.FREQ_COLUMNS[data_info['format']]),
         reverse = True,
       ))
 
@@ -366,7 +366,7 @@ def make_fractal_layout(data_info, graph, reverse_complement=False):
     for dist_ref in bucket_dict[var_type]:
       bucket = list(sorted(
         bucket_dict[var_type][dist_ref],
-        key = lambda x: max(x[col] for col in constants.FREQ_COLUMNS[data_info['format']]),
+        key = lambda x: max(x[col] for col in library_constants.FREQ_COLUMNS[data_info['format']]),
         reverse = True,
       ))
 
@@ -425,7 +425,7 @@ def get_pos_universal_layout(
       read_align,
     ))
     
-    row_spec = constants.GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC
+    row_spec = library_constants.GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC
     num_rows = row_spec[dist_ref]['rows']
     num_cols = row_spec[dist_ref]['cols']
     row = kmer_index % num_rows
@@ -479,7 +479,7 @@ def make_universal_layout(data_info, graph, reverse_complement=False):
     for dist_ref in bucket_dict[var_type]:
       bucket = list(sorted(
         bucket_dict[var_type][dist_ref],
-        key = lambda x: max(x[col] for col in constants.FREQ_COLUMNS[data_info['format']]),
+        key = lambda x: max(x[col] for col in library_constants.FREQ_COLUMNS[data_info['format']]),
         reverse = True,
       ))
 
@@ -511,8 +511,8 @@ def make_universal_layout_y_axis(
   y_min = None,
   y_max = None,
   tick_length = 0.25,
-  label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE,
-  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  label_font_size = library_constants.GRAPH_AXES_TICK_FONT_SIZE,
+  font_size_scale = library_constants.GRAPH_FONT_SIZE_SCALE,
   max_tick_insertion = 8,
   max_tick_deletion = 10,
   line_width_px = 4,
@@ -610,7 +610,7 @@ def make_universal_layout_x_axis(
   deletion_tick_type = 'start',
   base_tick_length = 0.25,
   label_font_size = None,
-  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  font_size_scale = library_constants.GRAPH_FONT_SIZE_SCALE,
   line_width_px = 4,
 ):
   if insertion_axis_type not in ['tick', 'bracket']:
@@ -619,9 +619,9 @@ def make_universal_layout_x_axis(
     raise Exception('Invalid deletion label type: ' + str(deletion_label_type))
   if label_font_size is None:
     if var_type == 'insertion':
-      label_font_size = 2 * constants.GRAPH_AXES_TICK_FONT_SIZE
+      label_font_size = 2 * library_constants.GRAPH_AXES_TICK_FONT_SIZE
     elif var_type == 'deletion':
-      label_font_size = constants.GRAPH_AXES_TICK_FONT_SIZE
+      label_font_size = library_constants.GRAPH_AXES_TICK_FONT_SIZE
     else:
       raise Exception('Unknown variation type: ' + str(var_type))
   tick_list = []
@@ -664,7 +664,7 @@ def make_universal_layout_x_axis(
         })
   elif var_type == 'deletion':
     tick_list_negative = []
-    pos_labels = constants.get_position_labels(
+    pos_labels = library_constants.get_position_labels(
       deletion_label_type,ref_length,
     )
     for deletion_start in range(1, (ref_length // 2) + 1):
@@ -1101,14 +1101,14 @@ def make_legend(
     xshift = x_shift,
     yshift = y_shift,
     showarrow = False,
-    font_size = constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
+    font_size = library_constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
   )
 
   y_shift_step_sign = -1 if y_shift_item_step < 0 else 1
   y_shift_item_step = legend_item_scale * y_shift_item_step
   curr_y_shift = (
     y_shift +
-    y_shift_step_sign * constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale +
+    y_shift_step_sign * library_constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale +
     y_shift_items
   )
   for _, item in enumerate(legend_items):
@@ -1160,11 +1160,11 @@ def make_legend(
       xanchor = 'left',
       yanchor = 'middle',
       showarrow = False,
-      font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
+      font_size = library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     )
     curr_y_shift += y_shift_step_sign * max(
       abs(y_shift_item_step),
-      1.5 * constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
+      1.5 * library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     )
   return curr_y_shift
 
@@ -1186,9 +1186,9 @@ def make_edge_legend(
     legend_items.append({
       'type': 'line',
       'size': line_size_px,
-      'text': constants.EDGE_TYPES[edge_type]['label'],
-      'color': constants.EDGE_TYPES[edge_type]['legend_color'],
-      'line_dash': constants.EDGE_TYPES[edge_type]['line_dash'],
+      'text': library_constants.EDGE_TYPES[edge_type]['label'],
+      'color': library_constants.EDGE_TYPES[edge_type]['legend_color'],
+      'line_dash': library_constants.EDGE_TYPES[edge_type]['line_dash'],
       'line_width': line_width_px,
     })
   return make_legend(
@@ -1225,8 +1225,8 @@ def make_variation_color_legend(
     legend_items.append({
       'type': 'circle',
       'size': node_size_px,
-      'text': constants.VARIATION_TYPES[var_type]['label'],
-      'color': constants.VARIATION_TYPES[var_type]['color'],
+      'text': library_constants.VARIATION_TYPES[var_type]['label'],
+      'color': library_constants.VARIATION_TYPES[var_type]['color'],
     })
   return make_legend(
     figure = figure,
@@ -1261,17 +1261,17 @@ def make_outline_legend(
     'type': 'circle',
     'size': node_size_px,
     'text': 'Reference',
-    'color': constants.GRAPH_BACKGROUND_COLOR,
-    'line_color': constants.REFERENCE_OUTLINE_COLOR,
-    'line_width': constants.REFERENCE_OUTLINE_WIDTH,
+    'color': library_constants.GRAPH_BACKGROUND_COLOR,
+    'line_color': library_constants.REFERENCE_OUTLINE_COLOR,
+    'line_width': library_constants.REFERENCE_OUTLINE_WIDTH,
   })
   legend_items.append({
     'type': 'circle',
     'size': node_size_px,
     'text': 'Non-reference',
-    'color': constants.GRAPH_BACKGROUND_COLOR,
-    'line_color': constants.DEFAULT_OUTLINE_COLOR,
-    'line_width': constants.DEFAULT_OUTLINE_WIDTH,
+    'color': library_constants.GRAPH_BACKGROUND_COLOR,
+    'line_color': library_constants.DEFAULT_OUTLINE_COLOR,
+    'line_width': library_constants.DEFAULT_OUTLINE_WIDTH,
   })
   return make_legend(
     figure = figure,
@@ -1368,26 +1368,26 @@ def make_freq_group_legend(
   legend_items.append({
     'type': 'circle',
     'size': node_size_px,
-    'text': constants.get_freq_ratio_label(
-      constants.FREQ_GROUP_A, treatment_1, treatment_2
+    'text': library_constants.get_freq_ratio_label(
+      library_constants.FREQ_GROUP_A, treatment_1, treatment_2
     ),
-    'color': constants.TREATMENT_COLOR[treatment_1],
+    'color': library_constants.TREATMENT_COLOR[treatment_1],
   })
   legend_items.append({
     'type': 'circle',
     'size': node_size_px,
-    'text': constants.get_freq_ratio_label(
-      constants.FREQ_GROUP_B, treatment_1, treatment_2
+    'text': library_constants.get_freq_ratio_label(
+      library_constants.FREQ_GROUP_B, treatment_1, treatment_2
     ),
-    'color': constants.SIMILAR_FREQ_COLOR,
+    'color': library_constants.SIMILAR_FREQ_COLOR,
   })
   legend_items.append({
     'type': 'circle',
     'size': node_size_px,
-    'text': constants.get_freq_ratio_label(
-      constants.FREQ_GROUP_C, treatment_1, treatment_2
+    'text': library_constants.get_freq_ratio_label(
+      library_constants.FREQ_GROUP_C, treatment_1, treatment_2
     ),
-    'color': constants.TREATMENT_COLOR[treatment_2],
+    'color': library_constants.TREATMENT_COLOR[treatment_2],
   })
   return make_legend(
     figure = figure,
@@ -1422,12 +1422,12 @@ def add_plotly_colorbar(
   # Note: Sometimes the entire plot disappears if the colorbar font is too large!
   # Fixes: Increase the colorbar length or make the fonts smaller.
   colorbar_height_px = (
-    constants.GRAPH_LEGEND_COLORBAR_HEIGHT_PX *
+    library_constants.GRAPH_LEGEND_COLORBAR_HEIGHT_PX *
     legend_colorbar_scale
   )
 
   colorbar_width_px =  (
-    constants.GRAPH_LEGEND_COLORBAR_WIDTH_PX *
+    library_constants.GRAPH_LEGEND_COLORBAR_WIDTH_PX *
     legend_colorbar_scale
   )
 
@@ -1447,17 +1447,17 @@ def add_plotly_colorbar(
         'outlinewidth': 2 * line_width_scale,
         'outlinecolor': 'black',
         'tickmode': 'array',
-        'tickvals': constants.FREQ_RATIO_COLOR_BAR_TICK_VALS,
-        'ticktext': constants.FREQ_RATIO_COLOR_BAR_TICK_TEXT,
+        'tickvals': library_constants.FREQ_RATIO_COLOR_BAR_TICK_VALS,
+        'ticktext': library_constants.FREQ_RATIO_COLOR_BAR_TICK_TEXT,
         'title': {
           'text': (
             'Frequency Ratio<br>'
             'Color Scale<br>'
-            f'[{constants.LABELS[treatment_1]} / {constants.LABELS[treatment_2]}]'
+            f'[{library_constants.LABELS[treatment_1]} / {library_constants.LABELS[treatment_2]}]'
           ),
-          'font_size': constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
+          'font_size': library_constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
         },
-        'tickfont_size': constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
+        'tickfont_size': library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
       },
     },
     row = row,
@@ -1519,11 +1519,11 @@ def make_custom_legends(
   elif node_color_type == 'freq_group':
     treatment_1_list = list(set(
       data_info['treatment_1'] for data_info in data_info_grid.ravel()
-      if data_info['format'] == constants.DATA_COMBINED
+      if data_info['format'] == library_constants.DATA_COMBINED
     ))
     treatment_2_list = list(set(
       data_info['treatment_2'] for data_info in data_info_grid.ravel()
-      if data_info['format'] == constants.DATA_COMBINED
+      if data_info['format'] == library_constants.DATA_COMBINED
     ))
     for treatment_1 in treatment_1_list:
       for treatment_2 in treatment_2_list:
@@ -1572,8 +1572,8 @@ def make_custom_legends(
     y_shift_curr_px = make_edge_legend(
       figure = figure,
       edge_type_list = edge_show_types,
-      line_size_px = constants.EDGE_LEGEND_ITEM_LINE_SIZE_PX,
-      line_width_px = constants.EDGE_LEGEND_ITEM_LINE_WIDTH_PX,
+      line_size_px = library_constants.EDGE_LEGEND_ITEM_LINE_SIZE_PX,
+      line_width_px = library_constants.EDGE_LEGEND_ITEM_LINE_WIDTH_PX,
       x_anchor = 1,
       y_anchor = 1,
       x_shift = legend_x_shift_px,
@@ -1634,7 +1634,7 @@ def make_graph_stats(
     xanchor = x_anchor,
     yanchor = y_anchor,
     align = 'left',
-    font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
+    font_size = library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     font_family = 'Monospace',
     text = (
       f'Num nodes:            {graph_stats["num_nodes"][0]}<br>'
@@ -1676,7 +1676,7 @@ def make_graph_stats_ref_component(
     y = [0],
     row = row,
     col = col,
-    marker_color = constants.GRAPH_BACKGROUND_COLOR,
+    marker_color = library_constants.GRAPH_BACKGROUND_COLOR,
     marker_size = 0,
     showlegend = False,
   )
@@ -1750,7 +1750,7 @@ def make_graph_stats_ref_component(
     xanchor = x_anchor,
     yanchor = y_anchor,
     align = 'left',
-    font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
+    font_size = library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     font_family = 'Monospace',
     text = (
       # data_set['label']['main'] + '<br>' +
@@ -1772,7 +1772,7 @@ def make_graph_single_panel(
   data_info,
   sequence_reverse_complement = False,
   node_type = 'sequence_data',
-  node_subst_type = constants.SUBST_WITHOUT,
+  node_subst_type = library_constants.SUBST_WITHOUT,
   node_filter_freq_min = 0,
   node_filter_freq_max = np.inf,
   node_filter_dist_min = 0,
@@ -1824,7 +1824,7 @@ def make_graph_single_panel(
   ### Node filtering / subgraph ###
   if node_filter_variation_types is not None:
     node_data = node_data.loc[node_data['variation_type'].isin(node_filter_variation_types)]
-  freq_rank_columns = constants.FREQ_RANK_COLUMNS[data_info['format']]
+  freq_rank_columns = library_constants.FREQ_RANK_COLUMNS[data_info['format']]
   node_data = node_data.loc[
     node_data[freq_rank_columns].min(axis='columns')
       .between(node_filter_freq_min, node_filter_freq_max, inclusive='both')
@@ -1897,7 +1897,7 @@ def make_graph_single_panel(
     show_node_labels = node_labels_show,
     node_label_columns = node_label_columns,
     node_label_position = node_label_position,
-    node_label_font_size = constants.GRAPH_LABEL_FONT_SIZE * font_size_scale,
+    node_label_font_size = library_constants.GRAPH_LABEL_FONT_SIZE * font_size_scale,
     node_type = node_type,
     node_color_type = node_color_type,
     node_size_type = node_size_type,
@@ -1937,13 +1937,13 @@ def make_graph_single_panel(
       position_label_type = (
         'absolute' if data_info['control'] == '30bpDown' else 'relative'
       )
-      x_axis_tick_text = constants.get_position_labels(
+      x_axis_tick_text = library_constants.get_position_labels(
         position_label_type,
         len(data_info['ref_seq'])
       )
       y_axis_tick_vals = list(range(
-        constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
-        constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
+        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
+        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
       ))
 
       x_axis_tick_vals = [
@@ -1956,15 +1956,15 @@ def make_graph_single_panel(
       y_axis_tick_text = [str(i) for i in y_axis_tick_vals]
 
       figure.update_xaxes(
-        title = constants.POSITION_TITLE[position_label_type],
+        title = library_constants.POSITION_TITLE[position_label_type],
         showgrid = True,
         showline = True,
         zeroline = True,
         dtick = 1,
         linecolor = 'black',
         linewidth = line_width_scale,
-        title_font_size = constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
-        tickfont_size = constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
+        title_font_size = library_constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
+        tickfont_size = library_constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
         ticktext = x_axis_tick_text,
         tickvals = x_axis_tick_vals,
         range = plot_range_x,
@@ -1972,8 +1972,8 @@ def make_graph_single_panel(
         col = col,
       )
       figure.update_yaxes(
-        title = constants.VARIATION_POSITION_LAYOUT_DISTANCE_LABEL[
-          constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN
+        title = library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_LABEL[
+          library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN
         ],
         showgrid = True,
         showline = True,
@@ -1981,8 +1981,8 @@ def make_graph_single_panel(
         dtick = 1,
         linecolor = 'black',
         linewidth = line_width_scale,
-        title_font_size = constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
-        tickfont_size = constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
+        title_font_size = library_constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
+        tickfont_size = library_constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
         ticktext = y_axis_tick_text,
         tickvals = y_axis_tick_vals,
         range = plot_range_y,
@@ -2024,12 +2024,12 @@ def make_graph_single_panel(
   if node_color_type == 'freq_ratio':
     figure.update_traces(
       marker = {
-        'colorscale': constants.get_freq_ratio_color_scale(
+        'colorscale': library_constants.get_freq_ratio_color_scale(
           data_info['treatment_1'],
           data_info['treatment_2'],
         ),
-        'cmin': constants.FREQ_RATIO_COLOR_SCALE_LOG_MIN,
-        'cmax': constants.FREQ_RATIO_COLOR_SCALE_LOG_MAX,
+        'cmin': library_constants.FREQ_RATIO_COLOR_SCALE_LOG_MIN,
+        'cmax': library_constants.FREQ_RATIO_COLOR_SCALE_LOG_MAX,
       },
       row = row,
       col = col,
@@ -2104,7 +2104,7 @@ def make_graph_figure(
   graph_layout_separate_components = True,
   sequence_reverse_complement = False,
   node_type = 'sequence_data',
-  node_subst_type = constants.SUBST_WITHOUT,
+  node_subst_type = library_constants.SUBST_WITHOUT,
   node_filter_variation_types = None,
   node_filter_freq_min = 0,
   node_filter_freq_max = np.inf,
@@ -2121,22 +2121,22 @@ def make_graph_figure(
   node_size_max_freq = 1,
   edge_show = True,
   edge_show_labels = False,
-  edge_show_types = list(constants.EDGE_TYPES),
+  edge_show_types = list(library_constants.EDGE_TYPES),
   edge_width_scale = 1,
   col_widths_px = None,
   row_heights_px = None,
-  row_space_px = constants.GRAPH_SUBPLOT_ROW_SPACE_PX,
-  col_space_px = constants.GRAPH_SUBPLOT_COL_SPACE_PX,
+  row_space_px = library_constants.GRAPH_SUBPLOT_ROW_SPACE_PX,
+  col_space_px = library_constants.GRAPH_SUBPLOT_COL_SPACE_PX,
   title = None,
-  title_height_px = constants.GRAPH_TITLE_HEIGHT_PX,
-  title_y_shift_px = constants.GRAPH_TITLE_HEIGHT_PX / 2,
+  title_height_px = library_constants.GRAPH_TITLE_HEIGHT_PX,
+  title_y_shift_px = library_constants.GRAPH_TITLE_HEIGHT_PX / 2,
   title_subplot_show = True,
   legend_plotly_show = False,
   legend_custom_show = True,
   legend_common = False,
-  legend_width_px = constants.GRAPH_LEGEND_WIDTH_PX,
+  legend_width_px = library_constants.GRAPH_LEGEND_WIDTH_PX,
   legend_x_shift_px = 0,
-  legend_vertical_space_px = constants.GRAPH_LEGEND_VERTICAL_SPACE_PX,
+  legend_vertical_space_px = library_constants.GRAPH_LEGEND_VERTICAL_SPACE_PX,
   legend_item_scale = 1,
   legend_colorbar_scale = 1,
   line_width_scale = 1,
@@ -2145,17 +2145,17 @@ def make_graph_figure(
   plot_range_y = None,
   graph_stats_show = False,
   graph_stats_separate = True,
-  graph_stats_subplot_px = constants.GRAPH_STATS_SUBPLOT_PX,
+  graph_stats_subplot_px = library_constants.GRAPH_STATS_SUBPLOT_PX,
   graph_stats_x = 0,
   graph_stats_y = 1,
   graph_stats_x_shift = 20,
   graph_stats_y_shift = -20,
   graph_stats_x_anchor = 'left',
   graph_stats_y_anchor = 'top',
-  margin_top_min_px = constants.GRAPH_MARGIN_TOP_MIN_PX,
-  margin_bottom_min_px = constants.GRAPH_MARGIN_BOTTOM_MIN_PX,
-  margin_left_min_px = constants.GRAPH_MARGIN_LEFT_MIN_PX,
-  margin_right_min_px = constants.GRAPH_MARGIN_RIGHT_MIN_PX,
+  margin_top_min_px = library_constants.GRAPH_MARGIN_TOP_MIN_PX,
+  margin_bottom_min_px = library_constants.GRAPH_MARGIN_BOTTOM_MIN_PX,
+  margin_left_min_px = library_constants.GRAPH_MARGIN_LEFT_MIN_PX,
+  margin_right_min_px = library_constants.GRAPH_MARGIN_RIGHT_MIN_PX,
   font_size_scale = 1,
   axis_show = False,
   axis_font_size_scale = 1,
@@ -2169,8 +2169,8 @@ def make_graph_figure(
       )
 
   if node_filter_variation_types is None:
-    node_filter_variation_types = list(constants.VARIATION_TYPES)
-  if node_subst_type == constants.SUBST_WITHOUT:
+    node_filter_variation_types = list(library_constants.VARIATION_TYPES)
+  if node_subst_type == library_constants.SUBST_WITHOUT:
     node_filter_variation_types = [
       x for x in node_filter_variation_types
       if x not in ['substitution', 'mixed']
@@ -2183,13 +2183,13 @@ def make_graph_figure(
   ]:
     if plot_range_x is None:
       plot_range_x = [
-        constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[0] - 1,
-        constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[1] + 1,
+        library_constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[0] - 1,
+        library_constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[1] + 1,
       ]
     if plot_range_y is None:
       plot_range_y = [
-        constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
-        constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
+        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
+        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
       ]
   elif 'plot_range' in LAYOUT_PROPERTIES[graph_layout_type]:
     if plot_range_x is None:
@@ -2222,9 +2222,9 @@ def make_graph_figure(
     shared_y_axes = False
 
   if row_heights_px is None:
-    row_heights_px = [constants.GRAPH_SUBPLOT_HEIGHT_PX] * num_rows_total
+    row_heights_px = [library_constants.GRAPH_SUBPLOT_HEIGHT_PX] * num_rows_total
   if col_widths_px is None:
-    col_widths_px = [constants.GRAPH_SUBPLOT_WIDTH_PX] * num_cols_total
+    col_widths_px = [library_constants.GRAPH_SUBPLOT_WIDTH_PX] * num_cols_total
 
   content_col_widths_with_stats_px = col_widths_px.copy()
   if graph_stats_separate:
@@ -2245,7 +2245,7 @@ def make_graph_figure(
 
   # For setting the subplot title font size
   figure.update_annotations(
-    font_size = constants.GRAPH_SUBPLOT_TITLE_FONT_SIZE * font_size_scale,
+    font_size = library_constants.GRAPH_SUBPLOT_TITLE_FONT_SIZE * font_size_scale,
   )
 
   for row in range(1, data_dir_grid.shape[0] + 1):
@@ -2375,9 +2375,9 @@ def make_graph_figure(
 
     font_color = 'black',
 
-    legend_title_font_size = constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
-    legend_grouptitlefont_size = constants.GRAPH_LEGEND_GROUP_TITLE_FONT_SIZE * font_size_scale,
-    legend_font_size = constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
+    legend_title_font_size = library_constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
+    legend_grouptitlefont_size = library_constants.GRAPH_LEGEND_GROUP_TITLE_FONT_SIZE * font_size_scale,
+    legend_font_size = library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     legend_itemsizing = 'constant',
     legend_itemwidth = 100,
     legend_yanchor = 'top',
@@ -2394,7 +2394,7 @@ def make_graph_figure(
     hoverlabel_font_family = 'Courier New, monospace',
     hoverlabel_bgcolor = 'white',
 
-    plot_bgcolor = constants.GRAPH_BACKGROUND_COLOR,
+    plot_bgcolor = library_constants.GRAPH_BACKGROUND_COLOR,
   )
 
   if LAYOUT_PROPERTIES[graph_layout_type].get('preserve_aspect', False):
@@ -2413,7 +2413,7 @@ def make_graph_figure(
       xanchor = 'center',
       yanchor = 'bottom',
       yshift = title_y_shift_px,
-      font_size = constants.GRAPH_TITLE_FONT_SIZE * font_size_scale,
+      font_size = library_constants.GRAPH_TITLE_FONT_SIZE * font_size_scale,
       showarrow = False,
     )
 
@@ -2448,22 +2448,22 @@ def get_plot_args(
   plot_type,
   title_show = False,
   sequence_reverse_complement = False,
-  node_subst_type = constants.SUBST_WITHOUT,
-  node_size_max_freq = constants.GRAPH_NODE_SIZE_MAX_FREQ,
-  node_size_min_freq = constants.GRAPH_NODE_SIZE_MIN_FREQ,
-  node_size_max_px = constants.GRAPH_NODE_SIZE_MAX_PX,
-  node_size_min_px = constants.GRAPH_NODE_SIZE_MIN_PX,
-  node_outline_width_scale = constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
-  node_filter_variation_types = constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
-  graph_width_px = constants.GRAPH_WIDTH_PX,
-  graph_height_px = constants.GRAPH_HEIGHT_PX,
+  node_subst_type = library_constants.SUBST_WITHOUT,
+  node_size_max_freq = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  node_size_min_freq = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  node_size_max_px = library_constants.GRAPH_NODE_SIZE_MAX_PX,
+  node_size_min_px = library_constants.GRAPH_NODE_SIZE_MIN_PX,
+  node_outline_width_scale = library_constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
+  node_filter_variation_types = library_constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
+  graph_width_px = library_constants.GRAPH_WIDTH_PX,
+  graph_height_px = library_constants.GRAPH_HEIGHT_PX,
   graph_layout_common_dir = None,
   graph_layout_separate_components = False,
-  edge_width_scale = constants.GRAPH_EDGE_WIDTH_SCALE,
-  line_width_scale = constants.GRAPH_LINE_WIDTH_SCALE,
-  font_size_scale = constants.GRAPH_FONT_SIZE_SCALE,
+  edge_width_scale = library_constants.GRAPH_EDGE_WIDTH_SCALE,
+  line_width_scale = library_constants.GRAPH_LINE_WIDTH_SCALE,
+  font_size_scale = library_constants.GRAPH_FONT_SIZE_SCALE,
   legend_show = False,
-  legend_colorbar_scale = constants.GRAPH_LEGEND_COLORBAR_SCALE,
+  legend_colorbar_scale = library_constants.GRAPH_LEGEND_COLORBAR_SCALE,
   plot_range_x = None,
   plot_range_y = None,
 ):
@@ -2510,7 +2510,7 @@ def get_plot_args(
   plot_args['plot_range_y'] = plot_range_y
 
   if title_show:
-    plot_title = constants.get_data_label(data_info)
+    plot_title = library_constants.get_data_label(data_info)
     plot_title += ' ' + {
       'kamada_layout': 'Kamada-Kawaii Layout',
       'radial_layout': 'Radial Layout',
@@ -2647,7 +2647,7 @@ def parse_args():
       'Max frequency to determine node size.' +
       'Higher frequencies are clipped to this value.'
     ),
-    default = constants.GRAPH_NODE_SIZE_MAX_FREQ,
+    default = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
   )
   parser.add_argument(
     '--node_min_freq',
@@ -2656,24 +2656,24 @@ def parse_args():
       'Min frequency to determine node size.' +
       'Lower frequencies are clipped to this value.'
     ),
-    default = constants.GRAPH_NODE_SIZE_MIN_FREQ,
+    default = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
   )
   parser.add_argument(
     '--node_max_px',
     type = float,
     help = 'Largest node size as determined by the frequency.',
-    default = constants.GRAPH_NODE_SIZE_MAX_PX,
+    default = library_constants.GRAPH_NODE_SIZE_MAX_PX,
   )
   parser.add_argument(
     '--node_min_px',
     type = float,
     help = 'Smallest node size as determined by the frequency.',
-    default = constants.GRAPH_NODE_SIZE_MIN_PX,
+    default = library_constants.GRAPH_NODE_SIZE_MIN_PX,
   )
   parser.add_argument(
     '--node_outline_scale',
     type = float,
-    default = constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
+    default = library_constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
     help = (
       'How much to scale the node outline width (thickness).' +
       ' Values > 1 increase the width; values < 1 decrease the width.'
@@ -2701,19 +2701,19 @@ def parse_args():
   parser.add_argument(
     '--width_px',
     type = int,
-    default = constants.GRAPH_WIDTH_PX,
+    default = library_constants.GRAPH_WIDTH_PX,
     help = 'The width of the plot in pixels.'
   )
   parser.add_argument(
     '--height_px',
     type = int,
-    default = constants.GRAPH_HEIGHT_PX,
+    default = library_constants.GRAPH_HEIGHT_PX,
     help = 'The height of the plot in pixels.'
   )
   parser.add_argument(
     '--line_width_scale',
     type = float,
-    default = constants.GRAPH_LINE_WIDTH_SCALE,
+    default = library_constants.GRAPH_LINE_WIDTH_SCALE,
     help = (
       'How much to scale the line widths (aka thickness).' +
       ' Values > 1 increase the width; values < 1 decrease the width.'
@@ -2722,7 +2722,7 @@ def parse_args():
   parser.add_argument(
     '--font_size_scale',
     type = float,
-    default = constants.GRAPH_FONT_SIZE_SCALE,
+    default = library_constants.GRAPH_FONT_SIZE_SCALE,
     help = (
       'How much to scale the font size.' +
       ' Values > 1 increase the font size; values < 1 decrease it.'
@@ -2792,7 +2792,7 @@ def parse_args():
   parser.add_argument(
     '--legend_color_bar_scale',
     type = float,
-    default = constants.GRAPH_LEGEND_COLORBAR_SCALE,
+    default = library_constants.GRAPH_LEGEND_COLORBAR_SCALE,
     help = 'How much to scale the legend color bar (for freq ratio coloring).'
   )
   parser.add_argument(
@@ -2861,7 +2861,7 @@ def main():
   # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout fractal --title --interactive'.split(' ')
   args = parse_args()
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
-  data_label = constants.get_data_label(data_info)
+  data_label = library_constants.get_data_label(data_info)
   plot_args = get_plot_args(
     data_info = data_info,
     plot_type = args.layout + '_layout',

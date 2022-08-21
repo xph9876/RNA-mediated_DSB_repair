@@ -11,7 +11,7 @@ import cigar_utils
 import fasta_utils
 import alignment_window
 import remove_substitution
-import constants as constants
+import library_constants
 
 import pandas as pd
 import numpy as np
@@ -21,17 +21,27 @@ import file_names as file_names
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Process data for downstream graph and variation position analysis.'
+    description = 'Process data for downstream graph and variation-position analysis.'
   )
   parser.add_argument(
     '-i',
     '--input',
     type = argparse.FileType(mode='r'),
     help = (
-      'Table of sequences produced with stage 1.\n'
-      'Column format: Sequence, CIGAR, Freq_1, Freq_2, etc.,\n'
-      'All the columns after CIGAR should be repeat frequencies.'
+      'Table of sequences produced with combine_repeats.py.' +
+      ' Column format: Sequence, CIGAR, Count_1, Count_2, ..., etc.' +
+      ' All the columns after CIGAR should be the counts for each repeat.'
     ),
+    required = True,
+  )
+  parser.add_argument(
+    '--total_reads',
+    type = int,
+    help = (
+      'Total reads for each file.'
+      ' Must be the same number of arguments as the number of Count columns in INPUT.'
+    ),
+    nargs = '+',
     required = True,
   )
   parser.add_argument(
@@ -114,11 +124,11 @@ def parse_args():
     '--treatment',
     type = str,
     choices = [
-      constants.TREATMENT_SENSE,
-      constants.TREATMENT_BRANCH,
-      constants.TREATMENT_CMV,
-      constants.TREATMENT_ANTISENSE,
-      constants.TREATMENT_SPLICING
+      library_constants.TREATMENT_SENSE,
+      library_constants.TREATMENT_BRANCH,
+      library_constants.TREATMENT_CMV,
+      library_constants.TREATMENT_ANTISENSE,
+      library_constants.TREATMENT_SPLICING
     ],
     help = 'Name of treatment.',
     required = True,
@@ -126,7 +136,7 @@ def parse_args():
   parser.add_argument(
     '--control',
     type = str,
-    choices = ['none', constants.CONTROL_NODSB, constants.CONTROL_30BPDOWN],
+    choices = ['none', library_constants.CONTROL_NODSB, library_constants.CONTROL_30BPDOWN],
     help = 'Whether this data is a control.',
     required = True,
   )
@@ -147,27 +157,27 @@ def parse_args():
   parser.add_argument(
     '--strand',
     type = str,
-    choices = [constants.STRAND_R1, constants.STRAND_R2],
+    choices = [library_constants.STRAND_R1, library_constants.STRAND_R2],
     help = 'Strand of the reads in this library.',
     required = True,
   )
   parser.add_argument(
     '--cell',
     type = str,
-    choices = [constants.CELL_WT, constants.CELL_KO],
+    choices = [library_constants.CELL_WT, library_constants.CELL_KO],
     help = 'Cell in this library.',
     required = True,
   )
   args = parser.parse_args()
   args.subst_type += 'Subst'
   args.dsb_type = {
-    '1': constants.DSB_1,
-    '2': constants.DSB_2,
-    '2a': constants.DSB_2anti,
+    '1': library_constants.DSB_1,
+    '2': library_constants.DSB_2,
+    '2a': library_constants.DSB_2anti,
   }[args.dsb_type]
   args.hguide = 'sg' + args.hguide
   if args.control == 'none':
-    args.control = constants.CONTROL_NOT
+    args.control = library_constants.CONTROL_NOT
   return args
 
 def make_alignment_windows(
@@ -281,17 +291,18 @@ def make_alignment_windows(
 
   # save the unfiltered repeat data
   data_repeats = data.drop('freq_repeat_min', axis='columns')
-  file_utils.write_tsv(data_repeats, file_names.main_repeats(output_dir, subst_type))
+  # file_utils.write_tsv(data_repeats, file_names.main_repeats(output_dir, subst_type))
+  file_utils.write_tsv(data_repeats, file_names.windows(output_dir, subst_type))
 
-  # filter the data with the minimum threshold
-  data = data.loc[data['freq_repeat_min'] > freq_min_threshold]
+  # # filter the data with the minimum threshold
+  # data = data.loc[data['freq_repeat_min'] > freq_min_threshold]
 
-  # average over repeats
-  data = data.groupby(['ref_align', 'read_align']).aggregate(
-    freq_mean = ('freq', 'mean')
-  ).reset_index()
-  data = data.sort_values('freq_mean', ascending = False).reset_index(drop=True)
-  file_utils.write_tsv(data, file_names.main(output_dir, subst_type))
+  # # average over repeats
+  # data = data.groupby(['ref_align', 'read_align']).aggregate(
+  #   freq_mean = ('freq', 'mean')
+  # ).reset_index()
+  # data = data.sort_values('freq_mean', ascending = False).reset_index(drop=True)
+  # file_utils.write_tsv(data, file_names.main(output_dir, subst_type))
 
 def make_data_info(
   dir,
@@ -314,9 +325,9 @@ def make_data_info(
     'control': control,
     'ref_seq': ref_seq_window,
   }
-  if (format == constants.DATA_INDIVIDUAL) and (len(treatments) == 1):
+  if (format == library_constants.DATA_INDIVIDUAL) and (len(treatments) == 1):
     data_info['treatment'] = treatments[0]
-  elif (format == constants.DATA_COMBINED) and (len(treatments) == 2):
+  elif (format == library_constants.DATA_COMBINED) and (len(treatments) == 2):
     data_info['treatment_1'] = treatments[0]
     data_info['treatment_2'] = treatments[1]
   else:
@@ -366,7 +377,7 @@ def main():
   )
   make_data_info(
     args.output,
-    constants.DATA_INDIVIDUAL,
+    library_constants.DATA_INDIVIDUAL,
     args.cell,
     args.dsb_type,
     args.hguide,

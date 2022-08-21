@@ -127,19 +127,21 @@ def get_experiment_info(**args):
     raise Exception(str(experiment_info.shape[0]) + ' experiment info results found')
 
 OUTPUT_DIR = {
-  'raw': 'libraries_0_raw',
-  'filter_nhej': 'libraries_1_filter_nhej',
-  'combine_repeats': 'libraries_2_combine_repeats',
-  'get_freqs': 'libraries_3_get_freqs',
-  'graph_processing': 'libraries_4_graph_processing',
+  'raw': 'data_0_raw',
+  'filter_nhej': 'data_1_filter_nhej',
+  'combine_repeats': 'data_2_combine_repeats',
+  'windows': 'data_3_windows',
+  'graph': 'data_4_graph',
+  'histogram_3d': 'data_5_histogram_3d',
 }
 
 # CONTINUE HERE !!!
 PYTHON_SCRIPTS = {
   'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
-  'combine_repeats': 'libraries_2_combine_repeats',
-  'get_freqs': 'libraries_3_get_freqs',
-  'graph_processing': 'libraries_4_graph_processing',
+  'combine_repeats': os.path.join('1_process_nhej', 'combine_repeats.py'),
+  'windows': os.path.join('1_process_nhej', 'get_windows.py'),
+  'windows_combined': os.path.join('1_process_nhej', 'get_windows.py'),
+  'graph': os.path.join('1_process_nhej', 'freqs.py'),
 }
 
 RUN_SCRIPTS = {

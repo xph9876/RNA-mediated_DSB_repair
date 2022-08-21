@@ -11,7 +11,7 @@ import file_utils
 import alignment_utils
 import log_utils
 import common_utils
-import constants as constants
+import library_constants as library_constants
 import graph_utils
 
 def parse_args():
@@ -96,7 +96,7 @@ def get_sequence_data(data, data_format):
   })
 
   all_data = pd.DataFrame(all_data)
-  all_data['freq_max'] = all_data[constants.FREQ_COLUMNS[data_format]].max(axis='columns')
+  all_data['freq_max'] = all_data[library_constants.FREQ_COLUMNS[data_format]].max(axis='columns')
   all_data = all_data.sort_values('freq_max', ascending=False)
   all_data = all_data.drop('freq_max', axis='columns')
   all_data['id'] = 'S' + pd.Series(range(1, all_data.shape[0] + 1), dtype=str)
@@ -107,8 +107,8 @@ def get_sequence_data(data, data_format):
       all_data,
       get_freq_ranks(
         all_data,
-        constants.FREQ_COLUMNS[data_format],
-        constants.FREQ_RANK_COLUMNS[data_format],
+        library_constants.FREQ_COLUMNS[data_format],
+        library_constants.FREQ_RANK_COLUMNS[data_format],
       )
     ],
     axis = 'columns',
@@ -316,8 +316,8 @@ def make_variation(dir, subst_type):
       variation_data,
       get_freq_ranks(
         variation_data,
-        constants.FREQ_COLUMNS[data_info['format']],
-        constants.FREQ_RANK_COLUMNS[data_info['format']],
+        library_constants.FREQ_COLUMNS[data_info['format']],
+        library_constants.FREQ_RANK_COLUMNS[data_info['format']],
       )
     ],
     axis = 'columns',
@@ -336,7 +336,7 @@ def make_variation_grouped(dir, subst_type):
 
   variation_data = file_utils.read_tsv(file_names.variation(dir, subst_type))
   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
-  freq_column_list = constants.FREQ_COLUMNS[data_info['format']]
+  freq_column_list = library_constants.FREQ_COLUMNS[data_info['format']]
   variation_data = variation_data[[
     'id',
     *freq_column_list,
@@ -370,7 +370,7 @@ def make_variation_grouped(dir, subst_type):
       get_freq_ranks(
         variation_data,
         freq_column_list,
-        constants.FREQ_RANK_COLUMNS[data_info['format']],
+        library_constants.FREQ_RANK_COLUMNS[data_info['format']],
       )
     ],
     axis = 'columns',

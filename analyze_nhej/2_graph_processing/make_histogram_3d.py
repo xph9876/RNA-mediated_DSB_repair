@@ -11,7 +11,7 @@ import common_utils
 import file_utils
 import log_utils
 import file_names
-import constants
+import library_constants
 
 def get_figure_args_pyplot(
   col_widths_px,
@@ -73,7 +73,7 @@ def get_variation_data(
   ref_length = len(data_info['ref_seq'])
 
   data_long = file_utils.read_tsv(
-    file_names.variation_grouped(data_info['dir'], constants.SUBST_WITH)
+    file_names.variation_grouped(data_info['dir'], library_constants.SUBST_WITH)
   )
   data_long = data_long.loc[data_long['variation_type'] == variation_type]
   if reverse_pos:
@@ -121,16 +121,16 @@ def plot_histogram_3d_impl(
   axis,
   show_title,
   label_type,
-  tick_modulus = constants.HISTOGRAM_3D_AXIS_TICK_MODULUS,
-  axis_label_font_size = constants.HISTOGRAM_3D_AXIS_LABEL_FONT_SIZE,
-  axis_tick_font_size = constants.HISTOGRAM_3D_AXIS_TICK_FONT_SIZE,
-  font_size_scale = constants.HISTOGRAM_3D_TITLE_FONT_SIZE,
+  tick_modulus = library_constants.HISTOGRAM_3D_AXIS_TICK_MODULUS,
+  axis_label_font_size = library_constants.HISTOGRAM_3D_AXIS_LABEL_FONT_SIZE,
+  axis_tick_font_size = library_constants.HISTOGRAM_3D_AXIS_TICK_FONT_SIZE,
+  font_size_scale = library_constants.HISTOGRAM_3D_TITLE_FONT_SIZE,
   label_pad_px = 10,
   reverse_pos = False,
 ):
 
   ref_length = len(data_info['ref_seq'])
-  ref_pos_labels = constants.get_position_labels(label_type, ref_length)
+  ref_pos_labels = library_constants.get_position_labels(label_type, ref_length)
 
   if freq_log:
     freq_min_axis = np.log10(freq_min)
@@ -146,7 +146,7 @@ def plot_histogram_3d_impl(
     reverse_pos = reverse_pos,
   )
 
-  color = constants.VARIATION_TYPES[variation_type]['color_3d']
+  color = library_constants.VARIATION_TYPES[variation_type]['color_3d']
 
   x = data_sub_long.iloc[:, 0].to_numpy()
   y = data_sub_long.iloc[:, 1].to_numpy()
@@ -238,8 +238,8 @@ def plot_histogram_3d_impl(
 
   if show_title:
     axis.set_title(
-      constants.LABELS[data_info['control']] + ' ' + variation_type.capitalize(),
-      fontsize = constants.HISTOGRAM_3D_TITLE_FONT_SIZE * font_size_scale,
+      library_constants.LABELS[data_info['control']] + ' ' + variation_type.capitalize(),
+      fontsize = library_constants.HISTOGRAM_3D_TITLE_FONT_SIZE * font_size_scale,
     )
 
 def plot_histogram_3d(
@@ -264,19 +264,19 @@ def plot_histogram_3d(
       'proj_type': 'ortho',
     },
     **get_figure_args_pyplot(
-      col_widths_px = [constants.HISTOGRAM_3D_WIDTH_PX],
-      row_heights_px = [constants.HISTOGRAM_3D_HEIGHT_PX],
+      col_widths_px = [library_constants.HISTOGRAM_3D_WIDTH_PX],
+      row_heights_px = [library_constants.HISTOGRAM_3D_HEIGHT_PX],
       col_space_px = 0,
       row_space_px = 0,
-      margin_left_px = constants.HISTOGRAM_3D_MARGIN_LEFT_PX,
-      margin_right_px = constants.HISTOGRAM_3D_MARGIN_RIGHT_PX,
-      margin_top_px = constants.HISTOGRAM_3D_MARGIN_TOP_PX,
-      margin_bottom_px = constants.HISTOGRAM_3D_MARGIN_BOTTOM_PX,
-      dpi = constants.HISTOGRAM_3D_DPI,
+      margin_left_px = library_constants.HISTOGRAM_3D_MARGIN_LEFT_PX,
+      margin_right_px = library_constants.HISTOGRAM_3D_MARGIN_RIGHT_PX,
+      margin_top_px = library_constants.HISTOGRAM_3D_MARGIN_TOP_PX,
+      margin_bottom_px = library_constants.HISTOGRAM_3D_MARGIN_BOTTOM_PX,
+      dpi = library_constants.HISTOGRAM_3D_DPI,
     ),
   )
 
-  font_size_scale = constants.HISTOGRAM_3D_FONT_SIZE_SCALE
+  font_size_scale = library_constants.HISTOGRAM_3D_FONT_SIZE_SCALE
 
   plot_histogram_3d_impl(
     data_info = data_info,
@@ -287,15 +287,15 @@ def plot_histogram_3d(
     axis = axis,
     show_title = False,
     label_type = label_type,
-    tick_modulus = constants.HISTOGRAM_3D_AXIS_TICK_MODULUS,
+    tick_modulus = library_constants.HISTOGRAM_3D_AXIS_TICK_MODULUS,
     font_size_scale = font_size_scale,
     reverse_pos = reverse_pos,
   )
 
   if show_title:
     figure.suptitle(
-      constants.get_data_label(data_info) + '\n' + variation_type, 
-      fontsize = constants.HISTOGRAM_3D_TITLE_FONT_SIZE * font_size_scale,
+      library_constants.get_data_label(data_info) + '\n' + variation_type, 
+      fontsize = library_constants.HISTOGRAM_3D_TITLE_FONT_SIZE * font_size_scale,
     )
 
   log_utils.log(file_out)
@@ -351,14 +351,14 @@ def main():
   # ]
   args = parse_args()
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
-  data_label = constants.get_data_label(data_info)
+  data_label = library_constants.get_data_label(data_info)
   for variation_type in ['substitution', 'insertion', 'deletion']:
     plot_histogram_3d(
       os.path.join(args.output, file_names.histogram_3d(data_label, variation_type)),
       data_info,
       variation_type,
-      freq_min = constants.HISTOGRAM_3D_FREQ_MIN,
-      freq_max = constants.HISTOGRAM_3D_FREQ_MAX,
+      freq_min = library_constants.HISTOGRAM_3D_FREQ_MIN,
+      freq_max = library_constants.HISTOGRAM_3D_FREQ_MAX,
       freq_log = True,
       label_type = args.label_type,
       show_title = False,

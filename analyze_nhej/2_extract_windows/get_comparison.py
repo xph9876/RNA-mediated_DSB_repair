@@ -8,12 +8,12 @@ import argparse
 import shutil
 
 import common_utils
-import constants
+import library_constants
 import file_names
 import file_utils
 import log_utils
 
-import make_main_data
+import get_windows
 
 def parse_args():
   parser = argparse.ArgumentParser(
@@ -122,9 +122,9 @@ if __name__ == '__main__':
   )
 
   # Make the combined info
-  make_main_data.make_data_info(
+  get_windows.make_data_info(
     args.output,
-    constants.DATA_COMBINED,
+    library_constants.DATA_COMBINED,
     data_info_1['cell_line'],
     data_info_1['dsb_type'],
     data_info_1['hguide'],
