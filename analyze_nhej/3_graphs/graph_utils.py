@@ -42,7 +42,7 @@ def is_alignment_adjacent_2(read_align_1, read_align_2):
   return get_alignment_distance_2(read_align_1, read_align_2) == 1
 
 def load_graph(dir, subst_type):
-  node_data = file_utils.read_tsv(file_names.vertex_data(dir, subst_type))
+  node_data = file_utils.read_tsv(file_names.sequence_data(dir, subst_type))
   node_data = node_data.set_index('id', drop=False)
   edge_data = file_utils.read_tsv(file_names.edge_data(dir, subst_type))
   graph = nx.Graph()

@@ -42,7 +42,7 @@ def parse_args():
   args.subst_type += 'Subst'
   return args
 
-def get_vertex_data(data, data_format):
+def get_sequence_data(data, data_format):
   """
     Get the data for the vertices of the graph.
   """
@@ -106,19 +106,19 @@ def get_vertex_data(data, data_format):
 
   return pd.DataFrame(all_data)
 
-def write_vertex_data(input_dir, output_dir, subst_type):
+def write_sequence_data(input_dir, output_dir, subst_type):
   """
     Make the main node data and write it to a file.
   """
 
   data = file_utils.read_tsv(file_names.windows(input_dir, subst_type))
   data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
-  data = get_vertex_data(data, data_info['format'])
-  out_file_name = file_names.vertex_data(output_dir, subst_type)
+  data = get_sequence_data(data, data_info['format'])
+  out_file_name = file_names.sequence_data(output_dir, subst_type)
   file_utils.write_tsv(data, out_file_name)
   log_utils.log(out_file_name)
 
-def get_edge_data(vertex_data):
+def get_edge_data(sequence_data):
   """
     Make adjacency edge data from sequence data.
   """
@@ -133,7 +133,7 @@ def get_edge_data(vertex_data):
     'variation_type_b': [],
     'edge_type': [],
   }
-  for row_a, row_b in itertools.combinations(vertex_data.to_dict('records'), 2):
+  for row_a, row_b in itertools.combinations(sequence_data.to_dict('records'), 2):
     ref_align_a = row_a['ref_align']
     read_align_a = row_a['read_align']
     ref_align_b = row_b['ref_align']
@@ -169,15 +169,15 @@ def write_edge_data(output_dir, subst_type):
     Make adjacency edge data and write to file.
     Sequence data should have been created already.
   """
-  in_file_name = file_names.vertex_data(output_dir, subst_type)
+  in_file_name = file_names.sequence_data(output_dir, subst_type)
   out_file_name = file_names.edge_data(output_dir, subst_type)
 
-  vertex_data = file_utils.read_tsv(in_file_name)
-  edge_data = get_edge_data(vertex_data)
+  sequence_data = file_utils.read_tsv(in_file_name)
+  edge_data = get_edge_data(sequence_data)
   file_utils.write_tsv(edge_data, out_file_name)
   log_utils.log(out_file_name)
 
-def get_distance_matrix(vertex_data):
+def get_distance_matrix(sequence_data):
   """
     Get pairwise distances between vertices.
   """
@@ -186,7 +186,7 @@ def get_distance_matrix(vertex_data):
     'id_b': [],
     'dist': [],
   }
-  for row_a, row_b in itertools.combinations(vertex_data.to_dict('records'), 2):
+  for row_a, row_b in itertools.combinations(sequence_data.to_dict('records'), 2):
     read_align_a = row_a['read_align']
     read_align_b = row_b['read_align']
     distance_matrix['id_a'].append(row_a['id'])
@@ -206,11 +206,11 @@ def write_distance_matrix(output_dir, subst_type):
     Sequence data should have been created already.
   """
 
-  in_file_name = file_names.vertex_data(output_dir, subst_type)
+  in_file_name = file_names.sequence_data(output_dir, subst_type)
   out_file_name = file_names.distance_matrix(output_dir, subst_type)
 
-  vertex_data = file_utils.read_tsv(in_file_name)
-  distance_matrix = get_distance_matrix(vertex_data)
+  sequence_data = file_utils.read_tsv(in_file_name)
+  distance_matrix = get_distance_matrix(sequence_data)
   file_utils.write_tsv(distance_matrix, out_file_name)
   log_utils.log(out_file_name)
 
@@ -293,7 +293,7 @@ def write_graph_stats(output_dir, subst_type):
 #   out_file_name = file_names.variation(dir, subst_type)
 #   log_utils.log(out_file_name)
 
-#   sequence_data = file_utils.read_tsv(file_names.vertex_data(dir, subst_type))
+#   sequence_data = file_utils.read_tsv(file_names.sequence_data(dir, subst_type))
 #   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
 #   variation_data = split_seqs_into_variations(sequence_data)
 
@@ -382,7 +382,7 @@ def main():
   input_data_info_file = file_names.data_info(args.input)
   output_data_info_file = file_names.data_info(args.output)
   shutil.copy(input_data_info_file, output_data_info_file)
-  write_vertex_data(args.input, args.output, args.subst_type)
+  write_sequence_data(args.input, args.output, args.subst_type)
   write_edge_data(args.output, args.subst_type)
   write_distance_matrix(args.output, args.subst_type)
   write_graph_stats(args.output, args.subst_type)

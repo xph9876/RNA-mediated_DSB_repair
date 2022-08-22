@@ -94,7 +94,7 @@ def get_common_layout(
     reverse complemented before joining with the common layout.
   """
   layout = file_utils.read_tsv(
-    file_names.vertex_data(
+    file_names.sequence_data(
       common_layout_dir,
       node_subst_type,
     )
@@ -139,7 +139,7 @@ def make_common_layout(
   ### Load node data and edge data ###
   seq_data_list = [
     file_utils.read_tsv(
-      file_names.vertex_data(data_dir, subst_type)
+      file_names.sequence_data(data_dir, subst_type)
     )
     for data_dir in data_dir_list
   ]
@@ -230,7 +230,7 @@ def make_common_layout(
   seq_data = seq_data.reset_index(drop=True)
 
   ### Write to files ###
-  file_out = file_names.vertex_data(output_dir, subst_type)
+  file_out = file_names.sequenec_data(output_dir, subst_type)
   log_utils.log(file_out)
   file_utils.write_tsv(seq_data, file_out)
   file_out = file_names.edge_data(output_dir, subst_type)

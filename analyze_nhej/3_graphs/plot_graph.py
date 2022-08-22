@@ -1809,7 +1809,7 @@ def make_graph_single_panel(
 ):
   ### Load node data ###
   if node_type == 'sequence_data':
-    node_data = file_utils.read_tsv(file_names.vertex_data(data_info['dir'], node_subst_type))
+    node_data = file_utils.read_tsv(file_names.sequence_data(data_info['dir'], node_subst_type))
   elif node_type == 'variation':
     node_data = file_utils.read_tsv(file_names.variation(data_info['dir'], node_subst_type))
   elif node_type == 'variation_grouped':
@@ -2890,7 +2890,7 @@ def main():
   figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
 
   sequence_data = file_utils.read_tsv(
-    file_names.vertex_data(data_info['dir'], args.subst_type)
+    file_names.sequence_data(data_info['dir'], args.subst_type)
   )
   if args.universal_layout_y_axis_insertion_max_tick is None:
     try:
