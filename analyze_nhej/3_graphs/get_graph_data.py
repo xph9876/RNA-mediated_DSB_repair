@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import itertools
 import pandas as pd
 import argparse
+import shutil
 
 import file_names
 import file_utils
@@ -16,15 +17,18 @@ import graph_utils
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Process data for the graph and variation position analysis.'
+    description = 'Process data for the graph analysis.'
   )
   parser.add_argument(
-    '--dir',
+    '--input',
     type = common_utils.check_dir,
-    help = (
-      'Directory where data for experiment is.' +
-      ' Should already contain the files generated with get_windows.py.'
-    ),
+    help = 'Directory where output from "windows" stage is located.',
+    required = True,
+  )
+  parser.add_argument(
+    '--output',
+    type = common_utils.check_dir_output,
+    help = 'Output directory.',
     required = True,
   )
   parser.add_argument(
@@ -38,9 +42,9 @@ def parse_args():
   args.subst_type += 'Subst'
   return args
 
-def get_sequence_data(data, data_format):
+def get_vertex_data(data, data_format):
   """
-    Get the data for each of the nodes of the graph.
+    Get the data for the vertices of the graph.
   """
   dist_ref = []
   variation_type = []
@@ -102,19 +106,19 @@ def get_sequence_data(data, data_format):
 
   return pd.DataFrame(all_data)
 
-def write_sequence_data(dir, subst_type):
+def write_vertex_data(input_dir, output_dir, subst_type):
   """
     Make the main node data and write it to a file.
   """
-  out_file_name = file_names.sequence_data(dir, subst_type)
 
-  data = file_utils.read_tsv(file_names.main(dir, subst_type))
-  data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
-  log_utils.log(out_file_name)
-  data = get_sequence_data(data, data_info['format'])
+  data = file_utils.read_tsv(file_names.windows(input_dir, subst_type))
+  data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
+  data = get_vertex_data(data, data_info['format'])
+  out_file_name = file_names.vertex_data(output_dir, subst_type)
   file_utils.write_tsv(data, out_file_name)
+  log_utils.log(out_file_name)
 
-def get_edge_data(sequence_data):
+def get_edge_data(vertex_data):
   """
     Make adjacency edge data from sequence data.
   """
@@ -129,7 +133,7 @@ def get_edge_data(sequence_data):
     'variation_type_b': [],
     'edge_type': [],
   }
-  for row_a, row_b in itertools.combinations(sequence_data.to_dict('records'), 2):
+  for row_a, row_b in itertools.combinations(vertex_data.to_dict('records'), 2):
     ref_align_a = row_a['ref_align']
     read_align_a = row_a['read_align']
     ref_align_b = row_b['ref_align']
@@ -160,30 +164,29 @@ def get_edge_data(sequence_data):
       edges['edge_type'].append(edge_type)
   return pd.DataFrame(edges)
 
-def write_edge_data(dir, subst_type):
+def write_edge_data(output_dir, subst_type):
   """
     Make adjacency edge data and write to file.
     Sequence data should have been created already.
   """
-  in_file_name = file_names.sequence_data(dir, subst_type)
-  out_file_name = file_names.edge_data(dir, subst_type)
+  in_file_name = file_names.vertex_data(output_dir, subst_type)
+  out_file_name = file_names.edge_data(output_dir, subst_type)
 
-  log_utils.log(out_file_name)
-  sequence_data = file_utils.read_tsv(in_file_name)
-  edge_data = get_edge_data(sequence_data)
+  vertex_data = file_utils.read_tsv(in_file_name)
+  edge_data = get_edge_data(vertex_data)
   file_utils.write_tsv(edge_data, out_file_name)
+  log_utils.log(out_file_name)
 
-def get_distance_matrix(sequence_data):
+def get_distance_matrix(vertex_data):
   """
-    Get pairwise distances between nodes.
-    Sequence data should have been created already.
+    Get pairwise distances between vertices.
   """
   distance_matrix = {
     'id_a': [],
     'id_b': [],
     'dist': [],
   }
-  for row_a, row_b in itertools.combinations(sequence_data.to_dict('records'), 2):
+  for row_a, row_b in itertools.combinations(vertex_data.to_dict('records'), 2):
     read_align_a = row_a['read_align']
     read_align_b = row_b['read_align']
     distance_matrix['id_a'].append(row_a['id'])
@@ -197,192 +200,195 @@ def get_distance_matrix(sequence_data):
     
   return pd.DataFrame(distance_matrix)
 
-def write_distance_matrix(dir, subst_type):
+def write_distance_matrix(output_dir, subst_type):
   """
     Get distance matrix and write to file.
     Sequence data should have been created already.
   """
 
-  in_file_name = file_names.sequence_data(dir, subst_type)
-  out_file_name = file_names.distance_matrix(dir, subst_type)
+  in_file_name = file_names.vertex_data(output_dir, subst_type)
+  out_file_name = file_names.distance_matrix(output_dir, subst_type)
 
-  log_utils.log(out_file_name)
-  sequence_data = file_utils.read_tsv(in_file_name)
-  distance_matrix = get_distance_matrix(sequence_data)
+  vertex_data = file_utils.read_tsv(in_file_name)
+  distance_matrix = get_distance_matrix(vertex_data)
   file_utils.write_tsv(distance_matrix, out_file_name)
+  log_utils.log(out_file_name)
 
-
-def write_graph_stats(dir, subst_type):
+def write_graph_stats(output_dir, subst_type):
   """
     Get graph summary statistics and write to file.
     Sequence data and edge data should have been created already.
   """
-  out_file_name = file_names.graph_stats(dir, subst_type)
-  log_utils.log(out_file_name)
 
-  graph = graph_utils.load_graph(dir, subst_type)
-  data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
+  graph = graph_utils.load_graph(output_dir, subst_type)
+  data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
   graph_stats = graph_utils.get_graph_stats_ref_component(data_info['format'], graph)
   graph_stats = pd.DataFrame.from_records([graph_stats])
+  out_file_name = file_names.graph_stats(output_dir, subst_type)
   file_utils.write_tsv(graph_stats, out_file_name)
-
-def split_seqs_into_variations(sequence_data):
-  """
-    Split sequences into it's individual variations.
-  """
-  variation_data = sequence_data.copy()
-  variation_data = variation_data.rename({'id': 'seq_id'}, axis='columns')
-
-  # Explode the different variations
-  variation_data = variation_data.rename(
-    {
-      'ref_align': 'ref_align',
-      'read_align': 'read_align',
-      'mid_align': 'mid_align',
-      'variation_type': 'variation_type_seq',
-    },
-    axis = 'columns',
-  )
-  if variation_data.shape[0] > 0:
-    variation_data['variation_info'] = (
-      variation_data.apply(
-        lambda x: [
-          dict(zip(['variation_pos', 'variation_type', 'variation_letter'], info_tuple))
-          for info_tuple in alignment_utils.get_variation_info(x['ref_align'], x['read_align'])
-        ],
-        axis = 'columns',
-      )
-    )
-  else:
-    variation_data['variation_info'] = []
-
-  variation_data = variation_data.loc[variation_data['variation_info'].apply(len) > 0]
-  variation_data = variation_data.explode('variation_info', ignore_index=True)
-  if variation_data.shape[0] > 0:
-    variation_data[['variation_pos', 'variation_type', 'variation_letter']] = (
-      variation_data['variation_info'].apply(
-        lambda x: pd.Series([x['variation_pos'], x['variation_type'], x['variation_letter']])
-      )
-    )
-  else:
-    variation_data['variation_pos'] = []
-    variation_data['variation_type'] = []
-    variation_data['variation_letter'] = []
-  variation_data = variation_data.drop('variation_info', axis='columns')
-
-  # Add the variation IDs
-  variation_data['id'] = (
-    variation_data['seq_id'] + '_V' +
-    (variation_data.groupby('seq_id')['seq_id'].cumcount() + 1).astype(str)
-  )
-
-  # Reorder the columns
-  columns = ['id', 'seq_id']
-  columns += list(variation_data.columns[~variation_data.columns.isin(columns)])
-  variation_data = variation_data[columns]
-
-  return variation_data
-
-def write_variation(dir, subst_type):
-  """
-    Make data on individual variations and write to file.
-    Sequence data should already be created.
-  """
-  out_file_name = file_names.variation(dir, subst_type)
   log_utils.log(out_file_name)
 
-  sequence_data = file_utils.read_tsv(file_names.sequence_data(dir, subst_type))
-  data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
-  variation_data = split_seqs_into_variations(sequence_data)
+# def split_seqs_into_variations(sequence_data):
+#   """
+#     Split sequences into it's individual variations.
+#   """
+#   variation_data = sequence_data.copy()
+#   variation_data = variation_data.rename({'id': 'seq_id'}, axis='columns')
 
-  variation_data = pd.concat(
-    [
-      variation_data,
-      get_freq_ranks(
-        variation_data,
-        library_constants.FREQ_COLUMNS[data_info['format']],
-        library_constants.FREQ_RANK_COLUMNS[data_info['format']],
-      )
-    ],
-    axis = 'columns',
-  )
-  file_utils.write_tsv(variation_data, out_file_name)
+#   # Explode the different variations
+#   variation_data = variation_data.rename(
+#     {
+#       'ref_align': 'ref_align',
+#       'read_align': 'read_align',
+#       'mid_align': 'mid_align',
+#       'variation_type': 'variation_type_seq',
+#     },
+#     axis = 'columns',
+#   )
+#   if variation_data.shape[0] > 0:
+#     variation_data['variation_info'] = (
+#       variation_data.apply(
+#         lambda x: [
+#           dict(zip(['variation_pos', 'variation_type', 'variation_letter'], info_tuple))
+#           for info_tuple in alignment_utils.get_variation_info(x['ref_align'], x['read_align'])
+#         ],
+#         axis = 'columns',
+#       )
+#     )
+#   else:
+#     variation_data['variation_info'] = []
 
-def write_variation_grouped(dir, subst_type):
-  """
-    Groups the variation data by position and number of variations on sequence.
-    This data is used for the 3D variation-position histograms.
-    Variation data should have already been made.
-  """
-  out_file_name = file_names.variation_grouped(dir, subst_type)
+#   variation_data = variation_data.loc[variation_data['variation_info'].apply(len) > 0]
+#   variation_data = variation_data.explode('variation_info', ignore_index=True)
+#   if variation_data.shape[0] > 0:
+#     variation_data[['variation_pos', 'variation_type', 'variation_letter']] = (
+#       variation_data['variation_info'].apply(
+#         lambda x: pd.Series([x['variation_pos'], x['variation_type'], x['variation_letter']])
+#       )
+#     )
+#   else:
+#     variation_data['variation_pos'] = []
+#     variation_data['variation_type'] = []
+#     variation_data['variation_letter'] = []
+#   variation_data = variation_data.drop('variation_info', axis='columns')
 
-  log_utils.log(out_file_name)
+#   # Add the variation IDs
+#   variation_data['id'] = (
+#     variation_data['seq_id'] + '_V' +
+#     (variation_data.groupby('seq_id')['seq_id'].cumcount() + 1).astype(str)
+#   )
 
-  variation_data = file_utils.read_tsv(file_names.variation(dir, subst_type))
-  data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
-  freq_column_list = library_constants.FREQ_COLUMNS[data_info['format']]
-  variation_data = variation_data[[
-    'id',
-    *freq_column_list,
-    'dist_ref',
-    'variation_pos',
-    'variation_type',
-    'variation_letter',
-  ]]
+#   # Reorder the columns
+#   columns = ['id', 'seq_id']
+#   columns += list(variation_data.columns[~variation_data.columns.isin(columns)])
+#   variation_data = variation_data[columns]
+
+#   return variation_data
+
+# def write_variation(dir, subst_type):
+#   """
+#     Make data on individual variations and write to file.
+#     Sequence data should already be created.
+#   """
+#   out_file_name = file_names.variation(dir, subst_type)
+#   log_utils.log(out_file_name)
+
+#   sequence_data = file_utils.read_tsv(file_names.vertex_data(dir, subst_type))
+#   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
+#   variation_data = split_seqs_into_variations(sequence_data)
+
+#   variation_data = pd.concat(
+#     [
+#       variation_data,
+#       get_freq_ranks(
+#         variation_data,
+#         library_constants.FREQ_COLUMNS[data_info['format']],
+#         library_constants.FREQ_RANK_COLUMNS[data_info['format']],
+#       )
+#     ],
+#     axis = 'columns',
+#   )
+#   file_utils.write_tsv(variation_data, out_file_name)
+
+# def write_variation_grouped(dir, subst_type):
+#   """
+#     Groups the variation data by position and number of variations on sequence.
+#     This data is used for the 3D variation-position histograms.
+#     Variation data should have already been made.
+#   """
+#   out_file_name = file_names.variation_grouped(dir, subst_type)
+
+#   log_utils.log(out_file_name)
+
+#   variation_data = file_utils.read_tsv(file_names.variation(dir, subst_type))
+#   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
+#   freq_column_list = library_constants.FREQ_COLUMNS[data_info['format']]
+#   variation_data = variation_data[[
+#     'id',
+#     *freq_column_list,
+#     'dist_ref',
+#     'variation_pos',
+#     'variation_type',
+#     'variation_letter',
+#   ]]
   
-  aggregate_args = {}
-  for freq_column in freq_column_list:
-    aggregate_args[freq_column] = (freq_column, 'sum')
-  aggregate_args['var_id'] = ('id', common_utils.join_with_comma)
-  variation_data = variation_data.groupby([
-    'dist_ref',
-    'variation_pos',
-    'variation_type',
-    'variation_letter',
-  ]).aggregate(**aggregate_args).reset_index()
+#   aggregate_args = {}
+#   for freq_column in freq_column_list:
+#     aggregate_args[freq_column] = (freq_column, 'sum')
+#   aggregate_args['var_id'] = ('id', common_utils.join_with_comma)
+#   variation_data = variation_data.groupby([
+#     'dist_ref',
+#     'variation_pos',
+#     'variation_type',
+#     'variation_letter',
+#   ]).aggregate(**aggregate_args).reset_index()
 
-  freq_min = variation_data[freq_column_list].min(axis='columns')
-  freq_min = freq_min.sort_values(ascending=False)
-  variation_data = variation_data.loc[freq_min.index]
-  variation_data['id'] = (
-    'GV' + pd.Series(range(1, variation_data.shape[0] + 1), dtype=str)
-  )
+#   freq_min = variation_data[freq_column_list].min(axis='columns')
+#   freq_min = freq_min.sort_values(ascending=False)
+#   variation_data = variation_data.loc[freq_min.index]
+#   variation_data['id'] = (
+#     'GV' + pd.Series(range(1, variation_data.shape[0] + 1), dtype=str)
+#   )
 
-  variation_data = pd.concat(
-    [
-      variation_data,
-      get_freq_ranks(
-        variation_data,
-        freq_column_list,
-        library_constants.FREQ_RANK_COLUMNS[data_info['format']],
-      )
-    ],
-    axis = 'columns',
-  )
+#   variation_data = pd.concat(
+#     [
+#       variation_data,
+#       get_freq_ranks(
+#         variation_data,
+#         freq_column_list,
+#         library_constants.FREQ_RANK_COLUMNS[data_info['format']],
+#       )
+#     ],
+#     axis = 'columns',
+#   )
 
-  variation_data = variation_data[
-    ['id', 'var_id'] +
-    list(variation_data.columns[~variation_data.columns.isin(['id', 'var_id'])])
-  ]
-  file_utils.write_tsv(variation_data, out_file_name)
+#   variation_data = variation_data[
+#     ['id', 'var_id'] +
+#     list(variation_data.columns[~variation_data.columns.isin(['id', 'var_id'])])
+#   ]
+#   file_utils.write_tsv(variation_data, out_file_name)
 
-def exhaustive_cycle_search(nodes, edge_list, cycle_size):
-  found_cycles = {}
-  for node_subset in itertools.combinations(nodes, cycle_size):
-    for i in range(cycle_size):
-      j = (i + 1) % cycle_size
-      if (node_subset[i], node_subset[j]) in edge_list:
-        found_cycles.add(tuple(sorted(node_subset)))
-  return len(found_cycles)
+# def exhaustive_cycle_search(nodes, edge_list, cycle_size):
+#   found_cycles = {}
+#   for node_subset in itertools.combinations(nodes, cycle_size):
+#     for i in range(cycle_size):
+#       j = (i + 1) % cycle_size
+#       if (node_subset[i], node_subset[j]) in edge_list:
+#         found_cycles.add(tuple(sorted(node_subset)))
+#   return len(found_cycles)
 
 def main():
   args = parse_args()
-  write_sequence_data(args.dir, args.subst_type)
-  write_edge_data(args.dir, args.subst_type)
-  write_distance_matrix(args.dir, args.subst_type)
-  write_graph_stats(args.dir, args.subst_type)
-  write_variation(args.dir, args.subst_type)
-  write_variation_grouped(args.dir, args.subst_type)
+  input_data_info_file = file_names.data_info(args.input)
+  output_data_info_file = file_names.data_info(args.output)
+  shutil.copy(input_data_info_file, output_data_info_file)
+  write_vertex_data(args.input, args.output, args.subst_type)
+  write_edge_data(args.output, args.subst_type)
+  write_distance_matrix(args.output, args.subst_type)
+  write_graph_stats(args.output, args.subst_type)
+
+  # write_variation(args.dir, args.subst_type)
+  # write_variation_grouped(args.dir, args.subst_type)
   log_utils.new_line()
 
 if __name__ == '__main__':

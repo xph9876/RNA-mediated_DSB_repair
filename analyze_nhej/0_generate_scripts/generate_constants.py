@@ -132,7 +132,7 @@ OUTPUT_DIR = {
   'filter_nhej': 'data_1_filter_nhej',
   'combine_repeats': 'data_2_combine_repeats',
   'windows': 'data_3_windows',
-  'graph': 'data_4_graph',
+  'graphs': 'data_4_graphs',
   'histogram_3d': 'data_5_histogram_3d',
 }
 

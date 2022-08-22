@@ -22,9 +22,9 @@ def windows(dir, subst_type):
 #   library_constants.check_subst_type(subst_type)
 #   return make_file_name(dir, 'main_repeats', subst_type, ext = 'tsv')
 
-def sequence_data(dir, subst_type):
+def vertex_data(dir, subst_type):
   library_constants.check_subst_type(subst_type)
-  return make_file_name(dir, 'sequence_data', subst_type, ext = 'tsv')
+  return make_file_name(dir, 'vertex_data', subst_type, ext = 'tsv')
 
 def edge_data(dir, subst_type):
   library_constants.check_subst_type(subst_type)

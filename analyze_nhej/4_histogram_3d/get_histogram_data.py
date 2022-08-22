@@ -102,7 +102,7 @@ def write_variation(dir, subst_type):
   out_file_name = file_names.variation(dir, subst_type)
   log_utils.log(out_file_name)
 
-  sequence_data = file_utils.read_tsv(file_names.sequence_data(dir, subst_type))
+  sequence_data = file_utils.read_tsv(file_names.vertex_data(dir, subst_type))
   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
   variation_data = split_seqs_into_variations(sequence_data)
 
