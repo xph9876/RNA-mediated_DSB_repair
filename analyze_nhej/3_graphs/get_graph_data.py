@@ -34,15 +34,21 @@ def parse_args():
   parser.add_argument(
     '--subst_type',
     type = str,
-    default = 'without',
-    choices = ['with', 'without'],
+    choices = library_constants.SUBST_TYPES,
     help = 'Whether to process the files with/without substitutions.',
   )
-  args = parser.parse_args()
-  args.subst_type += 'Subst'
-  return args
+  parser.add_argument(
+    '--filter_min_freq',
+    type = float,
+    default = 1e-5,
+    help = (
+      'Minimum frequency for sequences in graphs.\n'
+      'Sequences with frequences <= this are discarded.'
+    ),
+  )
+  return parser.parse_args()
 
-def get_sequence_data(data, data_format):
+def get_sequence_data(data, data_format, min_freq):
   """
     Get the data for the vertices of the graph.
   """
@@ -52,6 +58,12 @@ def get_sequence_data(data, data_format):
   insertion = []
   deletion = []
   indel = []
+
+  freq_cols = data.columns[data.columns.str.startswith('freq_')]
+  data['freq_mean'] = data[freq_cols].mean(axis='columns')
+  data['freq_min'] = data[freq_cols].min(axis='columns')
+  data = data.loc[data['freq_min'] > min_freq]
+  data = data[['ref_align', 'read_align', 'freq_mean']]
 
   for row in data.to_dict('records'):
     num_ins, num_del, num_subst = (
@@ -106,14 +118,16 @@ def get_sequence_data(data, data_format):
 
   return pd.DataFrame(all_data)
 
-def write_sequence_data(input_dir, output_dir, subst_type):
+def write_sequence_data(input_dir, output_dir, subst_type, min_freq):
   """
     Make the main node data and write it to a file.
   """
 
-  data = file_utils.read_tsv(file_names.windows(input_dir, subst_type))
+  data = file_utils.read_tsv(
+    file_names.windows(input_dir, library_constants.FREQ_FREQ, subst_type)
+  )
   data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
-  data = get_sequence_data(data, data_info['format'])
+  data = get_sequence_data(data, data_info['format'], min_freq)
   out_file_name = file_names.sequence_data(output_dir, subst_type)
   file_utils.write_tsv(data, out_file_name)
   log_utils.log(out_file_name)
@@ -122,6 +136,7 @@ def get_edge_data(sequence_data):
   """
     Make adjacency edge data from sequence data.
   """
+
   edges = {
     'id_a': [],
     'id_b': [],
@@ -379,10 +394,17 @@ def write_graph_stats(output_dir, subst_type):
 
 def main():
   args = parse_args()
+
+  log_utils.log(args.input)
+  log_utils.log('------>')
+
+  # copy graphs stats
   input_data_info_file = file_names.data_info(args.input)
   output_data_info_file = file_names.data_info(args.output)
   shutil.copy(input_data_info_file, output_data_info_file)
-  write_sequence_data(args.input, args.output, args.subst_type)
+  log_utils.log(output_data_info_file)
+
+  write_sequence_data(args.input, args.output, args.subst_type, args.filter_min_freq)
   write_edge_data(args.output, args.subst_type)
   write_distance_matrix(args.output, args.subst_type)
   write_graph_stats(args.output, args.subst_type)

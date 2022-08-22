@@ -16,14 +16,12 @@ def get_output_dir(info):
     info['name']
   )
 
-# FIXME: WHAT TO DO ABOUT CONVERTING TO FREQUENCIES? DO IN PREVIOUS STAGE!?
-# FIXME: RENAME NODE_DATA AND SEQUENCE_DATA TO VERTEX DATA?
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open(os.path.join('run_03_get_windows' + os.path.extsep + ext), 'w') as file_out:
+    with open(os.path.join('run_04_graph_data' + os.path.extsep + ext), 'w') as file_out:
       log_utils.log(file_out.name)
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         for subst_type in library_constants.SUBST_TYPES:
           input_dir = get_input_dir(info)
           output_dir = get_output_dir(info)
-          file_out.write(f"python 2_windows/get_windows.py --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
+          file_out.write(f"python 3_graphs/get_graph_data.py --input {input_dir} --output {output_dir} --subst_type {subst_type} --filter_min_freq 1e-5\n")

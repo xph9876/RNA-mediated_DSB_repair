@@ -55,16 +55,6 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '--filter_min_freq',
-    type = float,
-    default = 1e-5,
-    metavar = 'FILTER_THRESHOLD',
-    help = (
-      'Minimum frequency to allow in output.\n'
-      'Alignments with frequences <= this are discarded.'
-    ),
-  )
-  parser.add_argument(
     '--window_size',
     type = int,
     default = 10,
