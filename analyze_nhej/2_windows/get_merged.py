@@ -59,10 +59,10 @@ def parse_args():
 def main():
   args = parse_args()
 
-  log_utils.log(' '.join(x.name for x in args.input))
+  log_utils.log(' '.join(x for x in args.input))
   log_utils.log('------>')
 
-  data = [file_utils.read_tsv(file_names.windows(x)) for x in args.input]
+  data = [file_utils.read_tsv(file_names.windows(x, args.subst_type)) for x in args.input]
   library_names = []
   num_columns = data[0].shape[1]
   num_count_columns = num_columns - 2
@@ -97,13 +97,13 @@ def main():
   log_utils.log(output_file)
 
   data_info = [file_utils.read_tsv_dict(file_names.data_info(x)) for x in args.input]
-  ref_seq_window = data_info[0]['ref_seq_windows']
+  ref_seq_window = data_info[0]['ref_seq_window']
   if not(all(x['ref_seq_window'] == ref_seq_window for x in data_info)):
     raise Exception('Libraries begin merged have different window reference sequences.')
   data_info = data_info[0]
   data_info['ref_seq'] = None
   output_data_info_file = file_names.data_info(args.output)
-  file_utils.write_tsv(pd.DataFrame(data_info, index=[0]), output_file)
+  file_utils.write_tsv(pd.DataFrame(data_info, index=[0]), output_data_info_file)
   log_utils.log(output_data_info_file)
 
   log_utils.new_line()

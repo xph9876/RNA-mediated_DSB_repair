@@ -53,4 +53,4 @@ if __name__ == '__main__':
             construct = info['construct']
             control_type = info['control_type']
             output_dir = get_output_dir(info)
-            file_out.write(f"python 2_windows/get_merged.py --input {input_dirs} --output {output_dir}\n")
+            file_out.write(f"python 2_windows/get_merged.py --input {input_dirs} --output {output_dir} --subst_type {subst_type}\n")

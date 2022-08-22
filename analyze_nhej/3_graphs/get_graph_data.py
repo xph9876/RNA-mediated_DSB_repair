@@ -11,7 +11,7 @@ import file_utils
 import alignment_utils
 import log_utils
 import common_utils
-import library_constants as library_constants
+import library_constants
 import graph_utils
 
 def parse_args():
@@ -19,16 +19,15 @@ def parse_args():
     description = 'Process data for the graph and variation position analysis.'
   )
   parser.add_argument(
-    '-dir',
+    '--dir',
     type = common_utils.check_dir,
     help = (
       'Directory where data for experiment is.' +
-      ' Should already contain the files generated with make_main_data.py.'
+      ' Should already contain the files generated with get_windows.py.'
     ),
     required = True,
   )
   parser.add_argument(
-    '-st',
     '--subst_type',
     type = str,
     default = 'without',
@@ -38,19 +37,6 @@ def parse_args():
   args = parser.parse_args()
   args.subst_type += 'Subst'
   return args
-
-def get_freq_ranks(
-  data,
-  freq_column_list,
-  freq_rank_column_list,
-):
-  freq_rank_data = pd.DataFrame(index=data.index)
-  for freq_column, freq_rank_column in zip(freq_column_list, freq_rank_column_list):
-    freq_rank_data[freq_rank_column] = data[freq_column].rank(
-      ascending = False,
-      method = 'first',
-    ).astype(int)
-  return freq_rank_data
 
 def get_sequence_data(data, data_format):
   """
@@ -105,7 +91,7 @@ def get_sequence_data(data, data_format):
   all_data = pd.concat(
     [
       all_data,
-      get_freq_ranks(
+      common_utils.get_freq_ranks(
         all_data,
         library_constants.FREQ_COLUMNS[data_format],
         library_constants.FREQ_RANK_COLUMNS[data_format],
@@ -116,7 +102,7 @@ def get_sequence_data(data, data_format):
 
   return pd.DataFrame(all_data)
 
-def make_sequence_data(dir, subst_type):
+def write_sequence_data(dir, subst_type):
   """
     Make the main node data and write it to a file.
   """
@@ -174,7 +160,7 @@ def get_edge_data(sequence_data):
       edges['edge_type'].append(edge_type)
   return pd.DataFrame(edges)
 
-def make_edge_data(dir, subst_type):
+def write_edge_data(dir, subst_type):
   """
     Make adjacency edge data and write to file.
     Sequence data should have been created already.
@@ -198,9 +184,7 @@ def get_distance_matrix(sequence_data):
     'dist': [],
   }
   for row_a, row_b in itertools.combinations(sequence_data.to_dict('records'), 2):
-    ref_align_a = row_a['ref_align']
     read_align_a = row_a['read_align']
-    ref_align_b = row_b['ref_align']
     read_align_b = row_b['read_align']
     distance_matrix['id_a'].append(row_a['id'])
     distance_matrix['id_b'].append(row_b['id'])
@@ -213,7 +197,7 @@ def get_distance_matrix(sequence_data):
     
   return pd.DataFrame(distance_matrix)
 
-def make_distance_matrix(dir, subst_type):
+def write_distance_matrix(dir, subst_type):
   """
     Get distance matrix and write to file.
     Sequence data should have been created already.
@@ -228,7 +212,7 @@ def make_distance_matrix(dir, subst_type):
   file_utils.write_tsv(distance_matrix, out_file_name)
 
 
-def make_graph_stats(dir, subst_type):
+def write_graph_stats(dir, subst_type):
   """
     Get graph summary statistics and write to file.
     Sequence data and edge data should have been created already.
@@ -299,10 +283,10 @@ def split_seqs_into_variations(sequence_data):
 
   return variation_data
 
-def make_variation(dir, subst_type):
+def write_variation(dir, subst_type):
   """
     Make data on individual variations and write to file.
-    Sequene data should already be created.
+    Sequence data should already be created.
   """
   out_file_name = file_names.variation(dir, subst_type)
   log_utils.log(out_file_name)
@@ -324,7 +308,7 @@ def make_variation(dir, subst_type):
   )
   file_utils.write_tsv(variation_data, out_file_name)
 
-def make_variation_grouped(dir, subst_type):
+def write_variation_grouped(dir, subst_type):
   """
     Groups the variation data by position and number of variations on sequence.
     This data is used for the 3D variation-position histograms.
@@ -391,17 +375,14 @@ def exhaustive_cycle_search(nodes, edge_list, cycle_size):
         found_cycles.add(tuple(sorted(node_subset)))
   return len(found_cycles)
 
-def make_cycle(data_set):
-  pass
-
 def main():
   args = parse_args()
-  make_sequence_data(args.dir, args.subst_type)
-  make_edge_data(args.dir, args.subst_type)
-  make_distance_matrix(args.dir, args.subst_type)
-  make_graph_stats(args.dir, args.subst_type)
-  make_variation(args.dir, args.subst_type)
-  make_variation_grouped(args.dir, args.subst_type)
+  write_sequence_data(args.dir, args.subst_type)
+  write_edge_data(args.dir, args.subst_type)
+  write_distance_matrix(args.dir, args.subst_type)
+  write_graph_stats(args.dir, args.subst_type)
+  write_variation(args.dir, args.subst_type)
+  write_variation_grouped(args.dir, args.subst_type)
   log_utils.new_line()
 
 if __name__ == '__main__':

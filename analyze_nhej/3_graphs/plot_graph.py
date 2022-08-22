@@ -370,7 +370,7 @@ def make_fractal_layout(data_info, graph, reverse_complement=False):
         reverse = True,
       ))
 
-      cut_pos_ref = len(data_info['ref_seq']) / 2
+      cut_pos_ref = len(data_info['ref_seq_window']) / 2
       for data in bucket:
         ref_align = data['ref_align']
         read_align = data['read_align']
@@ -470,7 +470,7 @@ def make_universal_layout(data_info, graph, reverse_complement=False):
       bucket_dict[var_type].setdefault(dist_ref, [])
       bucket_dict[var_type][dist_ref].append(data)
 
-  cut_pos_ref = len(data_info['ref_seq']) / 2
+  cut_pos_ref = len(data_info['ref_seq_window']) / 2
 
   xy_dict = {}
   for data in ref_nodes:
@@ -1939,7 +1939,7 @@ def make_graph_single_panel(
       )
       x_axis_tick_text = library_constants.get_position_labels(
         position_label_type,
-        len(data_info['ref_seq'])
+        len(data_info['ref_seq_window'])
       )
       y_axis_tick_vals = list(range(
         library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
@@ -2922,8 +2922,8 @@ def main():
       x_pos = args.universal_layout_y_axis_x_pos,
       row = 1,
       col = 1,
-      ref_length = len(data_info['ref_seq']),
-      cut_pos_ref = len(data_info['ref_seq']) // 2,
+      ref_length = len(data_info['ref_seq_window']),
+      cut_pos_ref = len(data_info['ref_seq_window']) // 2,
       y_min = args.universal_layout_y_axis_y_range[0],
       y_max = args.universal_layout_y_axis_y_range[1],
       max_tick_deletion = max_tick_deletion,
@@ -2936,8 +2936,8 @@ def main():
       y_pos = args.universal_layout_x_axis_deletion_y_pos,
       row = 1,
       col = 1,
-      ref_length = len(data_info['ref_seq']),
-      cut_pos_ref = len(data_info['ref_seq']) // 2,
+      ref_length = len(data_info['ref_seq_window']),
+      cut_pos_ref = len(data_info['ref_seq_window']) // 2,
       x_min = args.universal_layout_x_axis_x_range[0],
       x_max = args.universal_layout_x_axis_x_range[1],
       deletion_label_type = (
@@ -2951,8 +2951,8 @@ def main():
       y_pos = args.universal_layout_x_axis_insertion_y_pos,
       row = 1,
       col = 1,
-      ref_length = len(data_info['ref_seq']),
-      cut_pos_ref = len(data_info['ref_seq']) // 2,
+      ref_length = len(data_info['ref_seq_window']),
+      cut_pos_ref = len(data_info['ref_seq_window']) // 2,
       x_min = args.universal_layout_x_axis_x_range[0],
       x_max = args.universal_layout_x_axis_x_range[1],
     )

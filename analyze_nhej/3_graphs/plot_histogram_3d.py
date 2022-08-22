@@ -70,7 +70,7 @@ def get_variation_data(
   y_axis_column = 'dist_ref',
   reverse_pos = False,
 ):
-  ref_length = len(data_info['ref_seq'])
+  ref_length = len(data_info['ref_seq_windows'])
 
   data_long = file_utils.read_tsv(
     file_names.variation_grouped(data_info['dir'], library_constants.SUBST_WITH)
@@ -129,7 +129,7 @@ def plot_histogram_3d_impl(
   reverse_pos = False,
 ):
 
-  ref_length = len(data_info['ref_seq'])
+  ref_length = len(data_info['ref_seq_window'])
   ref_pos_labels = library_constants.get_position_labels(label_type, ref_length)
 
   if freq_log:
