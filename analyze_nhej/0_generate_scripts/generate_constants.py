@@ -5,11 +5,6 @@ import pandas as pd
 import file_utils
 import library_constants
 
-# DSB_TYPES = ['1DSB', '2DSB', '2DSBanti']
-# STRANDS = ['R1', 'R2']
-# CONSTRUCTS = ['sense', 'branch', 'cmv', 'antisense', 'splicing']
-# CONTROL_TYPES = ['30bpDown', 'noDSB']
-
 VERSION_NONE = 'versionNone'
 
 def get_name(info):
@@ -128,6 +123,8 @@ def get_experiment_info(**args):
     return experiment_info.iloc[0].to_dict()
   else:
     raise Exception(str(experiment_info.shape[0]) + ' experiment info results found')
+
+# EXPERIMENT_INFO_COMPARISON = 
 
 REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {

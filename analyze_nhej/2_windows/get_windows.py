@@ -12,6 +12,7 @@ import fasta_utils
 import alignment_window
 import remove_substitution
 import library_constants
+import file_names
 
 import pandas as pd
 import numpy as np
@@ -40,8 +41,7 @@ def parse_args():
   )
   parser.add_argument(
     '--output',
-    # type = common_utils.check_dir_output,
-    type = common_utils.check_file_output,
+    type = common_utils.check_dir_output,
     help = 'Output directory.',
     required = True,
   )
@@ -156,7 +156,7 @@ def parse_args():
 
 def make_alignment_windows(
   input_file,
-  output_file,
+  output_dir,
   ref_seq,
   dsb_pos,
   window_size,
@@ -261,9 +261,9 @@ def make_alignment_windows(
   # save the unfiltered repeat data
   data = data.drop('count_min', axis='columns')
   # file_utils.write_tsv(data, file_names.main_repeats(output_dir, subst_type))
+  output_file = file_names.windows(output_dir, subst_type)
   file_utils.write_tsv(data, output_file)
-  log_utils.log(output_file.name)
-  log_utils.new_line()
+  log_utils.log(output_file)
 
   # # filter the data with the minimum threshold
   # data = data.loc[data['count_min'] > freq_min_threshold]
@@ -341,7 +341,7 @@ def main():
   ref_seq = fasta_utils.read_fasta_seq(args.ref_seq_file)
   make_alignment_windows(
     input_file = args.input, 
-    output_file = args.output,
+    output_dir = args.output,
     ref_seq = ref_seq,
     dsb_pos = args.dsb_pos,
     window_size = args.window_size,
@@ -349,22 +349,23 @@ def main():
     anchor_mismatches = args.anchor_mismatches,
     subst_type = args.subst_type,
   )
-  # make_data_info(
-  #   dir = args.output,
-  #   format = library_constants.DATA_INDIVIDUAL,
-  #   cell_line = args.cell_line,
-  #   dsb_type = args.dsb_type,
-  #   guide_rna = args.guide_rna,
-  #   strand = args.strand,
-  #   constructs = [args.construct],
-  #   control_type = args.control_type,
-  #   ref_seq = ref_seq,
-  #   ref_seq_window = get_ref_seq_window(
-  #     ref_seq,
-  #     args.dsb_pos,
-  #     args.window_size,
-  #   ),
-  # )
+  make_data_info(
+    dir = args.output,
+    format = library_constants.DATA_INDIVIDUAL,
+    cell_line = args.cell_line,
+    dsb_type = args.dsb_type,
+    guide_rna = args.guide_rna,
+    strand = args.strand,
+    constructs = [args.construct],
+    control_type = args.control_type,
+    ref_seq = ref_seq,
+    ref_seq_window = get_ref_seq_window(
+      ref_seq,
+      args.dsb_pos,
+      args.window_size,
+    ),
+  )
+  log_utils.new_line()
 
   # ref_file_out = file_names.ref(args.output)
   # log_utils.log(ref_file_out)
