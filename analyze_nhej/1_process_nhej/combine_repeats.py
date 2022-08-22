@@ -19,7 +19,6 @@ def main():
     )
   )
   parser.add_argument(
-    '-i',
     '--input',
     type = argparse.FileType('r'),
     help = (
@@ -33,14 +32,12 @@ def main():
     required = True,
   )
   parser.add_argument(
-    '-o',
     '--output',
     type = common_utils.check_file_output,
     help = 'Output file name',
     required = True,
   )
   parser.add_argument(
-    '-q',
     '--quiet',
     help = 'Do not output log messages.',
     action = 'store_true',
