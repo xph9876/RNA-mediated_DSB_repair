@@ -133,7 +133,7 @@ OUTPUT_DIR = {
   'combine_repeats': 'data_2_combine_repeats',
   'windows': 'data_3_windows',
   'graphs': 'data_4_graphs',
-  'histogram_3d': 'data_5_histogram_3d',
+  'histograms': 'data_5_histograms',
 }
 
 PYTHON_SCRIPTS = {

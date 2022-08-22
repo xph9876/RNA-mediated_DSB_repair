@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import itertools
 import pandas as pd
 import argparse
+import shutil
 
 import file_names
 import file_utils
@@ -13,33 +14,34 @@ import log_utils
 import common_utils
 import library_constants
 
+
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Process data for the graph and variation position analysis.'
+    description = 'Process data for the graph analysis.'
   )
   parser.add_argument(
-    '--dir',
+    '--input',
     type = common_utils.check_dir,
-    help = (
-      'Directory where data for experiment is.' +
-      ' Should already contain the files generated with get_windows.py.'
-    ),
+    help = 'Directory where output of graph data stage is located.',
+    required = True,
+  )
+  parser.add_argument(
+    '--output',
+    type = common_utils.check_dir_output,
+    help = 'Output directory.',
     required = True,
   )
   parser.add_argument(
     '--subst_type',
     type = str,
-    default = 'without',
-    choices = ['with', 'without'],
+    choices = library_constants.SUBST_TYPES,
     help = 'Whether to process the files with/without substitutions.',
   )
-  args = parser.parse_args()
-  args.subst_type += 'Subst'
-  return args
+  return parser.parse_args()
 
 def split_seqs_into_variations(sequence_data):
   """
-    Split sequences into it's individual variations.
+    Split sequences into their individual variations.
   """
   variation_data = sequence_data.copy()
   variation_data = variation_data.rename({'id': 'seq_id'}, axis='columns')
@@ -94,16 +96,13 @@ def split_seqs_into_variations(sequence_data):
 
   return variation_data
 
-def write_variation(dir, subst_type):
+def write_variation(input_dir, output_dir, subst_type):
   """
     Make data on individual variations and write to file.
     Sequence data should already be created.
   """
-  out_file_name = file_names.variation(dir, subst_type)
-  log_utils.log(out_file_name)
-
-  sequence_data = file_utils.read_tsv(file_names.sequence_data(dir, subst_type))
-  data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
+  sequence_data = file_utils.read_tsv(file_names.sequence_data(input_dir, subst_type))
+  data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
   variation_data = split_seqs_into_variations(sequence_data)
 
   variation_data = pd.concat(
@@ -117,20 +116,18 @@ def write_variation(dir, subst_type):
     ],
     axis = 'columns',
   )
+  out_file_name = file_names.variation(output_dir, subst_type)
   file_utils.write_tsv(variation_data, out_file_name)
+  log_utils.log(out_file_name)
 
-def write_variation_grouped(dir, subst_type):
+def write_variation_grouped(output_dir, subst_type):
   """
     Groups the variation data by position and number of variations on sequence.
     This data is used for the 3D variation-position histograms.
     Variation data should have already been made.
   """
-  out_file_name = file_names.variation_grouped(dir, subst_type)
-
-  log_utils.log(out_file_name)
-
-  variation_data = file_utils.read_tsv(file_names.variation(dir, subst_type))
-  data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
+  variation_data = file_utils.read_tsv(file_names.variation(output_dir, subst_type))
+  data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
   freq_column_list = library_constants.FREQ_COLUMNS[data_info['format']]
   variation_data = variation_data[[
     'id',
@@ -175,7 +172,9 @@ def write_variation_grouped(dir, subst_type):
     ['id', 'var_id'] +
     list(variation_data.columns[~variation_data.columns.isin(['id', 'var_id'])])
   ]
+  out_file_name = file_names.variation_grouped(output_dir, subst_type)
   file_utils.write_tsv(variation_data, out_file_name)
+  log_utils.log(out_file_name)
 
 def exhaustive_cycle_search(nodes, edge_list, cycle_size):
   found_cycles = {}
@@ -188,8 +187,18 @@ def exhaustive_cycle_search(nodes, edge_list, cycle_size):
 
 def main():
   args = parse_args()
-  write_variation(args.dir, args.subst_type)
-  write_variation_grouped(args.dir, args.subst_type)
+
+  log_utils.log(args.input)
+  log_utils.log('------>')
+
+  # copy data info files
+  input_data_info_file = file_names.data_info(args.input)
+  output_data_info_file = file_names.data_info(args.output)
+  shutil.copy(input_data_info_file, output_data_info_file)
+  log_utils.log(output_data_info_file)
+
+  write_variation(args.input, args.output, args.subst_type)
+  write_variation_grouped(args.output, args.subst_type)
   log_utils.new_line()
 
 if __name__ == '__main__':
