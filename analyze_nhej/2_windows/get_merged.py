@@ -36,8 +36,8 @@ def parse_args():
   )
   parser.add_argument(
     '--output',
-    type = common_utils.check_dir_output,
-    help = 'Output directory.',
+    type = common_utils.check_file_output,
+    help = 'Output file.',
     required = True,
   )
   return parser.parse_args()
@@ -47,29 +47,40 @@ def main():
 
   log_utils.log(' '.join(x.name for x in args.input))
   log_utils.log('------>')
-  log_utils.log(args.output.name)
-  log_utils.new_line()
 
-  if args.quiet:
-    log_utils.set_log_file(None)
-
-  data_list = [pd.read_csv(x.name, sep='\t') for x in args.input]
-  num_columns = data_list[0].shape[1]
+  data = [pd.read_csv(x.name, sep='\t') for x in args.input]
+  library_names = []
+  num_columns = data[0].shape[1]
   num_count_columns = num_columns - 2
-  for data in data_list:
-    if data.shape[1] != num_columns:
+  count_columns_temp = [str(x) for x in range(num_count_columns)]
+  for i in range(len(data)):
+    if data[i].shape[1] != num_columns:
       raise Exception('Different number of columns in data sets')
-    data.columns[2:] = ['count_' + str(i) for i in range(num_columns)]
-    # CONTINUE HERE BRO!!!!
+    count_columns = [x for x in data[i].columns if x.startswith('count_')]
+    
+    library_names.append([x.replace('count_', '') for x in count_columns])
+    # data.columns[2:] = [str(i) for i in range(num_columns)]
+    data[i] = data[i].rename(
+      dict(zip(count_columns, count_columns_temp), axis='columns'),
+      axis = 'columns'
+    )
   
+  library_names = list(zip(*library_names)) # transpose
+  count_columns_new = ['count_' + '|'.join(x) for x in library_names]
+
   data = pd.concat(data, axis='index')
-  data = data.groupby(['ref_align', 'read_align']).aggregate(
-    CIGAR = ('CIGAR', 'first'),
-    Count = ('Count', 'sum'),
-    Num_Subst = ('Num_Subst', 'first'),
-  ).reset_index()
+  data = data.rename(dict(zip(count_columns_temp, count_columns_new)), axis='columns')
+  data = data.groupby(['ref_align', 'read_align']).sum()
+  data['count_min'] = data.min(axis='columns')
+  data = data.reset_index()
+  data = data.sort_values(
+    ['count_min', 'read_align'],
+    ascending = [False, True],
+  ).reset_index(drop=True).drop('count_min', axis='columns')
 
   file_utils.write_tsv(data, args.output)
+  log_utils.log(args.output.name)
+  log_utils.new_line()
 
 if __name__ == '__main__':
   main()
