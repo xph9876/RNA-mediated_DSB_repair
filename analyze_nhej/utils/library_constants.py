@@ -8,6 +8,14 @@ def check_subst_type(subst_type):
   if subst_type not in SUBST_TYPES:
     raise Exception('Not a valid subst type: ' + str(subst_type))
 
+FREQ_FREQ = 'freq'
+FREQ_COUNT = 'count'
+FREQ_TYPES = [FREQ_FREQ, FREQ_COUNT]
+
+def check_freq_type(freq_type):
+  if freq_type not in FREQ_TYPES:
+    raise Exception('Not a valid freq type: ' + str(freq_type))
+
 VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN = 'dist_ref'
 VARIATION_POSITION_LAYOUT_DISTANCE_LABEL = {
   'dist_ref': (

@@ -21,6 +21,8 @@ if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(os.path.join('run_03_get_windows' + os.path.extsep + ext), 'w') as file_out:
       log_utils.log(file_out.name)
+
+      # get windows
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         if info['version'] != 'merged':
           for subst_type in library_constants.SUBST_TYPES:
@@ -36,6 +38,8 @@ if __name__ == '__main__':
             control_type = info['control_type']
             output_dir = get_output_dir(info)
             file_out.write(f"python 2_windows/get_windows.py --input {input_file} --ref_seq_file {ref_seq_file} --output {output_dir} --dsb_pos {dsb_pos} --dsb_type {dsb_type} --strand {strand} --guide_rna {guide_rna} --cell_line {cell_line} --construct {construct} --subst_type {subst_type} --control_type {control_type}\n")
+      
+      # get merged for old/new antisense libraries
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         if info['version'] == 'merged':
           for subst_type in library_constants.SUBST_TYPES:
@@ -54,3 +58,10 @@ if __name__ == '__main__':
             control_type = info['control_type']
             output_dir = get_output_dir(info)
             file_out.write(f"python 2_windows/get_merged.py --input {input_dirs} --output {output_dir} --subst_type {subst_type}\n")
+
+      # get freqs
+      for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
+        total_reads = ' '.join([str(x) for x in info['total_reads_list']])
+        for subst_type in library_constants.SUBST_TYPES:
+          output_dir = get_output_dir(info)
+          file_out.write(f"python 2_windows/get_freqs.py --input {output_dir} --output {output_dir} --subst_type {subst_type} --total_reads {total_reads}\n")

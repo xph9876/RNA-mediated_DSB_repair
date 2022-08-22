@@ -122,7 +122,7 @@ if __name__ == '__main__':
   )
 
   # Make the combined info
-  get_windows.make_data_info(
+  get_windows.write_data_info(
     args.output,
     library_constants.DATA_COMPARISON,
     data_info_1['cell_line'],

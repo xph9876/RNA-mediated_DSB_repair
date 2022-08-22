@@ -154,7 +154,7 @@ def parse_args():
     # args.control_type = library_constants.CONTROL_NOT
   return args
 
-def make_alignment_windows(
+def write_alignment_windows(
   input_file,
   output_dir,
   ref_seq,
@@ -261,7 +261,7 @@ def make_alignment_windows(
   # save the unfiltered repeat data
   data = data.drop('count_min', axis='columns')
   # file_utils.write_tsv(data, file_names.main_repeats(output_dir, subst_type))
-  output_file = file_names.windows(output_dir, subst_type)
+  output_file = file_names.windows(output_dir, library_constants.FREQ_COUNT, subst_type)
   file_utils.write_tsv(data, output_file)
   log_utils.log(output_file)
 
@@ -277,7 +277,7 @@ def make_alignment_windows(
 
 # FIXME: NEED TO MOVE THIS SOMEWHERE
 # FIXME: NEED TO DO THE FILTERING SOMEWHERE
-def make_data_info(
+def write_data_info(
   dir,
   format,
   cell_line,
@@ -339,7 +339,7 @@ def main():
   log_utils.log('------>')
 
   ref_seq = fasta_utils.read_fasta_seq(args.ref_seq_file)
-  make_alignment_windows(
+  write_alignment_windows(
     input_file = args.input, 
     output_dir = args.output,
     ref_seq = ref_seq,
@@ -349,7 +349,7 @@ def main():
     anchor_mismatches = args.anchor_mismatches,
     subst_type = args.subst_type,
   )
-  make_data_info(
+  write_data_info(
     dir = args.output,
     format = library_constants.DATA_INDIVIDUAL,
     cell_line = args.cell_line,

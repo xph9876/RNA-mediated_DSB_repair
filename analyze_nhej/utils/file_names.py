@@ -14,9 +14,10 @@ def make_file_name(dir, *args, ext):
 #   library_constants.check_subst_type(subst_type)
 #   return make_file_name(dir, 'main_repeats', subst_type, ext = 'tsv')
 
-def windows(dir, subst_type):
+def windows(dir, freq_type, subst_type):
   library_constants.check_subst_type(subst_type)
-  return make_file_name(dir, 'windows', subst_type, ext = 'tsv')
+  library_constants.check_freq_type(freq_type)
+  return make_file_name(dir, 'windows', freq_type, subst_type, ext = 'tsv')
 
 # def main_repeats(dir, subst_type):
 #   library_constants.check_subst_type(subst_type)
