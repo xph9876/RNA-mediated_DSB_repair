@@ -251,7 +251,11 @@ def write_alignment_windows(
   # save the unfiltered repeat data
   data = data.drop('count_min', axis='columns')
   # file_utils.write_tsv(data, file_names.main_repeats(output_dir, subst_type))
-  output_file = file_names.windows(output_dir, library_constants.FREQ_COUNT, subst_type)
+  output_file = file_names.windows(
+    output_dir,
+    library_constants.COUNT,
+    subst_type,
+  )
   file_utils.write_tsv(data, output_file)
   log_utils.log(output_file)
 

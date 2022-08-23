@@ -62,7 +62,12 @@ def main():
   log_utils.log(' '.join(x for x in args.input))
   log_utils.log('------>')
 
-  data = [file_utils.read_tsv(file_names.windows(x, library_constants.FREQ_COUNT, args.subst_type)) for x in args.input]
+  data = [
+    file_utils.read_tsv(
+      file_names.windows(x, library_constants.COUNT, args.subst_type)
+    )
+    for x in args.input
+  ]
   library_names = []
   num_columns = data[0].shape[1]
   num_count_columns = num_columns - 2
@@ -92,7 +97,11 @@ def main():
     ascending = [False, True],
   ).reset_index(drop=True).drop('count_min', axis='columns')
 
-  output_file = file_names.windows(args.output, library_constants.FREQ_COUNT, args.subst_type)
+  output_file = file_names.windows(
+    args.output,
+    library_constants.COUNT,
+    args.subst_type,
+  )
   file_utils.write_tsv(data, output_file)
   log_utils.log(output_file)
 

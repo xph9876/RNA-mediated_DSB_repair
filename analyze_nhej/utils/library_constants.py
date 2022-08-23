@@ -8,9 +8,11 @@ def check_subst_type(subst_type):
   if subst_type not in SUBST_TYPES:
     raise Exception('Not a valid subst type: ' + str(subst_type))
 
-FREQ_FREQ = 'freq'
-FREQ_COUNT = 'count'
-FREQ_TYPES = [FREQ_FREQ, FREQ_COUNT]
+FREQ = 'freq'
+FREQ_MEAN = 'freq_mean'
+FREQ_MEAN_FILTER = 'freq_mean_filter'
+COUNT = 'count'
+FREQ_TYPES = [COUNT, FREQ, FREQ_MEAN, FREQ_MEAN_FILTER]
 
 def check_freq_type(freq_type):
   if freq_type not in FREQ_TYPES:

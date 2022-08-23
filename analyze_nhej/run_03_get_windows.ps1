@@ -118,123 +118,123 @@ python 2_windows/get_merged.py --input data_3_windows/WT_sgCD_R1_splicing_old da
 python 2_windows/get_merged.py --input data_3_windows/WT_sgCD_R1_splicing_old data_3_windows/WT_sgCD_R1_splicing_new --output data_3_windows/WT_sgCD_R1_splicing_merged --subst_type withoutSubst
 python 2_windows/get_merged.py --input data_3_windows/WT_sgCD_R2_splicing_old data_3_windows/WT_sgCD_R2_splicing_new --output data_3_windows/WT_sgCD_R2_splicing_merged --subst_type withSubst
 python 2_windows/get_merged.py --input data_3_windows/WT_sgCD_R2_splicing_old data_3_windows/WT_sgCD_R2_splicing_new --output data_3_windows/WT_sgCD_R2_splicing_merged --subst_type withoutSubst
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_30bpDown --output data_3_windows/KO_sgA_R1_branch_30bpDown --subst_type withSubst --total_reads 11021111 11280773 12426852 11659042
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_30bpDown --output data_3_windows/KO_sgA_R1_branch_30bpDown --subst_type withoutSubst --total_reads 11021111 11280773 12426852 11659042
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_30bpDown --output data_3_windows/KO_sgA_R1_cmv_30bpDown --subst_type withSubst --total_reads 9933546 10351309 9388188 8668198
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_30bpDown --output data_3_windows/KO_sgA_R1_cmv_30bpDown --subst_type withoutSubst --total_reads 9933546 10351309 9388188 8668198
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_30bpDown --output data_3_windows/KO_sgA_R1_sense_30bpDown --subst_type withSubst --total_reads 8597510 10116623 8703707 9021103
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_30bpDown --output data_3_windows/KO_sgA_R1_sense_30bpDown --subst_type withoutSubst --total_reads 8597510 10116623 8703707 9021103
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_30bpDown --output data_3_windows/KO_sgB_R2_branch_30bpDown --subst_type withSubst --total_reads 9730255 10430885 9770845 10249893
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_30bpDown --output data_3_windows/KO_sgB_R2_branch_30bpDown --subst_type withoutSubst --total_reads 9730255 10430885 9770845 10249893
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_30bpDown --output data_3_windows/KO_sgB_R2_cmv_30bpDown --subst_type withSubst --total_reads 6718301 6435913 7285831 6372479
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_30bpDown --output data_3_windows/KO_sgB_R2_cmv_30bpDown --subst_type withoutSubst --total_reads 6718301 6435913 7285831 6372479
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_30bpDown --output data_3_windows/KO_sgB_R2_sense_30bpDown --subst_type withSubst --total_reads 6494964 7011524 7131423 6545416
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_30bpDown --output data_3_windows/KO_sgB_R2_sense_30bpDown --subst_type withoutSubst --total_reads 6494964 7011524 7131423 6545416
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_noDSB --output data_3_windows/KO_sgA_R1_branch_noDSB --subst_type withSubst --total_reads 10190833
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_noDSB --output data_3_windows/KO_sgA_R1_branch_noDSB --subst_type withoutSubst --total_reads 10190833
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_noDSB --output data_3_windows/KO_sgA_R1_cmv_noDSB --subst_type withSubst --total_reads 7763439
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_noDSB --output data_3_windows/KO_sgA_R1_cmv_noDSB --subst_type withoutSubst --total_reads 7763439
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_noDSB --output data_3_windows/KO_sgA_R1_sense_noDSB --subst_type withSubst --total_reads 7424148
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_noDSB --output data_3_windows/KO_sgA_R1_sense_noDSB --subst_type withoutSubst --total_reads 7424148
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_noDSB --output data_3_windows/KO_sgB_R2_branch_noDSB --subst_type withSubst --total_reads 10027116
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_noDSB --output data_3_windows/KO_sgB_R2_branch_noDSB --subst_type withoutSubst --total_reads 10027116
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_noDSB --output data_3_windows/KO_sgB_R2_cmv_noDSB --subst_type withSubst --total_reads 7622513
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_noDSB --output data_3_windows/KO_sgB_R2_cmv_noDSB --subst_type withoutSubst --total_reads 7622513
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_noDSB --output data_3_windows/KO_sgB_R2_sense_noDSB --subst_type withSubst --total_reads 7181166
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_noDSB --output data_3_windows/KO_sgB_R2_sense_noDSB --subst_type withoutSubst --total_reads 7181166
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch --output data_3_windows/KO_sgA_R1_branch --subst_type withSubst --total_reads 11021111 11280773 12426852 11659042
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch --output data_3_windows/KO_sgA_R1_branch --subst_type withoutSubst --total_reads 11021111 11280773 12426852 11659042
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv --output data_3_windows/KO_sgA_R1_cmv --subst_type withSubst --total_reads 9933546 10351309 9388188 8668198
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv --output data_3_windows/KO_sgA_R1_cmv --subst_type withoutSubst --total_reads 9933546 10351309 9388188 8668198
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense --output data_3_windows/KO_sgA_R1_sense --subst_type withSubst --total_reads 8597510 10116623 8703707 9021103
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense --output data_3_windows/KO_sgA_R1_sense --subst_type withoutSubst --total_reads 8597510 10116623 8703707 9021103
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch --output data_3_windows/KO_sgB_R2_branch --subst_type withSubst --total_reads 9730255 10430885 9770845 10249893
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch --output data_3_windows/KO_sgB_R2_branch --subst_type withoutSubst --total_reads 9730255 10430885 9770845 10249893
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv --output data_3_windows/KO_sgB_R2_cmv --subst_type withSubst --total_reads 6718301 6435913 7285831 6372479
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv --output data_3_windows/KO_sgB_R2_cmv --subst_type withoutSubst --total_reads 6718301 6435913 7285831 6372479
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense --output data_3_windows/KO_sgB_R2_sense --subst_type withSubst --total_reads 6494964 7011524 7131423 6545416
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense --output data_3_windows/KO_sgB_R2_sense --subst_type withoutSubst --total_reads 6494964 7011524 7131423 6545416
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_branch --output data_3_windows/KO_sgAB_R1_branch --subst_type withSubst --total_reads 13912975 15839537 13872702 13493608
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_branch --output data_3_windows/KO_sgAB_R1_branch --subst_type withoutSubst --total_reads 13912975 15839537 13872702 13493608
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_branch --output data_3_windows/KO_sgAB_R2_branch --subst_type withSubst --total_reads 12987477 14745821 12946604 12582077
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_branch --output data_3_windows/KO_sgAB_R2_branch --subst_type withoutSubst --total_reads 12987477 14745821 12946604 12582077
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_cmv --output data_3_windows/KO_sgAB_R1_cmv --subst_type withSubst --total_reads 11307677 11757615 10272339 9412394
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_cmv --output data_3_windows/KO_sgAB_R1_cmv --subst_type withoutSubst --total_reads 11307677 11757615 10272339 9412394
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_cmv --output data_3_windows/KO_sgAB_R2_cmv --subst_type withSubst --total_reads 10562895 10985096 9559721 8729797
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_cmv --output data_3_windows/KO_sgAB_R2_cmv --subst_type withoutSubst --total_reads 10562895 10985096 9559721 8729797
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_sense --output data_3_windows/KO_sgAB_R1_sense --subst_type withSubst --total_reads 11320509 12480734 12500966 12479012
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_sense --output data_3_windows/KO_sgAB_R1_sense --subst_type withoutSubst --total_reads 11320509 12480734 12500966 12479012
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_sense --output data_3_windows/KO_sgAB_R2_sense --subst_type withSubst --total_reads 10142826 11211467 11130391 11080481
-python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_sense --output data_3_windows/KO_sgAB_R2_sense --subst_type withoutSubst --total_reads 10142826 11211467 11130391 11080481
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_30bpDown --output data_3_windows/WT_sgA_R1_branch_30bpDown --subst_type withSubst --total_reads 8808358 9297647 9399483 8799841
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_30bpDown --output data_3_windows/WT_sgA_R1_branch_30bpDown --subst_type withoutSubst --total_reads 8808358 9297647 9399483 8799841
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_30bpDown --output data_3_windows/WT_sgA_R1_cmv_30bpDown --subst_type withSubst --total_reads 8171224 8180897 8314116 8096639
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_30bpDown --output data_3_windows/WT_sgA_R1_cmv_30bpDown --subst_type withoutSubst --total_reads 8171224 8180897 8314116 8096639
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_30bpDown --output data_3_windows/WT_sgA_R1_sense_30bpDown --subst_type withSubst --total_reads 7579965 7982725 7854740 7534924
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_30bpDown --output data_3_windows/WT_sgA_R1_sense_30bpDown --subst_type withoutSubst --total_reads 7579965 7982725 7854740 7534924
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_30bpDown --output data_3_windows/WT_sgB_R2_branch_30bpDown --subst_type withSubst --total_reads 9524548 10125834 10173904 9525100
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_30bpDown --output data_3_windows/WT_sgB_R2_branch_30bpDown --subst_type withoutSubst --total_reads 9524548 10125834 10173904 9525100
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_30bpDown --output data_3_windows/WT_sgB_R2_cmv_30bpDown --subst_type withSubst --total_reads 7280860 6872217 6847531 7081713
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_30bpDown --output data_3_windows/WT_sgB_R2_cmv_30bpDown --subst_type withoutSubst --total_reads 7280860 6872217 6847531 7081713
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_30bpDown --output data_3_windows/WT_sgB_R2_sense_30bpDown --subst_type withSubst --total_reads 7137355 6618133 8227882 7238408
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_30bpDown --output data_3_windows/WT_sgB_R2_sense_30bpDown --subst_type withoutSubst --total_reads 7137355 6618133 8227882 7238408
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_noDSB --output data_3_windows/WT_sgA_R1_branch_noDSB --subst_type withSubst --total_reads 12898941
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_noDSB --output data_3_windows/WT_sgA_R1_branch_noDSB --subst_type withoutSubst --total_reads 12898941
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_noDSB --output data_3_windows/WT_sgA_R1_cmv_noDSB --subst_type withSubst --total_reads 10217401
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_noDSB --output data_3_windows/WT_sgA_R1_cmv_noDSB --subst_type withoutSubst --total_reads 10217401
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_noDSB --output data_3_windows/WT_sgA_R1_sense_noDSB --subst_type withSubst --total_reads 10005232
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_noDSB --output data_3_windows/WT_sgA_R1_sense_noDSB --subst_type withoutSubst --total_reads 10005232
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_noDSB --output data_3_windows/WT_sgB_R2_branch_noDSB --subst_type withSubst --total_reads 12461219
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_noDSB --output data_3_windows/WT_sgB_R2_branch_noDSB --subst_type withoutSubst --total_reads 12461219
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_noDSB --output data_3_windows/WT_sgB_R2_cmv_noDSB --subst_type withSubst --total_reads 9853052
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_noDSB --output data_3_windows/WT_sgB_R2_cmv_noDSB --subst_type withoutSubst --total_reads 9853052
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_noDSB --output data_3_windows/WT_sgB_R2_sense_noDSB --subst_type withSubst --total_reads 9354510
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_noDSB --output data_3_windows/WT_sgB_R2_sense_noDSB --subst_type withoutSubst --total_reads 9354510
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch --output data_3_windows/WT_sgA_R1_branch --subst_type withSubst --total_reads 8808358 9297647 9399483 8799841
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch --output data_3_windows/WT_sgA_R1_branch --subst_type withoutSubst --total_reads 8808358 9297647 9399483 8799841
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv --output data_3_windows/WT_sgA_R1_cmv --subst_type withSubst --total_reads 8171224 8180897 8314116 8096639
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv --output data_3_windows/WT_sgA_R1_cmv --subst_type withoutSubst --total_reads 8171224 8180897 8314116 8096639
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense --output data_3_windows/WT_sgA_R1_sense --subst_type withSubst --total_reads 7579965 7982725 7854740 7534924
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense --output data_3_windows/WT_sgA_R1_sense --subst_type withoutSubst --total_reads 7579965 7982725 7854740 7534924
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch --output data_3_windows/WT_sgB_R2_branch --subst_type withSubst --total_reads 9524548 10125834 10173904 9525100
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch --output data_3_windows/WT_sgB_R2_branch --subst_type withoutSubst --total_reads 9524548 10125834 10173904 9525100
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv --output data_3_windows/WT_sgB_R2_cmv --subst_type withSubst --total_reads 7280860 6872217 6847531 7081713
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv --output data_3_windows/WT_sgB_R2_cmv --subst_type withoutSubst --total_reads 7280860 6872217 6847531 7081713
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense --output data_3_windows/WT_sgB_R2_sense --subst_type withSubst --total_reads 7137355 6618133 8227882 7238408
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense --output data_3_windows/WT_sgB_R2_sense --subst_type withoutSubst --total_reads 7137355 6618133 8227882 7238408
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_branch --output data_3_windows/WT_sgAB_R1_branch --subst_type withSubst --total_reads 9021462 9430938 9051278 9192054
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_branch --output data_3_windows/WT_sgAB_R1_branch --subst_type withoutSubst --total_reads 9021462 9430938 9051278 9192054
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_branch --output data_3_windows/WT_sgAB_R2_branch --subst_type withSubst --total_reads 8525251 8875435 8522228 8656502
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_branch --output data_3_windows/WT_sgAB_R2_branch --subst_type withoutSubst --total_reads 8525251 8875435 8522228 8656502
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_cmv --output data_3_windows/WT_sgAB_R1_cmv --subst_type withSubst --total_reads 7604379 8885716 8150455 7694818
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_cmv --output data_3_windows/WT_sgAB_R1_cmv --subst_type withoutSubst --total_reads 7604379 8885716 8150455 7694818
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_cmv --output data_3_windows/WT_sgAB_R2_cmv --subst_type withSubst --total_reads 6898791 7986453 7354088 6940576
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_cmv --output data_3_windows/WT_sgAB_R2_cmv --subst_type withoutSubst --total_reads 6898791 7986453 7354088 6940576
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_sense --output data_3_windows/WT_sgAB_R1_sense --subst_type withSubst --total_reads 6630053 7246619 8069391 7513691
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_sense --output data_3_windows/WT_sgAB_R1_sense --subst_type withoutSubst --total_reads 6630053 7246619 8069391 7513691
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_sense --output data_3_windows/WT_sgAB_R2_sense --subst_type withSubst --total_reads 6177083 6744517 7507107 7001340
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_sense --output data_3_windows/WT_sgAB_R2_sense --subst_type withoutSubst --total_reads 6177083 6744517 7507107 7001340
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_merged --output data_3_windows/WT_sgCD_R1_antisense_merged --subst_type withSubst --total_reads 14116151 13475081 13855904 11992516
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_merged --output data_3_windows/WT_sgCD_R1_antisense_merged --subst_type withoutSubst --total_reads 14116151 13475081 13855904 11992516
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_new --output data_3_windows/WT_sgCD_R1_antisense_new --subst_type withSubst --total_reads 6302370 5988345 5741048 5405939
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_new --output data_3_windows/WT_sgCD_R1_antisense_new --subst_type withoutSubst --total_reads 6302370 5988345 5741048 5405939
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_old --output data_3_windows/WT_sgCD_R1_antisense_old --subst_type withSubst --total_reads 7813781 7486736 8114856 6586577
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_old --output data_3_windows/WT_sgCD_R1_antisense_old --subst_type withoutSubst --total_reads 7813781 7486736 8114856 6586577
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_merged --output data_3_windows/WT_sgCD_R2_antisense_merged --subst_type withSubst --total_reads 13974893 13342868 13728439 11868064
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_merged --output data_3_windows/WT_sgCD_R2_antisense_merged --subst_type withoutSubst --total_reads 13974893 13342868 13728439 11868064
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_new --output data_3_windows/WT_sgCD_R2_antisense_new --subst_type withSubst --total_reads 6161112 5856132 5613583 5281487
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_new --output data_3_windows/WT_sgCD_R2_antisense_new --subst_type withoutSubst --total_reads 6161112 5856132 5613583 5281487
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_old --output data_3_windows/WT_sgCD_R2_antisense_old --subst_type withSubst --total_reads 7813781 7486736 8114856 6586577
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_old --output data_3_windows/WT_sgCD_R2_antisense_old --subst_type withoutSubst --total_reads 7813781 7486736 8114856 6586577
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_merged --output data_3_windows/WT_sgCD_R1_splicing_merged --subst_type withSubst --total_reads 13511783 13789121 12902873 13400566
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_merged --output data_3_windows/WT_sgCD_R1_splicing_merged --subst_type withoutSubst --total_reads 13511783 13789121 12902873 13400566
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_new --output data_3_windows/WT_sgCD_R1_splicing_new --subst_type withSubst --total_reads 4177291 4647120 4405688 5054324
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_new --output data_3_windows/WT_sgCD_R1_splicing_new --subst_type withoutSubst --total_reads 4177291 4647120 4405688 5054324
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_old --output data_3_windows/WT_sgCD_R1_splicing_old --subst_type withSubst --total_reads 9334492 9142001 8497185 8346242
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_old --output data_3_windows/WT_sgCD_R1_splicing_old --subst_type withoutSubst --total_reads 9334492 9142001 8497185 8346242
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_merged --output data_3_windows/WT_sgCD_R2_splicing_merged --subst_type withSubst --total_reads 13397050 13677124 12777909 13272580
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_merged --output data_3_windows/WT_sgCD_R2_splicing_merged --subst_type withoutSubst --total_reads 13397050 13677124 12777909 13272580
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_new --output data_3_windows/WT_sgCD_R2_splicing_new --subst_type withSubst --total_reads 4062558 4535123 4280724 4926338
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_new --output data_3_windows/WT_sgCD_R2_splicing_new --subst_type withoutSubst --total_reads 4062558 4535123 4280724 4926338
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_old --output data_3_windows/WT_sgCD_R2_splicing_old --subst_type withSubst --total_reads 9334492 9142001 8497185 8346242
-python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_old --output data_3_windows/WT_sgCD_R2_splicing_old --subst_type withoutSubst --total_reads 9334492 9142001 8497185 8346242
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_30bpDown --output data_3_windows/KO_sgA_R1_branch_30bpDown --subst_type withSubst --total_reads 11021111 11280773 12426852 11659042 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_30bpDown --output data_3_windows/KO_sgA_R1_branch_30bpDown --subst_type withoutSubst --total_reads 11021111 11280773 12426852 11659042 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_30bpDown --output data_3_windows/KO_sgA_R1_cmv_30bpDown --subst_type withSubst --total_reads 9933546 10351309 9388188 8668198 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_30bpDown --output data_3_windows/KO_sgA_R1_cmv_30bpDown --subst_type withoutSubst --total_reads 9933546 10351309 9388188 8668198 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_30bpDown --output data_3_windows/KO_sgA_R1_sense_30bpDown --subst_type withSubst --total_reads 8597510 10116623 8703707 9021103 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_30bpDown --output data_3_windows/KO_sgA_R1_sense_30bpDown --subst_type withoutSubst --total_reads 8597510 10116623 8703707 9021103 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_30bpDown --output data_3_windows/KO_sgB_R2_branch_30bpDown --subst_type withSubst --total_reads 9730255 10430885 9770845 10249893 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_30bpDown --output data_3_windows/KO_sgB_R2_branch_30bpDown --subst_type withoutSubst --total_reads 9730255 10430885 9770845 10249893 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_30bpDown --output data_3_windows/KO_sgB_R2_cmv_30bpDown --subst_type withSubst --total_reads 6718301 6435913 7285831 6372479 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_30bpDown --output data_3_windows/KO_sgB_R2_cmv_30bpDown --subst_type withoutSubst --total_reads 6718301 6435913 7285831 6372479 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_30bpDown --output data_3_windows/KO_sgB_R2_sense_30bpDown --subst_type withSubst --total_reads 6494964 7011524 7131423 6545416 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_30bpDown --output data_3_windows/KO_sgB_R2_sense_30bpDown --subst_type withoutSubst --total_reads 6494964 7011524 7131423 6545416 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_noDSB --output data_3_windows/KO_sgA_R1_branch_noDSB --subst_type withSubst --total_reads 10190833 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch_noDSB --output data_3_windows/KO_sgA_R1_branch_noDSB --subst_type withoutSubst --total_reads 10190833 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_noDSB --output data_3_windows/KO_sgA_R1_cmv_noDSB --subst_type withSubst --total_reads 7763439 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv_noDSB --output data_3_windows/KO_sgA_R1_cmv_noDSB --subst_type withoutSubst --total_reads 7763439 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_noDSB --output data_3_windows/KO_sgA_R1_sense_noDSB --subst_type withSubst --total_reads 7424148 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense_noDSB --output data_3_windows/KO_sgA_R1_sense_noDSB --subst_type withoutSubst --total_reads 7424148 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_noDSB --output data_3_windows/KO_sgB_R2_branch_noDSB --subst_type withSubst --total_reads 10027116 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch_noDSB --output data_3_windows/KO_sgB_R2_branch_noDSB --subst_type withoutSubst --total_reads 10027116 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_noDSB --output data_3_windows/KO_sgB_R2_cmv_noDSB --subst_type withSubst --total_reads 7622513 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv_noDSB --output data_3_windows/KO_sgB_R2_cmv_noDSB --subst_type withoutSubst --total_reads 7622513 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_noDSB --output data_3_windows/KO_sgB_R2_sense_noDSB --subst_type withSubst --total_reads 7181166 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense_noDSB --output data_3_windows/KO_sgB_R2_sense_noDSB --subst_type withoutSubst --total_reads 7181166 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch --output data_3_windows/KO_sgA_R1_branch --subst_type withSubst --total_reads 11021111 11280773 12426852 11659042 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_branch --output data_3_windows/KO_sgA_R1_branch --subst_type withoutSubst --total_reads 11021111 11280773 12426852 11659042 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv --output data_3_windows/KO_sgA_R1_cmv --subst_type withSubst --total_reads 9933546 10351309 9388188 8668198 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_cmv --output data_3_windows/KO_sgA_R1_cmv --subst_type withoutSubst --total_reads 9933546 10351309 9388188 8668198 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense --output data_3_windows/KO_sgA_R1_sense --subst_type withSubst --total_reads 8597510 10116623 8703707 9021103 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgA_R1_sense --output data_3_windows/KO_sgA_R1_sense --subst_type withoutSubst --total_reads 8597510 10116623 8703707 9021103 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch --output data_3_windows/KO_sgB_R2_branch --subst_type withSubst --total_reads 9730255 10430885 9770845 10249893 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_branch --output data_3_windows/KO_sgB_R2_branch --subst_type withoutSubst --total_reads 9730255 10430885 9770845 10249893 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv --output data_3_windows/KO_sgB_R2_cmv --subst_type withSubst --total_reads 6718301 6435913 7285831 6372479 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_cmv --output data_3_windows/KO_sgB_R2_cmv --subst_type withoutSubst --total_reads 6718301 6435913 7285831 6372479 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense --output data_3_windows/KO_sgB_R2_sense --subst_type withSubst --total_reads 6494964 7011524 7131423 6545416 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgB_R2_sense --output data_3_windows/KO_sgB_R2_sense --subst_type withoutSubst --total_reads 6494964 7011524 7131423 6545416 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_branch --output data_3_windows/KO_sgAB_R1_branch --subst_type withSubst --total_reads 13912975 15839537 13872702 13493608 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_branch --output data_3_windows/KO_sgAB_R1_branch --subst_type withoutSubst --total_reads 13912975 15839537 13872702 13493608 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_branch --output data_3_windows/KO_sgAB_R2_branch --subst_type withSubst --total_reads 12987477 14745821 12946604 12582077 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_branch --output data_3_windows/KO_sgAB_R2_branch --subst_type withoutSubst --total_reads 12987477 14745821 12946604 12582077 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_cmv --output data_3_windows/KO_sgAB_R1_cmv --subst_type withSubst --total_reads 11307677 11757615 10272339 9412394 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_cmv --output data_3_windows/KO_sgAB_R1_cmv --subst_type withoutSubst --total_reads 11307677 11757615 10272339 9412394 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_cmv --output data_3_windows/KO_sgAB_R2_cmv --subst_type withSubst --total_reads 10562895 10985096 9559721 8729797 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_cmv --output data_3_windows/KO_sgAB_R2_cmv --subst_type withoutSubst --total_reads 10562895 10985096 9559721 8729797 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_sense --output data_3_windows/KO_sgAB_R1_sense --subst_type withSubst --total_reads 11320509 12480734 12500966 12479012 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R1_sense --output data_3_windows/KO_sgAB_R1_sense --subst_type withoutSubst --total_reads 11320509 12480734 12500966 12479012 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_sense --output data_3_windows/KO_sgAB_R2_sense --subst_type withSubst --total_reads 10142826 11211467 11130391 11080481 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/KO_sgAB_R2_sense --output data_3_windows/KO_sgAB_R2_sense --subst_type withoutSubst --total_reads 10142826 11211467 11130391 11080481 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_30bpDown --output data_3_windows/WT_sgA_R1_branch_30bpDown --subst_type withSubst --total_reads 8808358 9297647 9399483 8799841 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_30bpDown --output data_3_windows/WT_sgA_R1_branch_30bpDown --subst_type withoutSubst --total_reads 8808358 9297647 9399483 8799841 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_30bpDown --output data_3_windows/WT_sgA_R1_cmv_30bpDown --subst_type withSubst --total_reads 8171224 8180897 8314116 8096639 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_30bpDown --output data_3_windows/WT_sgA_R1_cmv_30bpDown --subst_type withoutSubst --total_reads 8171224 8180897 8314116 8096639 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_30bpDown --output data_3_windows/WT_sgA_R1_sense_30bpDown --subst_type withSubst --total_reads 7579965 7982725 7854740 7534924 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_30bpDown --output data_3_windows/WT_sgA_R1_sense_30bpDown --subst_type withoutSubst --total_reads 7579965 7982725 7854740 7534924 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_30bpDown --output data_3_windows/WT_sgB_R2_branch_30bpDown --subst_type withSubst --total_reads 9524548 10125834 10173904 9525100 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_30bpDown --output data_3_windows/WT_sgB_R2_branch_30bpDown --subst_type withoutSubst --total_reads 9524548 10125834 10173904 9525100 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_30bpDown --output data_3_windows/WT_sgB_R2_cmv_30bpDown --subst_type withSubst --total_reads 7280860 6872217 6847531 7081713 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_30bpDown --output data_3_windows/WT_sgB_R2_cmv_30bpDown --subst_type withoutSubst --total_reads 7280860 6872217 6847531 7081713 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_30bpDown --output data_3_windows/WT_sgB_R2_sense_30bpDown --subst_type withSubst --total_reads 7137355 6618133 8227882 7238408 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_30bpDown --output data_3_windows/WT_sgB_R2_sense_30bpDown --subst_type withoutSubst --total_reads 7137355 6618133 8227882 7238408 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_noDSB --output data_3_windows/WT_sgA_R1_branch_noDSB --subst_type withSubst --total_reads 12898941 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch_noDSB --output data_3_windows/WT_sgA_R1_branch_noDSB --subst_type withoutSubst --total_reads 12898941 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_noDSB --output data_3_windows/WT_sgA_R1_cmv_noDSB --subst_type withSubst --total_reads 10217401 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv_noDSB --output data_3_windows/WT_sgA_R1_cmv_noDSB --subst_type withoutSubst --total_reads 10217401 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_noDSB --output data_3_windows/WT_sgA_R1_sense_noDSB --subst_type withSubst --total_reads 10005232 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense_noDSB --output data_3_windows/WT_sgA_R1_sense_noDSB --subst_type withoutSubst --total_reads 10005232 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_noDSB --output data_3_windows/WT_sgB_R2_branch_noDSB --subst_type withSubst --total_reads 12461219 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch_noDSB --output data_3_windows/WT_sgB_R2_branch_noDSB --subst_type withoutSubst --total_reads 12461219 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_noDSB --output data_3_windows/WT_sgB_R2_cmv_noDSB --subst_type withSubst --total_reads 9853052 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv_noDSB --output data_3_windows/WT_sgB_R2_cmv_noDSB --subst_type withoutSubst --total_reads 9853052 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_noDSB --output data_3_windows/WT_sgB_R2_sense_noDSB --subst_type withSubst --total_reads 9354510 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense_noDSB --output data_3_windows/WT_sgB_R2_sense_noDSB --subst_type withoutSubst --total_reads 9354510 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch --output data_3_windows/WT_sgA_R1_branch --subst_type withSubst --total_reads 8808358 9297647 9399483 8799841 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_branch --output data_3_windows/WT_sgA_R1_branch --subst_type withoutSubst --total_reads 8808358 9297647 9399483 8799841 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv --output data_3_windows/WT_sgA_R1_cmv --subst_type withSubst --total_reads 8171224 8180897 8314116 8096639 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_cmv --output data_3_windows/WT_sgA_R1_cmv --subst_type withoutSubst --total_reads 8171224 8180897 8314116 8096639 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense --output data_3_windows/WT_sgA_R1_sense --subst_type withSubst --total_reads 7579965 7982725 7854740 7534924 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgA_R1_sense --output data_3_windows/WT_sgA_R1_sense --subst_type withoutSubst --total_reads 7579965 7982725 7854740 7534924 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch --output data_3_windows/WT_sgB_R2_branch --subst_type withSubst --total_reads 9524548 10125834 10173904 9525100 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_branch --output data_3_windows/WT_sgB_R2_branch --subst_type withoutSubst --total_reads 9524548 10125834 10173904 9525100 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv --output data_3_windows/WT_sgB_R2_cmv --subst_type withSubst --total_reads 7280860 6872217 6847531 7081713 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_cmv --output data_3_windows/WT_sgB_R2_cmv --subst_type withoutSubst --total_reads 7280860 6872217 6847531 7081713 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense --output data_3_windows/WT_sgB_R2_sense --subst_type withSubst --total_reads 7137355 6618133 8227882 7238408 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgB_R2_sense --output data_3_windows/WT_sgB_R2_sense --subst_type withoutSubst --total_reads 7137355 6618133 8227882 7238408 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_branch --output data_3_windows/WT_sgAB_R1_branch --subst_type withSubst --total_reads 9021462 9430938 9051278 9192054 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_branch --output data_3_windows/WT_sgAB_R1_branch --subst_type withoutSubst --total_reads 9021462 9430938 9051278 9192054 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_branch --output data_3_windows/WT_sgAB_R2_branch --subst_type withSubst --total_reads 8525251 8875435 8522228 8656502 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_branch --output data_3_windows/WT_sgAB_R2_branch --subst_type withoutSubst --total_reads 8525251 8875435 8522228 8656502 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_cmv --output data_3_windows/WT_sgAB_R1_cmv --subst_type withSubst --total_reads 7604379 8885716 8150455 7694818 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_cmv --output data_3_windows/WT_sgAB_R1_cmv --subst_type withoutSubst --total_reads 7604379 8885716 8150455 7694818 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_cmv --output data_3_windows/WT_sgAB_R2_cmv --subst_type withSubst --total_reads 6898791 7986453 7354088 6940576 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_cmv --output data_3_windows/WT_sgAB_R2_cmv --subst_type withoutSubst --total_reads 6898791 7986453 7354088 6940576 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_sense --output data_3_windows/WT_sgAB_R1_sense --subst_type withSubst --total_reads 6630053 7246619 8069391 7513691 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R1_sense --output data_3_windows/WT_sgAB_R1_sense --subst_type withoutSubst --total_reads 6630053 7246619 8069391 7513691 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_sense --output data_3_windows/WT_sgAB_R2_sense --subst_type withSubst --total_reads 6177083 6744517 7507107 7001340 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgAB_R2_sense --output data_3_windows/WT_sgAB_R2_sense --subst_type withoutSubst --total_reads 6177083 6744517 7507107 7001340 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_merged --output data_3_windows/WT_sgCD_R1_antisense_merged --subst_type withSubst --total_reads 14116151 13475081 13855904 11992516 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_merged --output data_3_windows/WT_sgCD_R1_antisense_merged --subst_type withoutSubst --total_reads 14116151 13475081 13855904 11992516 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_new --output data_3_windows/WT_sgCD_R1_antisense_new --subst_type withSubst --total_reads 6302370 5988345 5741048 5405939 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_new --output data_3_windows/WT_sgCD_R1_antisense_new --subst_type withoutSubst --total_reads 6302370 5988345 5741048 5405939 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_old --output data_3_windows/WT_sgCD_R1_antisense_old --subst_type withSubst --total_reads 7813781 7486736 8114856 6586577 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_antisense_old --output data_3_windows/WT_sgCD_R1_antisense_old --subst_type withoutSubst --total_reads 7813781 7486736 8114856 6586577 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_merged --output data_3_windows/WT_sgCD_R2_antisense_merged --subst_type withSubst --total_reads 13974893 13342868 13728439 11868064 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_merged --output data_3_windows/WT_sgCD_R2_antisense_merged --subst_type withoutSubst --total_reads 13974893 13342868 13728439 11868064 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_new --output data_3_windows/WT_sgCD_R2_antisense_new --subst_type withSubst --total_reads 6161112 5856132 5613583 5281487 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_new --output data_3_windows/WT_sgCD_R2_antisense_new --subst_type withoutSubst --total_reads 6161112 5856132 5613583 5281487 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_old --output data_3_windows/WT_sgCD_R2_antisense_old --subst_type withSubst --total_reads 7813781 7486736 8114856 6586577 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_antisense_old --output data_3_windows/WT_sgCD_R2_antisense_old --subst_type withoutSubst --total_reads 7813781 7486736 8114856 6586577 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_merged --output data_3_windows/WT_sgCD_R1_splicing_merged --subst_type withSubst --total_reads 13511783 13789121 12902873 13400566 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_merged --output data_3_windows/WT_sgCD_R1_splicing_merged --subst_type withoutSubst --total_reads 13511783 13789121 12902873 13400566 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_new --output data_3_windows/WT_sgCD_R1_splicing_new --subst_type withSubst --total_reads 4177291 4647120 4405688 5054324 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_new --output data_3_windows/WT_sgCD_R1_splicing_new --subst_type withoutSubst --total_reads 4177291 4647120 4405688 5054324 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_old --output data_3_windows/WT_sgCD_R1_splicing_old --subst_type withSubst --total_reads 9334492 9142001 8497185 8346242 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R1_splicing_old --output data_3_windows/WT_sgCD_R1_splicing_old --subst_type withoutSubst --total_reads 9334492 9142001 8497185 8346242 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_merged --output data_3_windows/WT_sgCD_R2_splicing_merged --subst_type withSubst --total_reads 13397050 13677124 12777909 13272580 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_merged --output data_3_windows/WT_sgCD_R2_splicing_merged --subst_type withoutSubst --total_reads 13397050 13677124 12777909 13272580 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_new --output data_3_windows/WT_sgCD_R2_splicing_new --subst_type withSubst --total_reads 4062558 4535123 4280724 4926338 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_new --output data_3_windows/WT_sgCD_R2_splicing_new --subst_type withoutSubst --total_reads 4062558 4535123 4280724 4926338 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_old --output data_3_windows/WT_sgCD_R2_splicing_old --subst_type withSubst --total_reads 9334492 9142001 8497185 8346242 --freq_min 1e-5
+python 2_windows/get_freqs.py --input data_3_windows/WT_sgCD_R2_splicing_old --output data_3_windows/WT_sgCD_R2_splicing_old --subst_type withoutSubst --total_reads 9334492 9142001 8497185 8346242 --freq_min 1e-5

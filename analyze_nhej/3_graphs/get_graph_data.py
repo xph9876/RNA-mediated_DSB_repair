@@ -37,15 +37,6 @@ def parse_args():
     choices = library_constants.SUBST_TYPES,
     help = 'Whether to process the files with/without substitutions.',
   )
-  parser.add_argument(
-    '--filter_min_freq',
-    type = float,
-    default = 1e-5,
-    help = (
-      'Minimum frequency for sequences in graphs.\n'
-      'Sequences with frequences <= this are discarded.'
-    ),
-  )
   return parser.parse_args()
 
 def get_sequence_data(data, data_format, min_freq):
@@ -124,7 +115,11 @@ def write_sequence_data(input_dir, output_dir, subst_type, min_freq):
   """
 
   data = file_utils.read_tsv(
-    file_names.windows(input_dir, library_constants.FREQ_FREQ, subst_type)
+    file_names.windows(
+      input_dir,
+      library_constants.FREQ_MEAN_FILTER,
+      subst_type,
+    )
   )
   data_info = file_utils.read_tsv_dict(file_names.data_info(output_dir))
   data = get_sequence_data(data, data_info['format'], min_freq)

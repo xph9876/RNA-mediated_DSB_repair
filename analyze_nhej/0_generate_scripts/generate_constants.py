@@ -139,8 +139,10 @@ OUTPUT_DIR = {
 PYTHON_SCRIPTS = {
   'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
   'combine_repeats': os.path.join('1_process_nhej', 'combine_repeats.py'),
-  'windows': os.path.join('1_process_nhej', 'get_windows.py'),
-  'windows_combined': os.path.join('1_process_nhej', 'get_windows.py'),
+  'get_windows': os.path.join('2_windows', 'get_windows.py'),
+  'get_merged': os.path.join('2_windows', 'get_merged.py'),
+  'get_freqs': os.path.join('2_windows', 'get_freqs.py'),
+  'get_graph_data': os.path.join('3_graphs', 'get_graph_data.py'),
   'graph': os.path.join('1_process_nhej', 'freqs.py'),
 }
 
