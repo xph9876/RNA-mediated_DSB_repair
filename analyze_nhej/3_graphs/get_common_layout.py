@@ -224,7 +224,7 @@ def make_common_layout(
   seq_data = seq_data.reset_index(drop=True)
 
   ### Write to files ###
-  file_out = file_names.sequenec_data(output_dir, subst_type)
+  file_out = file_names.sequence_data(output_dir, subst_type)
   log_utils.log(file_out)
   file_utils.write_tsv(seq_data, file_out)
   file_out = file_names.edge_data(output_dir, subst_type)

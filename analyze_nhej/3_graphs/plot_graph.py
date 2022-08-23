@@ -27,7 +27,7 @@ import kmer_utils
 import alignment_utils
 import file_names
 import plot_graph_helpers
-import make_common_layout
+import get_common_layout
 
 LAYOUT_PROPERTIES = {
  'mds_layout': {
