@@ -134,6 +134,7 @@ OUTPUT_DIR = {
   'windows': 'data_3_windows',
   'graphs': 'data_4_graphs',
   'histograms': 'data_5_histograms',
+  'layouts': 'data_6_layouts',
 }
 
 PYTHON_SCRIPTS = {
@@ -143,8 +144,13 @@ PYTHON_SCRIPTS = {
   'get_merged': os.path.join('2_windows', 'get_merged.py'),
   'get_freqs': os.path.join('2_windows', 'get_freqs.py'),
   'get_graph_data': os.path.join('3_graphs', 'get_graph_data.py'),
-  'graph': os.path.join('1_process_nhej', 'freqs.py'),
+  'common_layout': os.path.join('3_graphs', 'get_common_layout.py'),
 }
+
+for x in PYTHON_SCRIPTS.values():
+  if not os.path.exists(x):
+    raise Exception('Could not find script: ' + str(x))
+del x
 
 RUN_SCRIPTS = {
   'filter_nhej': 'data_1_filter_nhej',

@@ -23,7 +23,6 @@ def parse_args():
     description = 'Make common layouts for graphs.'
   )
   parser.add_argument(
-    '-i',
     '--input',
     type = common_utils.check_dir,
     nargs = '+',
@@ -35,7 +34,6 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '-rc',
     '--reverse_complement',
     choices = ['0', '1'],
     nargs = '+',
@@ -48,17 +46,14 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-o',
     '--output',
     type = common_utils.check_dir_output,
     help = 'Output directory.',
     required = True,
   )
   parser.add_argument(
-    '-st',
     '--subst_type',
-    default = 'without',
-    choices = ['with', 'without'],
+    choices = library_constants.SUBST_TYPES,
     help = 'Whether to use the data with or without substitutions.',
   )
   parser.add_argument(
@@ -68,7 +63,6 @@ def parse_args():
     help = 'Type of layout to use.',
   )
   args = parser.parse_args()
-  args.subst_type += 'Subst'
   args.layout += '_layout'
   if args.reverse_complement is None:
     args.reverse_complement = ['0'] * len(args.input)
@@ -239,8 +233,6 @@ def make_common_layout(
   log_utils.new_line()
 
 def main():
-  # sys.argv += "-i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv -o layouts/2DSB_R1 --subst_type without".split(" ")
-  # sys.argv += "-i libraries_4/WT_sgCD_R1_antisense libraries_4/WT_sgCD_R1_splicing -o layouts/2DSBanti_R1 --subst_type without".split(" ")
   args = parse_args()
   make_common_layout(
     args.input,
