@@ -71,7 +71,7 @@ def main():
   )
   args = parser.parse_args()
 
-  input_file = file_names.windows(
+  input_file = file_names.window(
     args.input,
     library_constants.COUNT,
     args.subst_type,
@@ -92,7 +92,7 @@ def main():
   data[freq_cols] = data[count_cols].divide(args.total_reads, axis='columns')
   data = data.drop(count_cols, axis='columns')
 
-  output_file = file_names.windows(
+  output_file = file_names.window(
     args.input,
     library_constants.FREQ,
     args.subst_type,
@@ -104,7 +104,7 @@ def main():
   data['freq_min'] = data[freq_cols].min(axis='columns')
   data = data.sort_values('freq_mean', ascending = False)
   
-  output_file = file_names.windows(
+  output_file = file_names.window(
     args.input,
     library_constants.FREQ_MEAN,
     args.subst_type,
@@ -116,7 +116,7 @@ def main():
   log_utils.log(output_file)
 
   data = data.loc[data['freq_min'] > args.freq_min]
-  output_file = file_names.windows(
+  output_file = file_names.window(
     args.input,
     library_constants.FREQ_MEAN_FILTER,
     args.subst_type,

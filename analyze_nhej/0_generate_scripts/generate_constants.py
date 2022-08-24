@@ -130,19 +130,21 @@ REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {
   'raw': 'data_0_raw',
   'filter_nhej': 'data_1_filter_nhej',
-  'combine_repeats': 'data_2_combine_repeats',
-  'windows': 'data_3_windows',
+  'combine_repeat': 'data_2_combine_repeat',
+  'window': 'data_3_window',
   'graphs': 'data_4_graphs',
-  'histograms': 'data_5_histograms',
+  'histogram_3d': 'data_5_histogram_3d',
   'layouts': 'data_6_layouts',
+  'plot_graph': os.path.join('plot', 'graph'),
+  'plot_histogram': os.path.join('plot', 'histogram'),
 }
 
 PYTHON_SCRIPTS = {
   'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
   'combine_repeats': os.path.join('1_process_nhej', 'combine_repeats.py'),
-  'get_windows': os.path.join('2_get_window_data', 'get_windows.py'),
+  'get_window': os.path.join('2_get_window_data', 'get_window.py'),
   'get_merged': os.path.join('2_get_window_data', 'get_merged.py'),
-  'get_freqs': os.path.join('2_get_window_data', 'get_freqs.py'),
+  'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
   'get_graph_data': os.path.join('3_get_graph_data', 'get_graph_data.py'),
   'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
   'get_common_layout': os.path.join('5_plot_graph', 'get_common_layout.py'),

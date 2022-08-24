@@ -144,7 +144,7 @@ def parse_args():
     # args.control_type = library_constants.CONTROL_NOT
   return args
 
-def write_alignment_windows(
+def write_alignment_window(
   input_file,
   output_dir,
   ref_seq,
@@ -251,7 +251,7 @@ def write_alignment_windows(
   # save the unfiltered repeat data
   data = data.drop('count_min', axis='columns')
   # file_utils.write_tsv(data, file_names.main_repeats(output_dir, subst_type))
-  output_file = file_names.windows(
+  output_file = file_names.window(
     output_dir,
     library_constants.COUNT,
     subst_type,
@@ -333,7 +333,7 @@ def main():
   log_utils.log('------>')
 
   ref_seq = fasta_utils.read_fasta_seq(args.ref_seq_file)
-  write_alignment_windows(
+  write_alignment_window(
     input_file = args.input, 
     output_dir = args.output,
     ref_seq = ref_seq,

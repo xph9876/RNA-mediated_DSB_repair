@@ -115,7 +115,7 @@ def write_sequence_data(input_dir, output_dir, subst_type):
   """
 
   data = file_utils.read_tsv(
-    file_names.windows(
+    file_names.window(
       input_dir,
       library_constants.FREQ_MEAN_FILTER,
       subst_type,

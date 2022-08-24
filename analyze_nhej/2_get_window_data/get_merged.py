@@ -64,7 +64,7 @@ def main():
 
   data = [
     file_utils.read_tsv(
-      file_names.windows(x, library_constants.COUNT, args.subst_type)
+      file_names.window(x, library_constants.COUNT, args.subst_type)
     )
     for x in args.input
   ]
@@ -97,7 +97,7 @@ def main():
     ascending = [False, True],
   ).reset_index(drop=True).drop('count_min', axis='columns')
 
-  output_file = file_names.windows(
+  output_file = file_names.window(
     args.output,
     library_constants.COUNT,
     args.subst_type,

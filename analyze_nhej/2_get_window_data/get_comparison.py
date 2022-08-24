@@ -13,7 +13,7 @@ import file_names
 import file_utils
 import log_utils
 
-import get_windows
+import get_window
 
 def parse_args():
   parser = argparse.ArgumentParser(
@@ -122,7 +122,7 @@ if __name__ == '__main__':
   )
 
   # Make the combined info
-  get_windows.write_data_info(
+  get_window.write_data_info(
     args.output,
     library_constants.DATA_COMPARISON,
     data_info_1['cell_line'],

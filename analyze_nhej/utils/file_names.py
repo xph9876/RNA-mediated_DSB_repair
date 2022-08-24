@@ -6,10 +6,10 @@ IMAGE_DIR = 'images'
 def make_file_name(dir, *args, ext):
   return os.path.join(dir, '_'.join(map(str, args)) + os.path.extsep + ext)
 
-def windows(dir, freq_type, subst_type):
+def window(dir, freq_type, subst_type):
   library_constants.check_subst_type(subst_type)
   library_constants.check_freq_type(freq_type)
-  return make_file_name(dir, 'windows', freq_type, subst_type, ext = 'tsv')
+  return make_file_name(dir, 'window', freq_type, subst_type, ext = 'tsv')
 
 def sequence_data(dir, subst_type):
   library_constants.check_subst_type(subst_type)

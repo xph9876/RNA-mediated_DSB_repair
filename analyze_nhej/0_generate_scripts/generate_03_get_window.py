@@ -5,20 +5,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import log_utils
 import generate_constants
 import library_constants
-import generate_02_combine_repeats
+import generate_02_combine_repeat
 
 def get_input_file(name):
-  return generate_02_combine_repeats.get_output_file(name)
+  return generate_02_combine_repeat.get_output_file(name)
 
 def get_output_dir(name):
   return os.path.join(
-    generate_constants.OUTPUT_DIR['windows'],
+    generate_constants.OUTPUT_DIR['window'],
     name
   )
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open(os.path.join('run_03_get_windows' + os.path.extsep + ext), 'w') as file_out:
+    with open(os.path.join('run_03_get_window' + os.path.extsep + ext), 'w') as file_out:
       # get windows
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         if info['version'] != 'merged':
@@ -33,7 +33,7 @@ if __name__ == '__main__':
             construct = info['construct']
             control_type = info['control_type']
             output_dir = get_output_dir(info['name'])
-            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_windows']} --input {input_file} --ref_seq_file {ref_seq_file} --output {output_dir} --dsb_pos {dsb_pos} --dsb_type {dsb_type} --strand {strand} --guide_rna {guide_rna} --cell_line {cell_line} --construct {construct} --subst_type {subst_type} --control_type {control_type}\n")
+            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_window']} --input {input_file} --ref_seq_file {ref_seq_file} --output {output_dir} --dsb_pos {dsb_pos} --dsb_type {dsb_type} --strand {strand} --guide_rna {guide_rna} --cell_line {cell_line} --construct {construct} --subst_type {subst_type} --control_type {control_type}\n")
       
       # get merged for old/new antisense libraries
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):

@@ -26,7 +26,7 @@ import file_utils
 import kmer_utils
 import alignment_utils
 import file_names
-import plot_graph_helpers
+import plot_graph_helper
 import get_common_layout
 
 LAYOUT_PROPERTIES = {
@@ -1841,7 +1841,7 @@ def make_graph_single_panel(
   ### Make graph layout ###
   extra_layout_args = {}
   if graph_layout_type == 'variation_position_layout_circle_pack':
-    extra_layout_args['node_size_px_dict'] = plot_graph_helpers.get_node_size(
+    extra_layout_args['node_size_px_dict'] = plot_graph_helper.get_node_size(
       data_info = data_info,
       node_data = node_data,
       node_type = node_type,
@@ -1880,7 +1880,7 @@ def make_graph_single_panel(
   ### Plot edges and nodes ###
   edge_traces = []
   if edge_show:
-    edge_traces = plot_graph_helpers.make_edges_traces(
+    edge_traces = plot_graph_helper.make_edges_traces(
       data_info = data_info,
       graph = graph,
       layout = graph_layout,
@@ -1890,7 +1890,7 @@ def make_graph_single_panel(
       reverse_complement = sequence_reverse_complement,
     )
 
-  node_traces = plot_graph_helpers.make_point_traces(
+  node_traces = plot_graph_helper.make_point_traces(
     data_info = data_info,
     node_data = node_data,
     graph_layout = graph_layout,

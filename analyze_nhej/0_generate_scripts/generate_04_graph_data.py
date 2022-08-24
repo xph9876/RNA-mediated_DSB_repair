@@ -5,10 +5,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import log_utils
 import generate_constants
 import library_constants
-import generate_03_get_windows
+import generate_03_get_window
 
 def get_input_dir(name):
-  return generate_03_get_windows.get_output_dir(name)
+  return generate_03_get_window.get_output_dir(name)
 
 def get_output_dir(name):
   return os.path.join(
