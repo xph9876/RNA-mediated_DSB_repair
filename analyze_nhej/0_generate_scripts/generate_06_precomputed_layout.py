@@ -31,6 +31,6 @@ if __name__ == '__main__':
           '1' if strand == library_constants.STRAND_R2 else '0'
           for strand in experiments['strand']
         )
-        output_dir = get_output_dir(generate_constants.LAYOUT_NAME, group_name)
-        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_precomputed_layout']} --input {input_dirs} --output {output_dir} --reverse_complement {reverse_complement} --subst_type {library_constants.SUBST_WITHOUT} --layout {generate_constants.LAYOUT_NAME}\n")
+        output_dir = get_output_dir(generate_constants.USE_LAYOUT, group_name)
+        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_precomputed_layout']} --input {input_dirs} --output {output_dir} --reverse_complement {reverse_complement} --subst_type {library_constants.SUBST_WITHOUT} --layout {generate_constants.USE_LAYOUT}\n")
       log_utils.log(file_out.name)

@@ -211,4 +211,8 @@ LIBRARY_INFO.to_excel('library_info.xlsx')
 EXPERIMENT_INFO.to_excel('experiment_info.xlsx')
 
 USE_PRECOMPUTED_LAYOUT = True
-LAYOUT_NAME = 'universal'
+LAYOUT_UNIVERSAL = 'universal'
+LAYOUT_FRACTAL = 'fractal'
+LAYOUT_RADIAL = 'radial'
+LAYOUTS = [LAYOUT_UNIVERSAL, LAYOUT_FRACTAL, LAYOUT_RADIAL]
+USE_LAYOUT = LAYOUT_UNIVERSAL
