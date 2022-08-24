@@ -20,6 +20,23 @@ def get_output_dir(name):
     name,
   )
 
+def get_range_x(layout_name, layout_group):
+  if layout_name == 'universal':
+    # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", -12, IF(table_7_1[[#This Row],[hguide]]="CD", -12, IF(table_7_1[[#This Row],[hguide]]="A", -12, IF(table_7_1[[#This Row],[hguide]]="B", -12, NA())))), NA())
+    if layout_group == '2DSB':
+      range_x = [-12, 13]
+    elif layout_group == '1DSB_A':
+      range_x = [-12, 13]
+    elif layout_group == '1DSB_B':
+      range_x = [-12, 13]
+    elif layout_group == '2DSBanti':
+      range_x = [-12, 13]
+    else:
+      raise Exception('Unknown layout group: ' + str(layout_group))
+    return '--range_x ' + ' '.join(str(x) for x in range_x)
+  else:
+    return ''
+
 # FIXME: DO THIS NEXT!!!
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
