@@ -176,17 +176,17 @@ FREQ_RATIO_COLOR_BAR_TICK_TEXT = [
   '3/2',
 ]
 
-def get_freq_ratio_color_scale(treatment_1, treatment_2):
+def get_freq_ratio_color_scale(construct_1, construct_2):
   return [
-    [0, CONSTRUCT_COLOR[treatment_2]],
-    [0.5, CONSTRUCT_COLOR[treatment_1 + '_' + treatment_2]],
-    [1, CONSTRUCT_COLOR[treatment_1]],
+    [0, CONSTRUCT_COLOR[construct_2]],
+    [0.5, CONSTRUCT_COLOR[construct_1 + '_' + construct_2]],
+    [1, CONSTRUCT_COLOR[construct_1]],
   ]
 
-def get_freq_ratio_label(freq_group, treatment_1, treatment_2):
+def get_freq_ratio_label(freq_group, construct_1, construct_2):
   if freq_group == FREQ_GROUP_A:
     return (
-      f'Higher in {LABELS[treatment_1]}<br>' +
+      f'Higher in {LABELS[construct_1]}<br>' +
       f'(ratio > {FREQ_RATIO_A:0.2f})'
     )
   elif freq_group == FREQ_GROUP_B:
@@ -196,7 +196,7 @@ def get_freq_ratio_label(freq_group, treatment_1, treatment_2):
     )
   elif freq_group == FREQ_GROUP_C:
     return (
-      f'Higher in {LABELS[treatment_2]}<br>' + 
+      f'Higher in {LABELS[construct_2]}<br>' + 
       f'(ratio < {FREQ_RATIO_C:0.2f})'
     )
   else:
@@ -216,7 +216,7 @@ FREQ_RANK_COLUMNS = {
   DATA_COMPARISON: ['freq_mean_rank_1', 'freq_mean_rank_2'],
 }
 
-### Treatments ###
+### Constructs ###
 
 ## Individual ##
 CONSTRUCT_SENSE = 'sense'
@@ -274,20 +274,20 @@ LABELS = {
 
 def get_data_label(data_info):
   if data_info['format'] == 'individual':
-    treatment_str = data_info['treatment']
+    construct_str = data_info['construct']
   elif data_info['format'] == 'combined':
-    treatment_str = '_'.join([data_info['treatment_1'], data_info['treatment_2']])
+    construct_str = '_'.join([data_info['construct_1'], data_info['construct_2']])
   else:
     raise Exception('Unknown format: ' + str(data_info['format']))
-  if data_info['control'] == CONTROL_NOT:
+  if data_info['control_type'] == CONTROL_NOT:
     control_str = None
   else:
-    control_str = data_info['control']
+    control_str = data_info['control_type']
   str_list = [
     data_info['cell_line'],
-    data_info['hguide'],
+    data_info['guide_rna'],
     data_info['strand'],
-    treatment_str,
+    construct_str,
     control_str
   ]
   return '_'.join(x for x in str_list if x is not None)

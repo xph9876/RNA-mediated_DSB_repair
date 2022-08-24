@@ -982,6 +982,7 @@ def make_grid_spec(
   return grid_spec
 
 def make_graph_layout(
+  data_dir,
   data_info,
   node_type,
   node_subst_type,
@@ -1030,10 +1031,7 @@ def make_graph_layout(
 
     if LAYOUT_PROPERTIES[layout_type].get('distance_matrix', False):
       distance_matrix = file_utils.read_tsv(
-        file_names.distance_matrix(
-          data_info['dir'],
-          node_subst_type,
-        )
+        file_names.distance_matrix(data_dir, node_subst_type)
       )
     else:
       distance_matrix = None
@@ -1352,8 +1350,8 @@ def make_size_legend(
 
 
 def make_freq_group_legend(
-  treatment_1,
-  treatment_2,
+  construct_1,
+  construct_2,
   figure,
   node_size_px,
   x_anchor,
@@ -1369,15 +1367,15 @@ def make_freq_group_legend(
     'type': 'circle',
     'size': node_size_px,
     'text': library_constants.get_freq_ratio_label(
-      library_constants.FREQ_GROUP_A, treatment_1, treatment_2
+      library_constants.FREQ_GROUP_A, construct_1, construct_2
     ),
-    'color': library_constants.CONSTRUCT_COLOR[treatment_1],
+    'color': library_constants.CONSTRUCT_COLOR[construct_1],
   })
   legend_items.append({
     'type': 'circle',
     'size': node_size_px,
     'text': library_constants.get_freq_ratio_label(
-      library_constants.FREQ_GROUP_B, treatment_1, treatment_2
+      library_constants.FREQ_GROUP_B, construct_1, construct_2
     ),
     'color': library_constants.SIMILAR_FREQ_COLOR,
   })
@@ -1385,9 +1383,9 @@ def make_freq_group_legend(
     'type': 'circle',
     'size': node_size_px,
     'text': library_constants.get_freq_ratio_label(
-      library_constants.FREQ_GROUP_C, treatment_1, treatment_2
+      library_constants.FREQ_GROUP_C, construct_1, construct_2
     ),
-    'color': library_constants.CONSTRUCT_COLOR[treatment_2],
+    'color': library_constants.CONSTRUCT_COLOR[construct_2],
   })
   return make_legend(
     figure = figure,
@@ -1408,8 +1406,8 @@ def make_freq_group_legend(
 
 def add_plotly_colorbar(
   figure,
-  treatment_1,
-  treatment_2,
+  construct_1,
+  construct_2,
   row,
   col,
   figure_height_px,
@@ -1453,7 +1451,7 @@ def add_plotly_colorbar(
           'text': (
             'Frequency Ratio<br>'
             'Color Scale<br>'
-            f'[{library_constants.LABELS[treatment_1]} / {library_constants.LABELS[treatment_2]}]'
+            f'[{library_constants.LABELS[construct_1]} / {library_constants.LABELS[construct_2]}]'
           ),
           'font_size': library_constants.GRAPH_LEGEND_TITLE_FONT_SIZE * font_size_scale,
         },
@@ -1517,19 +1515,19 @@ def make_custom_legends(
     )
     y_shift_curr_px -= legend_vertical_space_px
   elif node_color_type == 'freq_group':
-    treatment_1_list = list(set(
-      data_info['treatment_1'] for data_info in data_info_grid.ravel()
+    construct_1_list = list(set(
+      data_info['construct_1'] for data_info in data_info_grid.ravel()
       if data_info['format'] == library_constants.DATA_COMPARISON
     ))
-    treatment_2_list = list(set(
-      data_info['treatment_2'] for data_info in data_info_grid.ravel()
+    construct_2_list = list(set(
+      data_info['construct_2'] for data_info in data_info_grid.ravel()
       if data_info['format'] == library_constants.DATA_COMPARISON
     ))
-    for treatment_1 in treatment_1_list:
-      for treatment_2 in treatment_2_list:
+    for construct_1 in construct_1_list:
+      for construct_2 in construct_2_list:
         y_shift_curr_px = make_freq_group_legend(
-          treatment_1 = treatment_1,
-          treatment_2 = treatment_2,
+          construct_1 = construct_1,
+          construct_2 = construct_2,
           figure = figure,
           node_size_px = node_size_max_px,
           x_anchor = 1,
@@ -1542,18 +1540,18 @@ def make_custom_legends(
         )
       y_shift_curr_px -= legend_vertical_space_px
   elif node_color_type == 'freq_ratio':
-    treatment_pair_row_col = {}
+    construct_pair_row_col = {}
     for row in range(data_info_grid.shape[0]):
       for col in range(data_info_grid.shape[1]):
-        treatment_1 = data_info_grid[row, col]['treatment_1']
-        treatment_2 = data_info_grid[row, col]['treatment_2']
-        treatment_pair_row_col[treatment_1, treatment_2] = (row, col)
+        construct_1 = data_info_grid[row, col]['construct_1']
+        construct_2 = data_info_grid[row, col]['construct_2']
+        construct_pair_row_col[construct_1, construct_2] = (row, col)
 
-    for (treatment_1, treatment_2), (row, col) in treatment_pair_row_col.items():
+    for (construct_1, construct_2), (row, col) in construct_pair_row_col.items():
       y_shift_curr_px = add_plotly_colorbar(
         figure = figure,
-        treatment_1 = treatment_1,
-        treatment_2 = treatment_2,
+        construct_1 = construct_1,
+        construct_2 = construct_2,
         row = row + 1,
         col = col + 1,
         # figure_height_px = figure_size_args['total_height_px'],
@@ -1605,6 +1603,7 @@ def make_custom_legends(
 
 def make_graph_stats(
   figure,
+  data_dir,
   data_info,
   row,
   col,
@@ -1616,7 +1615,7 @@ def make_graph_stats(
   y_anchor,
   font_size_scale = 1,
 ):
-  graph_stats = file_utils.read_tsv_dict(file_names.graph_stats(data_info['dir']))
+  graph_stats = file_utils.read_tsv_dict(file_names.graph_stats(data_dir))
   graph_stats = graph_stats.applymap(
     lambda x: (
       'NA' if pd.isna(x) else
@@ -1655,6 +1654,7 @@ def make_graph_stats(
 
 def make_graph_stats_ref_component(
   figure,
+  data_dir,
   data_info,
   subst_type,
   row,
@@ -1668,7 +1668,7 @@ def make_graph_stats_ref_component(
   font_size_scale = 1,
 ):
   graph_stats = file_utils.read_tsv_dict(
-    file_names.graph_stats(data_info['dir'], subst_type)
+    file_names.graph_stats(data_dir, subst_type)
   )
   # Need a dummy scatter to initialize the axes
   figure.add_scatter(
@@ -1769,6 +1769,7 @@ def make_graph_single_panel(
   figure,
   row,
   col,
+  data_dir,
   data_info,
   sequence_reverse_complement = False,
   node_type = 'sequence_data',
@@ -1809,17 +1810,17 @@ def make_graph_single_panel(
 ):
   ### Load node data ###
   if node_type == 'sequence_data':
-    node_data = file_utils.read_tsv(file_names.sequence_data(data_info['dir'], node_subst_type))
+    node_data = file_utils.read_tsv(file_names.sequence_data(data_dir, node_subst_type))
   elif node_type == 'variation':
-    node_data = file_utils.read_tsv(file_names.variation(data_info['dir'], node_subst_type))
+    node_data = file_utils.read_tsv(file_names.variation(data_dir, node_subst_type))
   elif node_type == 'variation_grouped':
-    node_data = file_utils.read_tsv(file_names.variation_grouped(data_info['dir'], node_subst_type))
+    node_data = file_utils.read_tsv(file_names.variation_grouped(data_dir, node_subst_type))
   else:
     raise Exception('Unknown node data type: ' + str(node_type))
   node_data = node_data.set_index('id', drop=False)
 
   ### Load graph ###
-  graph = graph_utils.load_graph(data_info['dir'], node_subst_type)
+  graph = graph_utils.load_graph(data_dir, node_subst_type)
 
   ### Node filtering / subgraph ###
   if node_filter_variation_types is not None:
@@ -1866,6 +1867,7 @@ def make_graph_single_panel(
   )
   
   graph_layout = make_graph_layout(
+    data_dir = data_dir,
     data_info = data_info,
     node_type = node_type,
     node_subst_type = node_subst_type,
@@ -1935,7 +1937,7 @@ def make_graph_single_panel(
       'variation_position_layout_circle_pack',
     ]:
       position_label_type = (
-        'absolute' if data_info['control'] == '30bpDown' else 'relative'
+        'absolute' if data_info['control_type'] == '30bpDown' else 'relative'
       )
       x_axis_tick_text = library_constants.get_position_labels(
         position_label_type,
@@ -2025,8 +2027,8 @@ def make_graph_single_panel(
     figure.update_traces(
       marker = {
         'colorscale': library_constants.get_freq_ratio_color_scale(
-          data_info['treatment_1'],
-          data_info['treatment_2'],
+          data_info['construct_1'],
+          data_info['construct_2'],
         ),
         'cmin': library_constants.FREQ_RATIO_COLOR_SCALE_LOG_MIN,
         'cmax': library_constants.FREQ_RATIO_COLOR_SCALE_LOG_MAX,
@@ -2256,14 +2258,14 @@ def make_graph_figure(
       elif legend_common:
         legend_show = (row == 1) and (col == 1)
 
-      data_info = file_utils.read_tsv_dict(
-        file_names.data_info(data_dir_grid[row - 1, col - 1])
-      )
+      data_dir = data_dir_grid[row - 1, col - 1]
+      data_info = file_utils.read_tsv_dict(file_names.data_info(data_dir))
 
       make_graph_single_panel(
         figure = figure,
         row = row,
         col = col,
+        data_dir = data_dir,
         data_info = data_info,
         node_type = node_type,
         node_subst_type = node_subst_type,
@@ -2328,6 +2330,7 @@ def make_graph_figure(
       if graph_stats_show:
         make_graph_stats_ref_component(
           figure = figure,
+          data_dir = data_dir,
           data_info = data_info,
           row = row,
           col = col,
@@ -2444,6 +2447,7 @@ def make_graph_figure(
 
 
 def get_plot_args(
+  data_dir,
   data_info,
   plot_type,
   title_show = False,
@@ -2477,7 +2481,7 @@ def get_plot_args(
     raise Exception('Unhandled plot type: ' + str(plot_type))
 
   plot_args = {}
-  plot_args['data_dir_grid'] = np.array([[data_info['dir']]])
+  plot_args['data_dir_grid'] = np.array([[data_dir]])
   plot_args['sequence_reverse_complement'] = sequence_reverse_complement
   plot_args['node_type'] = 'sequence_data'
   plot_args['node_subst_type'] = node_subst_type
@@ -2536,23 +2540,21 @@ def parse_args():
     description = 'Plot graph-theory graphs.'
   )
   parser.add_argument(
-    '-i',
     '--input',
     type = common_utils.check_dir,
-    help = 'Directory with the data files.',
+    help = 'Directory with the data files produced with make_graph_data.py.',
     required = True,
   )
   parser.add_argument(
-    '-o',
     '--output',
     type = common_utils.check_dir_output,
     help = (
       'Output directory.' +
-      ' If not given not output will be written (only useful when using --interative).'
+      ' If not given no output will be written.'
     ),
   )
   parser.add_argument(
-    '-ext',
+    '--ext',
     choices = ['png', 'html'],
     default = 'png',
     help = (
@@ -2564,7 +2566,7 @@ def parse_args():
     '--title',
     action = 'store_true',
     help = (
-      'If present adds a title to the plot showing the type of'
+      'If present, adds a title to the plot showing the type of'
       ' and the name of the data set.'
     )
   )
@@ -2847,22 +2849,12 @@ def parse_args():
   return args
 
 def main():
-  # sys.argv += (
-  #   '-i libraries_4/WT_sgCD_R2_antisense --layout universal --title --interactive' +
-  #   ' --universal_layout_y_axis_x_pos 13 --universal_layout_x_axis_deletion_y_pos -18' +
-  #   ' --universal_layout_y_axis_y_range -16 18' +
-  #   ' --universal_layout_x_axis_insertion_y_pos 19 --universal_layout_x_axis_x_range -11 11'
-  # ).split(' ')
-  # sys.argv += '-i libraries_4/WT_sgCD_R2_antisense_splicing --layout universal --title --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgCD_R1_antisense --layout fractal --title --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgAB_R2_sense --layout fractal --title --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgAB_R1_sense --layout fractal --title --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgB_R2_sense --layout fractal --title --interactive'.split(' ')
-  # sys.argv += '-i libraries_4/WT_sgA_R1_sense --layout fractal --title --interactive'.split(' ')
   args = parse_args()
+  data_dir = args.input
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
   data_label = library_constants.get_data_label(data_info)
   plot_args = get_plot_args(
+    data_dir = data_dir,
     data_info = data_info,
     plot_type = args.layout + '_layout',
     title_show = args.title,
@@ -2890,7 +2882,7 @@ def main():
   figure = make_graph_figure(**plot_args, edge_show=True, edge_show_types=['indel'])
 
   sequence_data = file_utils.read_tsv(
-    file_names.sequence_data(data_info['dir'], args.subst_type)
+    file_names.sequence_data(data_dir, args.subst_type)
   )
   if args.universal_layout_y_axis_insertion_max_tick is None:
     try:
@@ -2941,7 +2933,7 @@ def main():
       x_min = args.universal_layout_x_axis_x_range[0],
       x_max = args.universal_layout_x_axis_x_range[1],
       deletion_label_type = (
-        'absolute' if data_info['control'] == '30bpDown' else 'relative'
+        'absolute' if data_info['control_type'] == '30bpDown' else 'relative'
       ),
     )
   if args.universal_layout_x_axis_insertion_y_pos is not None:

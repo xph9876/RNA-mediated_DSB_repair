@@ -9,8 +9,8 @@ import log_utils
 
 total_reads = pd.read_csv(os.path.join(os.path.dirname(__file__), 'total_reads_orig.csv'))
 total_reads_new = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'total_reads_new.tsv'))
-total_reads_new = total_reads_new.loc[total_reads_new['control'] == 'none']
-total_reads_new = total_reads_new.drop('control', axis='columns')
+total_reads_new = total_reads_new.loc[total_reads_new['control_type'] == 'none']
+total_reads_new = total_reads_new.drop('control_type', axis='columns')
 total_reads_new.columns = [
   x + ('_new' if x.startswith('total') else '')
   for x in total_reads_new.columns

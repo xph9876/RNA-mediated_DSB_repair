@@ -8,14 +8,11 @@ import library_constants
 import generate_04_graph_data
 
 def get_input_dir(name):
-  return os.path.join(
-    generate_04_graph_data.get_output_dir(name),
-    name,
-  )
+  return generate_04_graph_data.get_output_dir(name)
 
 def get_output_dir(layout_name, layout_group):
   return os.path.join(
-    generate_constants.OUTPUT_DIR['layouts'],
+    generate_constants.OUTPUT_DIR['layout'],
     layout_name,
     layout_group,
   )
@@ -26,9 +23,9 @@ if __name__ == '__main__':
       layout_group_experiments = dict(list(generate_constants.EXPERIMENT_INFO.groupby('layout_group')))
       for group_name in generate_constants.LAYOUT_GROUPS:
         experiments = layout_group_experiments[group_name]
-        input_dirs = ' '.join([get_input_dir(name) for name in experiments['name']])
+        input_dirs = ' '.join(get_input_dir(name) for name in experiments['name'])
         reverse_complement = ' '.join(
-          '1' if strand == library_constants.STRAND_R2 else '0'
+          '1' if (strand == library_constants.STRAND_R2) else '0'
           for strand in experiments['strand']
         )
         output_dir = get_output_dir(generate_constants.USE_LAYOUT, group_name)

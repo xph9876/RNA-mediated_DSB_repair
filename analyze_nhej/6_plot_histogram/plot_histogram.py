@@ -64,6 +64,7 @@ def get_figure_args_pyplot(
   }
 
 def get_variation_data(
+  data_dir,
   data_info,
   variation_type,
   format,
@@ -73,7 +74,7 @@ def get_variation_data(
   ref_length = len(data_info['ref_seq_windows'])
 
   data_long = file_utils.read_tsv(
-    file_names.variation_grouped(data_info['dir'], library_constants.SUBST_WITH)
+    file_names.variation_grouped(data_dir, library_constants.SUBST_WITH)
   )
   data_long = data_long.loc[data_long['variation_type'] == variation_type]
   if reverse_pos:
@@ -113,6 +114,7 @@ def get_variation_data(
     raise Exception('Invalid value for format: ' + str(format))
 
 def plot_histogram_impl(
+  data_dir,
   data_info,
   variation_type,
   freq_min,
@@ -140,9 +142,10 @@ def plot_histogram_impl(
     freq_max_axis = freq_max
 
   data_sub_long = get_variation_data(
-    data_info,
-    variation_type,
-    'long',
+    data_dir = data_dir,
+    data_info = data_info,
+    variation_type = variation_type,
+    format = 'long',
     reverse_pos = reverse_pos,
   )
 
@@ -238,12 +241,13 @@ def plot_histogram_impl(
 
   if show_title:
     axis.set_title(
-      library_constants.LABELS[data_info['control']] + ' ' + variation_type.capitalize(),
+      library_constants.LABELS[data_info['control_type']] + ' ' + variation_type.capitalize(),
       fontsize = library_constants.HISTOGRAM_TITLE_FONT_SIZE * font_size_scale,
     )
 
 def plot_histogram(
   file_out,
+  data_dir,
   data_info,
   variation_type,
   freq_min,
@@ -279,6 +283,7 @@ def plot_histogram(
   font_size_scale = library_constants.HISTOGRAM_FONT_SIZE_SCALE
 
   plot_histogram_impl(
+    data_dir = data_dir,
     data_info = data_info,
     variation_type = variation_type,
     freq_min = freq_min,
@@ -307,21 +312,18 @@ def parse_args():
     description = 'Plot 3d histograms showing variation type/position/frequency.'
   )
   parser.add_argument(
-    '-i',
     '--input',
     type = common_utils.check_dir,
     help = 'Directory with the data files.',
     required = True,
   )
   parser.add_argument(
-    '-o',
     '--output',
     type = common_utils.check_dir_output,
     help = 'Output directory.',
     required = True,
   )
   parser.add_argument(
-    '-rp',
     '--reverse_pos',
     action = 'store_true',
     help = (
@@ -330,7 +332,6 @@ def parse_args():
     )
   )
   parser.add_argument(
-    '-lt',
     '--label_type',
     choices = ['relative', 'absolute'],
     help = (
@@ -344,13 +345,15 @@ def parse_args():
 
 def main():
   args = parse_args()
+  data_dir = args.input
   data_info = file_utils.read_tsv_dict(file_names.data_info(args.input))
   data_label = library_constants.get_data_label(data_info)
   for variation_type in ['substitution', 'insertion', 'deletion']:
     plot_histogram(
-      os.path.join(args.output, file_names.histogram_3d(data_label, variation_type)),
-      data_info,
-      variation_type,
+      file_out = os.path.join(args.output, file_names.histogram_3d(data_label, variation_type)),
+      data_dir = data_dir,
+      data_info = data_info,
+      variation_type = variation_type,
       freq_min = library_constants.HISTOGRAM_FREQ_MIN,
       freq_max = library_constants.HISTOGRAM_FREQ_MAX,
       freq_log = True,

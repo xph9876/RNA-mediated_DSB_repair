@@ -149,6 +149,20 @@ EXPERIMENT_INFO.loc[
   'layout_group'
 ] = LAYOUT_GROUP_2DSBanti
 
+EXPERIMENT_INFO['show_universal_layout_axis'] = False
+EXPERIMENT_INFO.loc[
+  EXPERIMENT_INFO['name'].isin(
+    [
+      'WT_sgAB_R1_sense',
+      'WT_sgA_R1_sense',
+      'KO_sgAB_R1_sense',
+      'KO_sgA_R1_sense',
+      'WT_sgCD_R1_antisense'
+    ]
+ ),
+ 'show_universal_layout_axis'
+] = True
+
 def get_experiment_info(**args):
   experiment_info = EXPERIMENT_INFO
   for key in args:
@@ -167,9 +181,9 @@ OUTPUT_DIR = {
   'filter_nhej': 'data_1_filter_nhej',
   'combine_repeat': 'data_2_combine_repeat',
   'window': 'data_3_window',
-  'graphs': 'data_4_graphs',
+  'graph': 'data_4_graph',
   'histogram': 'data_5_histogram',
-  'layouts': 'data_6_layouts',
+  'layout': 'data_6_precomputed_layout',
   'plot_graph': os.path.join('plot', 'graph'),
   'plot_histogram': os.path.join('plot', 'histogram'),
 }
@@ -182,7 +196,7 @@ PYTHON_SCRIPTS = {
   'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
   'get_graph_data': os.path.join('3_get_graph_data', 'get_graph_data.py'),
   'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
-  'get_common_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),
+  'get_precomputed_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),
   'plot_graph': os.path.join('5_plot_graph', 'plot_graph.py'),
   'plot_histogram': os.path.join('6_plot_histogram', 'plot_histogram.py'),
 }
@@ -216,3 +230,6 @@ LAYOUT_FRACTAL = 'fractal'
 LAYOUT_RADIAL = 'radial'
 LAYOUTS = [LAYOUT_UNIVERSAL, LAYOUT_FRACTAL, LAYOUT_RADIAL]
 USE_LAYOUT = LAYOUT_UNIVERSAL
+
+GRAPH_HEIGHT_PX = 1800
+GRAPH_WIDTH_PX = 2400

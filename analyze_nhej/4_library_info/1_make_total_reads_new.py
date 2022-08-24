@@ -44,7 +44,7 @@ for library_file in glob.glob('libraries_2/*'):
   data_output.append({
     'library': library,
     'strand': strand,
-    'control': control,
+    'control_type': control,
     'total_nhej': total,
     'total_nhej_no_mut': total_no_mut,
     'total_nhej_yes_mut': total_yes_mut,
@@ -55,7 +55,7 @@ data_output = pd.DataFrame.from_records(
   columns = [
     'library',
     'strand',
-    'control',
+    'control_type',
     'total_nhej',
     'total_nhej_no_mut',
     'total_nhej_yes_mut',

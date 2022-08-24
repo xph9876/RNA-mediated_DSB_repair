@@ -70,20 +70,20 @@ LEGENDS = {
   'node_type': {'type': 'node_type'},
   'freq_ratio_sense_branch': {
    'type': 'freq_ratio',
-   'treatment_1': 'sense',
-   'treatment_2': 'branch',
+   'construct_1': 'sense',
+   'construct_2': 'branch',
    'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_sense_branch.png'),
   },
   'freq_ratio_sense_cmv': {
    'type': 'freq_ratio',
-   'treatment_1': 'sense',
-   'treatment_2': 'cmv',
+   'construct_1': 'sense',
+   'construct_2': 'cmv',
    'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_sense_cmv.png'),
   },
   'freq_ratio_antisense_splicing': {
    'type': 'freq_ratio',
-   'treatment_1': 'antisense',
-   'treatment_2': 'splicing',
+   'construct_1': 'antisense',
+   'construct_2': 'splicing',
    'color_bar_file': os.path.join(file_names.IMAGE_DIR, 'freq_ratio_antisense_splicing.png'),
   },
 }
@@ -544,12 +544,12 @@ def make_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'freq_ratio':
-        treatment_1 = legend['treatment_1']
-        treatment_2 = legend['treatment_2']
+        construct_1 = legend['construct_1']
+        construct_2 = legend['construct_2']
         if orientation == 'v':
-          title = f'Ratio\n[{library_constants.LABELS[treatment_1]} / {library_constants.LABELS[treatment_2]}]'
+          title = f'Ratio\n[{library_constants.LABELS[construct_1]} / {library_constants.LABELS[construct_2]}]'
         elif orientation == 'h':
-          title = f'Ratio [{library_constants.LABELS[treatment_1]} / {library_constants.LABELS[treatment_2]}]'
+          title = f'Ratio [{library_constants.LABELS[construct_1]} / {library_constants.LABELS[construct_2]}]'
         else:
           raise Exception('Impossible')
         color_bar_file = legend['color_bar_file']

@@ -284,7 +284,6 @@ def write_data_info(
   ref_seq_window,
 ):
   data_info = {
-    'dir': dir,
     'format': format,
     'cell_line': cell_line,
     'dsb_type': dsb_type,

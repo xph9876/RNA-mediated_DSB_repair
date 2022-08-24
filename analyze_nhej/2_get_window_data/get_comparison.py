@@ -21,7 +21,7 @@ def parse_args():
       'Combine two individual experiment directories to make combined' +
       ' experiment directory for comparison graphs.' +
       ' The experiments must be compatible (have all the same attribute ' +
-      ' except for the treatments which must be different).'
+      ' except for the constructs which must be different).'
     )
   )
   parser.add_argument(
@@ -109,7 +109,7 @@ if __name__ == '__main__':
   # Make sure the experiments are compatible
   if not all(
     data_info_1[x] == data_info_2[x] for x in data_info_1
-    if x not in ['dir', 'treatment']
+    if x not in ['dir', 'comparison']
   ):
     raise Exception(f'Incompatible experiments:\n{data_info_1}\n{data_info_2}')
 
@@ -127,10 +127,10 @@ if __name__ == '__main__':
     library_constants.DATA_COMPARISON,
     data_info_1['cell_line'],
     data_info_1['dsb_type'],
-    data_info_1['hguide'],
+    data_info_1['guide_rna'],
     data_info_1['strand'],
-    [data_info_1['treatment'], data_info_2['treatment']],
-    data_info_1['control'],
+    [data_info_1['construct'], data_info_2['construct']],
+    data_info_1['control_type'],
     data_info_1['ref_seq'],
   )
 
