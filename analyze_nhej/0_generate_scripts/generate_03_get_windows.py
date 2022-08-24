@@ -59,6 +59,6 @@ if __name__ == '__main__':
         total_reads = ' '.join([str(x) for x in info['total_reads_list']])
         for subst_type in library_constants.SUBST_TYPES:
           output_dir = get_output_dir(info['name'])
-          file_out.write(f"python 2_windows/get_freqs.py --input {output_dir} --output {output_dir} --subst_type {subst_type} --total_reads {total_reads} --freq_min 1e-5\n")
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freqs']} --input {output_dir} --output {output_dir} --subst_type {subst_type} --total_reads {total_reads} --freq_min 1e-5\n")
 
       log_utils.log(file_out.name)

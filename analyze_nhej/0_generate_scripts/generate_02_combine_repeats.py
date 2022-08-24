@@ -25,5 +25,5 @@ if __name__ == '__main__':
         if info['version'] != 'merged':
           input_files = get_input_files(info['name'])
           output_file = get_output_file(info['name'])
-          file_out.write(f"python 1_process_nhej/combine_repeats.py --input {input_files} --output {output_file} --quiet\n")
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['combine_repeats']} --input {input_files} --output {output_file} --quiet\n")
       log_utils.log(file_out.name)

@@ -23,5 +23,5 @@ if __name__ == '__main__':
         for subst_type in library_constants.SUBST_TYPES:
           input_dir = get_input_dir(info['name'])
           output_dir = get_output_dir(info['name'])
-          file_out.write(f"python 3_graphs/get_graph_data.py --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_graph_data']} --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
       log_utils.log(file_out.name)
