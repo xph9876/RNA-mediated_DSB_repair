@@ -133,7 +133,7 @@ OUTPUT_DIR = {
   'combine_repeat': 'data_2_combine_repeat',
   'window': 'data_3_window',
   'graphs': 'data_4_graphs',
-  'histogram_3d': 'data_5_histogram_3d',
+  'histogram': 'data_5_histogram',
   'layouts': 'data_6_layouts',
   'plot_graph': os.path.join('plot', 'graph'),
   'plot_histogram': os.path.join('plot', 'histogram'),
@@ -149,7 +149,7 @@ PYTHON_SCRIPTS = {
   'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
   'get_common_layout': os.path.join('5_plot_graph', 'get_common_layout.py'),
   'plot_graph': os.path.join('5_plot_graph', 'plot_graph.py'),
-  'plot_histogram_3d': os.path.join('6_plot_histogram_3d', 'plot_histogram_3d.py'),
+  'plot_histogram': os.path.join('6_plot_histogram', 'plot_histogram.py'),
 }
 
 OUTPUT_SCRIPTS = {

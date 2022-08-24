@@ -12,7 +12,7 @@ def get_input_dir(name):
 
 def get_output_dir(name):
   return os.path.join(
-    generate_constants.OUTPUT_DIR['histograms'],
+    generate_constants.OUTPUT_DIR['histogram'],
     name,
   )
 
