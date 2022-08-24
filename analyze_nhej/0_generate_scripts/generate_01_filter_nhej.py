@@ -23,5 +23,5 @@ if __name__ == '__main__':
         if info['version'] != 'merged':
           input_file = get_input_file(info['name'])
           output_file = get_output_file(info['name'])
-          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['filter_nhej']} --sam {input_file} -ref ref_seq/{info['ref_seq_file']} -o {output_file} --min_length {info['min_read_length']} -dsb {info['dsb_pos']} --quiet\n")
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['filter_nhej']} --sam_file {input_file} --ref_seq_file ref_seq/{info['ref_seq_file']} --output {output_file} --min_length {info['min_read_length']} --dsb_pos {info['dsb_pos']} --quiet\n")
       log_utils.log(file_out.name)
