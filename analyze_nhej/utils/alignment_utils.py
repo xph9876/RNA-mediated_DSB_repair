@@ -71,7 +71,8 @@ def count_variations(ref_align, read_align):
       num_del   : the number of deletions
       num_subst : the number of substitutions
   """
-  assert len(ref_align) == len(read_align), "Alignment strings must be the same length"
+  if len(ref_align) != len(read_align):
+    raise Exception("Alignment strings must be the same length")
   num_ins = 0
   num_del = 0
   num_subst = 0
@@ -88,7 +89,8 @@ def count_variations(ref_align, read_align):
       
 
 def get_variation_pos(ref_align, read_align):
-  assert len(ref_align) == len(read_align), "Alignment strings must be the same length"
+  if len(ref_align) != len(read_align):
+    raise Exception("Alignment strings must be the same length")
 
   ref_pos = 1
   ins_pos = []
@@ -135,8 +137,10 @@ def get_cigar(ref_align, read_align):
 
     Note: substitutions and matches are both converted to "M".
   """
-  assert len(ref_align) > 0, 'Empty alignment string'
-  assert len(ref_align) == len(read_align), 'Unequal lengths alignment strings'
+  if len(ref_align) == 0:
+    raise Exception('Empty alignment string')
+  if len(ref_align) != len(read_align):
+    raise Exception('Unequal lengths alignment strings')
 
   cigar = ''
   last_type = None

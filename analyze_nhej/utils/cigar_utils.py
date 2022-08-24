@@ -36,5 +36,5 @@ def parse_cigar(cigar):
       )
       count_str = ''
     else:
-      assert False, 'Malformed CIGAR: ' + str(cigar)
+      raise Exception('Malformed CIGAR: ' + str(cigar))
   return variations

@@ -5,17 +5,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import log_utils
 import generate_constants
 import library_constants
-import generate_03_get_windows
+import generate_04_graph_data
 
 def get_input_dir(name):
   return os.path.join(
-    generate_constants.OUTPUT_DIR['graphs'],
+    generate_04_graph_data.get_output_dir(name),
     name,
   )
 
-def get_output_dir(layout_group):
+def get_output_dir(layout_name, layout_group):
   return os.path.join(
     generate_constants.OUTPUT_DIR['layouts'],
+    layout_name,
     layout_group,
   )
 
@@ -41,17 +42,17 @@ LAYOUT_GROUPS = {
   ],
 }
 
+LAYOUT_NAME = 'universal'
+
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(os.path.join('run_06_common_layout' + os.path.extsep + ext), 'w') as file_out:
-      # python 2_graph_processing/make_common_layout.py -i libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_sense libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_branch libraries_4/WT_sgAB_R1_cmv libraries_4/WT_sgAB_R1_cmv libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_sense libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_branch libraries_4/KO_sgAB_R1_cmv libraries_4/KO_sgAB_R1_cmv -rc 0 0 0 0 0 0 0 0 0 0 0 0 -o layouts/universal/2DSB_AB --subst_type without --layout universal
-# WORK ON ME NEXT!!!!
       for group_name, experiments in LAYOUT_GROUPS.items():
         input_dirs = ' '.join([get_input_dir(name) for name in experiments['name']])
         reverse_complement = ' '.join(
           '1' if strand == library_constants.STRAND_R2 else '0'
           for strand in experiments['strand']
         )
-        output_dir = get_output_dir(group_name)
-        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['common_layout']} --input {input_dirs} --output {output_dir} --reverse_complement {reverse_complement} --subst_type {library_constants.SUBST_WITHOUT}\n")
+        output_dir = get_output_dir(LAYOUT_NAME, group_name)
+        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['common_layout']} --input {input_dirs} --output {output_dir} --reverse_complement {reverse_complement} --subst_type {library_constants.SUBST_WITHOUT} --layout {LAYOUT_NAME}\n")
       log_utils.log(file_out.name)

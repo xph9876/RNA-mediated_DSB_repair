@@ -37,7 +37,8 @@ def parse_sam_fields(fields):
   SAM optional fields : https://github.com/samtools/hts-specs/blob/master/SAMtags.pdf
   """
   
-  assert len(fields) >= len(SAM_MANDATORY_FIELDS), 'Not enough fields for SAM format'
+  if len(fields) < len(SAM_MANDATORY_FIELDS):
+    raise Exception('Not enough fields for SAM format')
 
   mandatory_fields = fields[:len(SAM_MANDATORY_FIELDS)]
   optional_fields = fields[len(SAM_MANDATORY_FIELDS):]
@@ -45,6 +46,7 @@ def parse_sam_fields(fields):
   optional = {}
   for field in optional_fields:
     field = field.split(':') # optional fields are of form TAG:TYPE:VALUE
-    assert len(field) == 3, 'Incorrect number of subfields: ' + str(field)
+    if len(field) != 3:
+      raise Exception('Incorrect number of subfields: ' + str(field))
     optional[field[0]] = {'TYPE': field[1], 'VALUE': field[2]}
   return mandatory, optional

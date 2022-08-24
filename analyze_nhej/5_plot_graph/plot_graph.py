@@ -1004,7 +1004,7 @@ def make_graph_layout(
       orient = 'index',
     )
     layout_list = [
-      make_common_layout.get_common_layout(
+      get_common_layout.get_common_layout(
         common_layout_dir,
         node_data = node_data,
         node_subst_type = node_subst_type,

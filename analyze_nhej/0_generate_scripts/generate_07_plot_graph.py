@@ -6,9 +6,13 @@ import log_utils
 import generate_constants
 import library_constants
 import generate_04_graph_data
+import generate_06_common_layout
 
 def get_input_dir(name):
   return generate_04_graph_data.get_output_dir(name)
+
+def get_layout_dir(layout_name, layout_group):
+  return generate_06_common_layout.get_output_dir(layout_name, layout_group)
 
 def get_output_dir(name):
   return os.path.join(
