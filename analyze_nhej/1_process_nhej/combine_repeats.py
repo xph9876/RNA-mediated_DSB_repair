@@ -48,12 +48,6 @@ def main():
 
   for input_file in args.input:
     log_utils.log(input_file.name)
-  log_utils.log('------>')
-  log_utils.log(args.output.name)
-  log_utils.new_line()
-
-  if args.quiet:
-    log_utils.set_log_file(None)
 
   data = [
     pd.read_csv(args.input[i], sep='\t').set_index(['Sequence', 'CIGAR'])
@@ -82,8 +76,12 @@ def main():
   for i in range(num_repeats):
     data_combined['Count_' + names[i]] = data['Count_' + names[i]]
 
-  log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
+  if not args.quiet:
+    log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
   file_utils.write_tsv(data_combined, args.output)
+  log_utils.log('------>')
+  log_utils.log(args.output.name)
+  log_utils.new_line()
   
 if __name__ == '__main__':
   main()

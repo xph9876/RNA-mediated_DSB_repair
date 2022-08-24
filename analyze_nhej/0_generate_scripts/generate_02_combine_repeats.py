@@ -7,7 +7,7 @@ import generate_01_filter_nhej
 
 def get_input_files(name):
   return ' '.join(
-    generate_01_filter_nhej.get_output_file({'name': x + '_' + name})
+    generate_01_filter_nhej.get_output_file(x + '_' + name)
     for x in info['library_list']
   )
 

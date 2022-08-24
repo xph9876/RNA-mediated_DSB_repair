@@ -54,5 +54,5 @@ if __name__ == '__main__':
           for strand in experiments['strand']
         )
         output_dir = get_output_dir(LAYOUT_NAME, group_name)
-        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['common_layout']} --input {input_dirs} --output {output_dir} --reverse_complement {reverse_complement} --subst_type {library_constants.SUBST_WITHOUT} --layout {LAYOUT_NAME}\n")
+        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_common_layout']} --input {input_dirs} --output {output_dir} --reverse_complement {reverse_complement} --subst_type {library_constants.SUBST_WITHOUT} --layout {LAYOUT_NAME}\n")
       log_utils.log(file_out.name)

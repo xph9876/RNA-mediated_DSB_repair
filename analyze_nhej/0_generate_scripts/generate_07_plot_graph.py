@@ -20,6 +20,7 @@ def get_output_dir(name):
     name,
   )
 
+# FIXME: DO THIS NEXT!!!
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(os.path.join('run_05_histogram_data' + os.path.extsep + ext), 'w') as file_out:

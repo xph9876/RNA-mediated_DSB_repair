@@ -150,6 +150,14 @@ PYTHON_SCRIPTS = {
   'plot_histogram_3d': os.path.join('6_plot_histogram_3d', 'plot_histogram_3d.py'),
 }
 
+OUTPUT_SCRIPTS = {
+  'filter_nhej': 'run_01_filter_nhej',
+  'combine_repeats': 'run_02_combine_repeats',
+  'get_windows': 'run_03_get_windows',
+  'get_windows': 'run_03_get_windows',
+  'graph_data': 'run_04_graph_data',
+}
+
 for x in PYTHON_SCRIPTS.values():
   if not os.path.exists(x):
     raise Exception('Could not find script: ' + str(x))

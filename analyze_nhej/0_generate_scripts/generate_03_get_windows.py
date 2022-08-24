@@ -33,7 +33,7 @@ if __name__ == '__main__':
             construct = info['construct']
             control_type = info['control_type']
             output_dir = get_output_dir(info['name'])
-            file_out.write(f"python 2_windows/get_windows.py --input {input_file} --ref_seq_file {ref_seq_file} --output {output_dir} --dsb_pos {dsb_pos} --dsb_type {dsb_type} --strand {strand} --guide_rna {guide_rna} --cell_line {cell_line} --construct {construct} --subst_type {subst_type} --control_type {control_type}\n")
+            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_windows']} --input {input_file} --ref_seq_file {ref_seq_file} --output {output_dir} --dsb_pos {dsb_pos} --dsb_type {dsb_type} --strand {strand} --guide_rna {guide_rna} --cell_line {cell_line} --construct {construct} --subst_type {subst_type} --control_type {control_type}\n")
       
       # get merged for old/new antisense libraries
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
