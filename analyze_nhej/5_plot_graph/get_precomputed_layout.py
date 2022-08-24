@@ -74,22 +74,22 @@ def parse_args():
   args.reverse_complement = [x == '1' for x in args.reverse_complement]
   return args
 
-def get_common_layout(
-  common_layout_dir,
+def get_precomputed_layout(
+  precomputed_layout_dir,
   node_data,
   node_subst_type,
   reverse_complement = False,
 ):
   """
-    Get the common layout coordinates for the node data.
-    Assumes that the sequence in node_data are part of the
-    common layout in common_layout_dir.If reverse complement is true
+    Get the precomputed layout coordinates for the node data.
+    Assumes that the sequences in node_data are part of the
+    precomputed layout in precomputed_layout_dir.If reverse complement is true
     then sequences in node_data will be
     reverse complemented before joining with the common layout.
   """
   layout = file_utils.read_tsv(
     file_names.sequence_data(
-      common_layout_dir,
+      precomputed_layout_dir,
       node_subst_type,
     )
   )
@@ -115,7 +115,7 @@ def get_common_layout(
   return node_data
 
 
-def make_common_layout(
+def make_precomputed_layout(
   data_dir_list,
   reverse_complement_list,
   output_dir,
@@ -215,7 +215,7 @@ def make_common_layout(
     x_size_px = None,
     y_size_px = None,
     separate_components = False,
-    common_layout_dir = None,
+    precomputed_layout_dir = None,
   )
   layout.columns = ['x', 'y']
 
@@ -234,7 +234,7 @@ def make_common_layout(
 
 def main():
   args = parse_args()
-  make_common_layout(
+  make_precomputed_layout(
     args.input,
     args.reverse_complement,
     args.output,

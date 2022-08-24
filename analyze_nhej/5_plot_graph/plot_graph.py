@@ -27,7 +27,7 @@ import kmer_utils
 import alignment_utils
 import file_names
 import plot_graph_helper
-import get_common_layout
+import get_precomputed_layout
 
 LAYOUT_PROPERTIES = {
  'mds_layout': {
@@ -987,7 +987,7 @@ def make_graph_layout(
   node_subst_type,
   graph,
   layout_type,
-  common_layout_dir = None,
+  precomputed_layout_dir = None,
   node_size_px_dict = None,
   x_size_domain = None,
   y_size_domain = None,
@@ -996,7 +996,7 @@ def make_graph_layout(
   separate_components = True,
   reverse_complement = False,
 ):
-  if common_layout_dir is not None:
+  if precomputed_layout_dir is not None:
     separate_components = False
     node_groups = None
     node_data = pd.DataFrame.from_dict(
@@ -1004,8 +1004,8 @@ def make_graph_layout(
       orient = 'index',
     )
     layout_list = [
-      get_common_layout.get_common_layout(
-        common_layout_dir,
+      get_precomputed_layout.get_precomputed_layout(
+        precomputed_layout_dir,
         node_data = node_data,
         node_subst_type = node_subst_type,
         reverse_complement = reverse_complement,
@@ -1782,7 +1782,7 @@ def make_graph_single_panel(
   edge_labels_show = False,
   edge_width_scale = 1,
   graph_layout_type = 'kamada_layout',
-  graph_layout_common_dir = None,
+  graph_layout_precomputed_dir = None,
   graph_layout_separate_components = True,
   node_labels_show = False,
   node_label_columns = ['id'],
@@ -1871,7 +1871,7 @@ def make_graph_single_panel(
     node_subst_type = node_subst_type,
     graph = graph,
     layout_type = graph_layout_type,
-    common_layout_dir = graph_layout_common_dir,
+    precomputed_layout_dir = graph_layout_precomputed_dir,
     separate_components = graph_layout_separate_components,
     reverse_complement = sequence_reverse_complement,
     **extra_layout_args,
@@ -2100,7 +2100,7 @@ def make_subplots_plotly(
 def make_graph_figure(
   data_dir_grid,
   graph_layout_type = 'kamada_layout',
-  graph_layout_common_dir = None,
+  graph_layout_precomputed_dir = None,
   graph_layout_separate_components = True,
   sequence_reverse_complement = False,
   node_type = 'sequence_data',
@@ -2276,7 +2276,7 @@ def make_graph_figure(
         edge_labels_show = edge_show_labels,
         edge_width_scale = edge_width_scale,
         graph_layout_type = graph_layout_type,
-        graph_layout_common_dir = graph_layout_common_dir,
+        graph_layout_precomputed_dir = graph_layout_precomputed_dir,
         graph_layout_separate_components = graph_layout_separate_components,
         sequence_reverse_complement = sequence_reverse_complement,
         node_labels_show = node_labels_show,
@@ -2457,7 +2457,7 @@ def get_plot_args(
   node_filter_variation_types = library_constants.GRAPH_NODE_FILTER_VARIATION_TYPES,
   graph_width_px = library_constants.GRAPH_WIDTH_PX,
   graph_height_px = library_constants.GRAPH_HEIGHT_PX,
-  graph_layout_common_dir = None,
+  graph_layout_precomputed_dir = None,
   graph_layout_separate_components = False,
   edge_width_scale = library_constants.GRAPH_EDGE_WIDTH_SCALE,
   line_width_scale = library_constants.GRAPH_LINE_WIDTH_SCALE,
@@ -2487,7 +2487,7 @@ def get_plot_args(
   plot_args['node_outline_width_scale'] = node_outline_width_scale
   plot_args['graph_stats_show'] = False
   plot_args['graph_layout_type'] = plot_type
-  plot_args['graph_layout_common_dir'] = graph_layout_common_dir
+  plot_args['graph_layout_precomputed_dir'] = graph_layout_precomputed_dir
   plot_args['graph_layout_separate_components'] = graph_layout_separate_components
   plot_args['edge_width_scale'] = edge_width_scale
   plot_args['legend_common'] = True
@@ -2729,7 +2729,7 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '--layout_dir',
+    '--precomputed_layout_dir',
     type = common_utils.check_dir,
     default = None,
     help = (
@@ -2877,7 +2877,7 @@ def main():
     edge_width_scale = args.edge_scale,
     graph_width_px = args.width_px,
     graph_height_px = args.height_px,
-    graph_layout_common_dir = args.layout_dir,
+    graph_layout_precomputed_dir = args.precomputed_layout_dir,
     graph_layout_separate_components = args.separate_components,
     line_width_scale = args.line_width_scale,
     font_size_scale = args.font_size_scale,

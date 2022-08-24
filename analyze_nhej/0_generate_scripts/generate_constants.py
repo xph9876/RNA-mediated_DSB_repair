@@ -114,6 +114,41 @@ EXPERIMENT_INFO = LIBRARY_INFO.groupby([
 
 EXPERIMENT_INFO['name'] = EXPERIMENT_INFO.apply(get_name, axis='columns')
 
+LAYOUT_GROUP_2DSB = '2DSB'
+LAYOUT_GROUP_1DSB_A = '1DSB_A'
+LAYOUT_GROUP_1DSB_B = '1DSB_B'
+LAYOUT_GROUP_2DSBanti = '2DSBanti'
+LAYOUT_GROUPS = [
+  LAYOUT_GROUP_2DSB,
+  LAYOUT_GROUP_1DSB_A,
+  LAYOUT_GROUP_1DSB_B,
+  LAYOUT_GROUP_2DSBanti,
+]
+
+EXPERIMENT_INFO['layout_group'] = None
+EXPERIMENT_INFO.loc[
+  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_2,
+  'layout_group'
+] = LAYOUT_GROUP_2DSB
+EXPERIMENT_INFO.loc[
+  (
+    (EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_1) &
+    (EXPERIMENT_INFO['guide_rna'] == library_constants.GUIDE_RNA_A)
+  ),
+  'layout_group'
+] = LAYOUT_GROUP_1DSB_A
+EXPERIMENT_INFO.loc[
+  (
+    (EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_1) &
+    (EXPERIMENT_INFO['guide_rna'] == library_constants.GUIDE_RNA_B)
+  ),
+  'layout_group'
+] = LAYOUT_GROUP_1DSB_B
+EXPERIMENT_INFO.loc[
+  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_2anti,
+  'layout_group'
+] = LAYOUT_GROUP_2DSBanti
+
 def get_experiment_info(**args):
   experiment_info = EXPERIMENT_INFO
   for key in args:
@@ -147,7 +182,7 @@ PYTHON_SCRIPTS = {
   'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
   'get_graph_data': os.path.join('3_get_graph_data', 'get_graph_data.py'),
   'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
-  'get_common_layout': os.path.join('5_plot_graph', 'get_common_layout.py'),
+  'get_common_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),
   'plot_graph': os.path.join('5_plot_graph', 'plot_graph.py'),
   'plot_histogram': os.path.join('6_plot_histogram', 'plot_histogram.py'),
 }
@@ -160,6 +195,7 @@ OUTPUT_SCRIPTS = {
   'graph_data': 'run_04_graph_data',
 }
 
+# Make sure all scripts exist
 for x in PYTHON_SCRIPTS.values():
   if not os.path.exists(x):
     raise Exception('Could not find script: ' + str(x))
@@ -173,3 +209,6 @@ RUN_SCRIPTS = {
 
 LIBRARY_INFO.to_excel('library_info.xlsx')
 EXPERIMENT_INFO.to_excel('experiment_info.xlsx')
+
+USE_PRECOMPUTED_LAYOUT = True
+LAYOUT_NAME = 'universal'
