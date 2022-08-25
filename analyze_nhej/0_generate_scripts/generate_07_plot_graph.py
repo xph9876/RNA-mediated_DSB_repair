@@ -1,4 +1,3 @@
-
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
@@ -7,8 +6,6 @@ import generate_constants
 import library_constants
 import generate_04_graph_data
 import generate_06_precomputed_layout
-
-
 
 def get_input_dir(name):
   return generate_04_graph_data.get_output_dir(name)
@@ -75,7 +72,7 @@ if __name__ == '__main__':
                   (generate_constants.USE_LAYOUT == generate_constants.LAYOUT_FRACTAL) or
                   (
                     (generate_constants.USE_LAYOUT == generate_constants.LAYOUT_RADIAL) and
-                    (info['dsb_type'] != library_constants.DSB_1)
+                    (info['dsb_type'] != library_constants.DSB_TYPE_1)
                   )
                 )
               )

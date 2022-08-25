@@ -15,8 +15,8 @@ import file_utils
 import file_names
 import log_utils
 import library_constants
-import make_pptx_helpers
-import make_pptx_legend
+import get_pptx_helpers
+import get_pptx_legend
 
 import pptx
 import pptx.util
@@ -123,7 +123,7 @@ WIDTH_SPACING_PT = 5
 MULTIPLE_GRIDS_SPACING_PT = 40
 CONTENT_LEGEND_SPACING_PT = 20
 
-def make_slide(
+def get_slide(
   prs,
   image_grid_list,
   total_width_frac_list = None,
@@ -322,7 +322,7 @@ def make_slide(
 
   # Title
   if title is not None:
-    make_pptx_helpers.add_textbox_pptx(
+    get_pptx_helpers.add_textbox_pptx(
       slide = slide,
       text = title,
       x_pt = 0,
@@ -366,7 +366,7 @@ def make_slide(
       content_x_pt += margin_left_width_pt
 
     # Content images
-    make_pptx_helpers.add_picture_grid_pptx(
+    get_pptx_helpers.add_picture_grid_pptx(
       slide = slide,
       file_name_grid = image_grid_list[i],
       x_pt = content_x_pt,
@@ -384,7 +384,7 @@ def make_slide(
           f" Expected: {image_grid_list[i].shape}."
         )
       # Image labels
-      make_pptx_helpers.add_textbox_grid_pptx(
+      get_pptx_helpers.add_textbox_grid_pptx(
         slide = slide,
         text_grid = image_label_grid_list[i],
         x_pt = content_x_pt,
@@ -401,7 +401,7 @@ def make_slide(
 
     if margin_show_top:
       # Top margin
-      make_pptx_helpers.add_textbox_grid_pptx(
+      get_pptx_helpers.add_textbox_grid_pptx(
         slide = slide,
         text_grid = np.array(margin_label_top_list[i]).reshape(1, -1),
         x_pt = margin_left_width_pt,
@@ -417,7 +417,7 @@ def make_slide(
 
     if margin_show_left:
       # Left margin
-      make_pptx_helpers.add_textbox_grid_pptx(
+      get_pptx_helpers.add_textbox_grid_pptx(
         slide = slide,
         text_grid = np.array(margin_label_left_list[i]).reshape(-1, 1),
         x_pt = -margin_left_spill_over_pt,
@@ -436,7 +436,7 @@ def make_slide(
     # Size legends
     if any(legend['type'] == 'node_size' for legend in legend_list):
       for orientation in ['h', 'v']:
-        y_legend_new_pt = make_pptx_legend.make_size_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.make_size_legend_pptx(
           slide = slide,
           x_pt = x_legend_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -467,7 +467,7 @@ def make_slide(
       if legend['type'] == 'node_size':
         pass # already handled above
       elif legend['type'] == 'node_outline':
-        y_legend_new_pt = make_pptx_legend.make_outline_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.make_outline_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -486,7 +486,7 @@ def make_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'edge_type':
-        y_legend_new_pt = make_pptx_legend.make_edge_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.make_edge_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -505,7 +505,7 @@ def make_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'variation_type':
-        y_legend_new_pt = make_pptx_legend.make_variation_color_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.make_variation_color_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -525,7 +525,7 @@ def make_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'node_type':
-        y_legend_new_pt = make_pptx_legend.make_node_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.make_node_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -553,7 +553,7 @@ def make_slide(
         else:
           raise Exception('Impossible')
         color_bar_file = legend['color_bar_file']
-        y_legend_new_pt = make_pptx_legend.make_freq_ratio_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.make_freq_ratio_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -581,7 +581,6 @@ def parse_args():
     description = 'Create powerpoint figures from the graphs.'
   )
   parser.add_argument(
-    '-i',
     '--input',
     nargs = '+',
     type = common_utils.check_file,
@@ -589,38 +588,32 @@ def parse_args():
     required = True,
   )
   parser.add_argument(
-    '-lab',
     '--labels',
     nargs = '+',
     help = 'Labels of images in the grid',
   )
   parser.add_argument(
-    '-tmlab',
     '--top_margin_labels',
     nargs = '+',
     help = 'Labels in the top margins of the grids',
   )
   parser.add_argument(
-    '-lmlab',
     '--left_margin_labels',
     nargs = '+',
     help = 'Labels in the left margins of the grids',
   )
   parser.add_argument(
-    '-o',
     '--output',
     help = 'Output PPTX file.',
     required = True,
   )
   parser.add_argument(
-    '-ng',
     '--num_grids',
     required = True,
     type = int,
     help = 'Number of separate grids to create',
   )
   parser.add_argument(
-    '-nr',
     '--num_rows',
     nargs = '+',
     required = True,
@@ -631,7 +624,6 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-nc',
     '--num_cols',
     nargs = '+',
     required = True,
@@ -642,7 +634,6 @@ def parse_args():
     ),
   )
   parser.add_argument(
-    '-tw',
     '--total_width',
     nargs = '+',
     type = float,
@@ -811,7 +802,7 @@ if __name__ == '__main__':
 
   prs = pptx.Presentation(PPTX_TEMPLATE_FILE)
 
-  make_slide(
+  get_slide(
     prs,
     title = args.title,
     image_grid_list = image_grid_list,

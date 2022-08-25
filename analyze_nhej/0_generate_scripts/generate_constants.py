@@ -127,25 +127,25 @@ LAYOUT_GROUPS = [
 
 EXPERIMENT_INFO['layout_group'] = None
 EXPERIMENT_INFO.loc[
-  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_2,
+  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_2,
   'layout_group'
 ] = LAYOUT_GROUP_2DSB
 EXPERIMENT_INFO.loc[
   (
-    (EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_1) &
+    (EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_1) &
     (EXPERIMENT_INFO['guide_rna'] == library_constants.GUIDE_RNA_A)
   ),
   'layout_group'
 ] = LAYOUT_GROUP_1DSB_A
 EXPERIMENT_INFO.loc[
   (
-    (EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_1) &
+    (EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_1) &
     (EXPERIMENT_INFO['guide_rna'] == library_constants.GUIDE_RNA_B)
   ),
   'layout_group'
 ] = LAYOUT_GROUP_1DSB_B
 EXPERIMENT_INFO.loc[
-  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_2anti,
+  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_2anti,
   'layout_group'
 ] = LAYOUT_GROUP_2DSBanti
 EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
@@ -175,7 +175,7 @@ def get_experiment_info_comparison():
   for key, experiments in EXPERIMENT_INFO.groupby(experiments_comparison_keys):
     key_dict = dict(zip(experiments_comparison_keys, key))
     if key_dict['control_type'] == library_constants.CONTROL_NOT:
-      if key_dict['dsb_type'] == library_constants.DSB_2anti:
+      if key_dict['dsb_type'] == library_constants.DSB_TYPE_2anti:
         construct_1_list = [library_constants.CONSTRUCT_ANTISENSE]
         construct_2_list = [library_constants.CONSTRUCT_SPLICING]
       else:
@@ -212,6 +212,7 @@ OUTPUT_DIR = {
   'layout': 'data_6_precomputed_layout',
   'plot_graph': os.path.join('plot', 'graph'),
   'plot_histogram': os.path.join('plot', 'histogram'),
+  'pptx': 'pptx',
 }
 
 PYTHON_SCRIPTS = {
@@ -226,6 +227,7 @@ PYTHON_SCRIPTS = {
   'get_precomputed_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),
   'plot_graph': os.path.join('5_plot_graph', 'plot_graph.py'),
   'plot_histogram': os.path.join('6_plot_histogram', 'plot_histogram.py'),
+  'get_pptx': os.path.join('7_get_pptx', 'get_pptx.py'),
 }
 
 OUTPUT_SCRIPTS = {

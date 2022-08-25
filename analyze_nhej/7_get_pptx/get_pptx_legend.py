@@ -22,11 +22,11 @@ import pptx.enum.dml
 import pptx.dml.color
 import pptx.util
 
-import make_pptx_helpers
+import get_pptx_helpers
 
 import library_constants
 
-def make_legend_pptx(
+def get_legend_pptx(
   slide,
   title,
   items,
@@ -44,7 +44,7 @@ def make_legend_pptx(
   legend_label_font_size_pt = 8,
   orientation = 'v',
 ):
-  make_pptx_helpers.add_textbox_pptx(
+  get_pptx_helpers.add_textbox_pptx(
     slide,
     title,
     x_pt + title_x_offset_pt,
@@ -115,7 +115,7 @@ def make_legend_pptx(
       raise ValueError('Unhandled item type: ' + str(item['type']))
 
     if orientation == 'v':
-      shape = make_pptx_helpers.add_textbox_pptx(
+      shape = get_pptx_helpers.add_textbox_pptx(
         slide,
         item.get('text', ''),
         x_pt + item_width_pt,
@@ -127,7 +127,7 @@ def make_legend_pptx(
       )
       y_pt += stride_pt
     elif orientation == 'h':
-      shape = make_pptx_helpers.add_textbox_pptx(
+      shape = get_pptx_helpers.add_textbox_pptx(
         slide,
         item.get('text', ''),
         x_pt + stride_pt / 2 - label_width_pt / 2,
@@ -145,7 +145,7 @@ def make_legend_pptx(
     y_pt += item_height_pt + label_height_pt
   return y_pt 
 
-def make_edge_legend_pptx(
+def get_edge_legend_pptx(
   slide,
   x_pt,
   y_pt,
@@ -184,7 +184,7 @@ def make_edge_legend_pptx(
     'line_width': line_width_pt,
     'size': line_size_pt,
   })
-  return make_legend_pptx(
+  return get_legend_pptx(
     slide = slide,
     title = 'Edges',
     items = items,
@@ -203,7 +203,7 @@ def make_edge_legend_pptx(
     orientation = orientation,
   )
 
-def make_variation_color_legend_pptx(
+def get_variation_color_legend_pptx(
   slide,
   x_pt,
   y_pt,
@@ -231,7 +231,7 @@ def make_variation_color_legend_pptx(
       'color': library_constants.VARIATION_TYPES[var_type]['color'],
       'line_width': line_width_pt,
     })
-  return make_legend_pptx(
+  return get_legend_pptx(
     slide = slide,
     title = 'Variation Types',
     items = items,
@@ -250,7 +250,7 @@ def make_variation_color_legend_pptx(
     orientation = orientation,
   )
 
-def make_outline_legend_pptx(
+def get_outline_legend_pptx(
   slide,
   x_pt,
   y_pt,
@@ -285,7 +285,7 @@ def make_outline_legend_pptx(
     'line_color': library_constants.DEFAULT_OUTLINE_COLOR,
     'line_width': line_width_pt,
   })
-  return make_legend_pptx(
+  return get_legend_pptx(
     slide = slide,
     title = 'Outline',
     items = items,
@@ -304,7 +304,7 @@ def make_outline_legend_pptx(
     orientation = orientation,
   )
 
-def make_node_legend_pptx(
+def get_node_legend_pptx(
   slide,
   x_pt,
   y_pt,
@@ -346,7 +346,7 @@ def make_node_legend_pptx(
       'line_color': library_constants.REFERENCE_OUTLINE_COLOR,
     },
   ]
-  return make_legend_pptx(
+  return get_legend_pptx(
     slide = slide,
     title = 'Vertices',
     items = items,
@@ -365,7 +365,7 @@ def make_node_legend_pptx(
     orientation = orientation,
   )
 
-def make_size_legend_pptx(
+def get_size_legend_pptx(
   slide,
   x_pt,
   y_pt,
@@ -415,7 +415,7 @@ def make_size_legend_pptx(
       'line_width': line_width_pt,
     })
   items = items[::-1] # Show largest to smallest
-  return make_legend_pptx(
+  return get_legend_pptx(
     slide = slide,
     title = 'Sequence frequency',
     items = items,
@@ -434,7 +434,7 @@ def make_size_legend_pptx(
     orientation = orientation,
   )
 
-def make_freq_ratio_legend_pptx(
+def get_freq_ratio_legend_pptx(
   slide,
   x_pt,
   y_pt,
@@ -452,7 +452,7 @@ def make_freq_ratio_legend_pptx(
   orientation = 'v',
 ):
 
-  make_pptx_helpers.add_textbox_pptx(
+  get_pptx_helpers.add_textbox_pptx(
     slide,
     title,
     x_pt + title_x_offset_pt,
@@ -463,7 +463,7 @@ def make_freq_ratio_legend_pptx(
   )
   y_pt += title_height_pt
 
-  # IN CASE WANT FIXED ASPECT
+  # IN CASE WE WANT A FIXED ASPECT RATIO
   # image = PIL.Image.open(color_bar_file)
   # image_width_px = image.width
   # image_height_px = image.height
@@ -511,7 +511,7 @@ def make_freq_ratio_legend_pptx(
       text_align = 'center'
     else:
       raise Exception('Unknown orientation: ' + str(orientation))
-    make_pptx_helpers.add_textbox_pptx(
+    get_pptx_helpers.add_textbox_pptx(
       slide = slide,
       text = text,
       x_pt = x_label_pt,

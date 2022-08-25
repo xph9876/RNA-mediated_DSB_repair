@@ -112,7 +112,7 @@ def parse_args():
   parser.add_argument(
     '--dsb_type',
     type = str,
-    choices = library_constants.DSBS,
+    choices = library_constants.DSB_TYPES,
     help = 'Whether this data is 1 DSB, 2 DSB, or 2 DSB antisense.',
     required = True,
   )
@@ -133,7 +133,7 @@ def parse_args():
   parser.add_argument(
     '--cell_line',
     type = str,
-    choices = [library_constants.CELL_WT, library_constants.CELL_KO],
+    choices = [library_constants.CELL_LINE_WT, library_constants.CELL_LINE_KO],
     help = 'Cell in this library.',
     required = True,
   )
