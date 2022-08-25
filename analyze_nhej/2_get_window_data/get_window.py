@@ -259,20 +259,7 @@ def write_alignment_window(
   file_utils.write_tsv(data, output_file)
   log_utils.log(output_file)
 
-  # # filter the data with the minimum threshold
-  # data = data.loc[data['count_min'] > freq_min_threshold]
-
-  # # average over repeats
-  # data = data.groupby(['ref_align', 'read_align']).aggregate(
-  #   freq_mean = ('freq', 'mean')
-  # ).reset_index()
-  # data = data.sort_values('freq_mean', ascending = False).reset_index(drop=True)
-  # file_utils.write_tsv(data, file_names.main(output_dir, subst_type))
-
-# FIXME: NEED TO MOVE THIS SOMEWHERE
-# FIXME: NEED TO DO THE FILTERING SOMEWHERE
 def write_data_info(
-  dir,
   format,
   cell_line,
   dsb_type,
@@ -343,7 +330,6 @@ def main():
     subst_type = args.subst_type,
   )
   write_data_info(
-    dir = args.output,
     format = library_constants.DATA_INDIVIDUAL,
     cell_line = args.cell_line,
     dsb_type = args.dsb_type,
