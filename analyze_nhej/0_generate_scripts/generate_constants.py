@@ -218,6 +218,7 @@ PYTHON_SCRIPTS = {
   'get_window': os.path.join('2_get_window_data', 'get_window.py'),
   'get_merged': os.path.join('2_get_window_data', 'get_merged.py'),
   'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
+  'get_comparison': os.path.join('2_get_window_data', 'get_comparison.py'),
   'get_graph_data': os.path.join('3_get_graph_data', 'get_graph_data.py'),
   'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
   'get_precomputed_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),
