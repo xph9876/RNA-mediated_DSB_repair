@@ -12,7 +12,7 @@ log*.txt
 data*
 
 # Plots
-plots/
+plot/
 
 # Temp files
 *~*

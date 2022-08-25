@@ -69,7 +69,7 @@ if __name__ == '__main__':
           if info['control_type'] == library_constants.CONTROL_NOT:
             for subst_type in library_constants.SUBST_TYPES:
               input_dir = get_input_dir(info['name'])
-              output_dir = get_output_dir(info['name'], 'individual', output_ext)
+              output_dir = get_output_dir(generate_constants.USE_LAYOUT, 'individual', output_ext)
               if generate_constants.USE_LAYOUT == generate_constants.LAYOUT_UNIVERSAL:
                 range_x = {
                   generate_constants.LAYOUT_GROUP_2DSB: [-12, 13],
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 arg_range_y = ''
               if generate_constants.USE_PRECOMPUTED_LAYOUT:
                 arg_precomputed_layout_dir = (
-                  ' --precomputed_layout_dir ' +
+                  '--precomputed_layout_dir ' +
                   generate_06_precomputed_layout.get_output_dir(
                     generate_constants.USE_LAYOUT,
                     info['layout_group']
@@ -112,10 +112,7 @@ if __name__ == '__main__':
                   )
                 )
               )
-              arg_reverse_complement = (
-                '--reverse_complement ' +
-                ('1' if arg_reverse_complement else '0')
-              )
+              arg_reverse_complement = '--reverse_complement' if arg_reverse_complement else ''
               arg_width_height = (
                 '--width ' +
                 str(generate_constants.GRAPH_WIDTH_PX) +
@@ -167,7 +164,7 @@ if __name__ == '__main__':
               else:
                 arg_universal_layout_max_tick = ''
               arg_ext = '--ext ' + output_ext
-              # python 2_graph_processing/plot_graph.py -i libraries_4/WT_sgAB_R1_sense -o plots/graphs/universal/individual/html --layout_dir layouts/universal/2DSB_AB -ext html --layout universal --width 2400 --height 1800 --range_x -12 13 --range_y -22 22  --universal_layout_y_axis_x_pos 12 --universal_layout_y_axis_y_range -19.5 20.5   --universal_layout_x_axis_deletion_y_pos -20.5 --universal_layout_x_axis_insertion_y_pos 21.5 --universal_layout_x_axis_x_range -11.5 11.5  --universal_layout_y_axis_deletion_max_tick 17 --universal_layout_y_axis_insertion_max_tick 7
+              # =CONCAT("python 2_graph_processing/plot_graph.py ", "-i ", libraries_4, "/", table_7_1[[#This Row],[dir]], " -o ", table_7_1[[#This Row],[output_dir]], IF(var_7_common_layout, CONCAT(" --layout_dir ", layouts, "/", table_7_1[[#This Row],[common_layout_dir]]), ""), " -ext ", var_7_ext, " --layout ", var_7_layout, IF(table_7_1[[#This Row],[reverse_complement]], " --reverse_complement ", ""), " --width ", var_7_width, " --height ", var_7_height, " ",  table_7_1[[#This Row],[range_args]], " ", table_7_1[[#This Row],[universal_layout_y_axis_args]], " ", table_7_1[[#This Row],[universal_layout_x_axis_args]], " ", table_7_1[[#This Row],[universal_layout_max_tick_args]])
 
-              file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['plot_graph']} --input {input_dir} --output {output_dir} {arg_precomputed_layout_dir} {arg_ext} {arg_layout} {arg_width_height} {arg_range_x} {arg_range_y} {arg_universal_layout_axis_pos} {arg_universal_layout_max_tick}\n")
+              file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['plot_graph']} --input {input_dir} --output {output_dir} {arg_precomputed_layout_dir} {arg_ext} {arg_layout} {arg_reverse_complement} {arg_width_height} {arg_range_x} {arg_range_y} {arg_universal_layout_axis_pos} {arg_universal_layout_max_tick}\n")
         log_utils.log(file_out.name)
