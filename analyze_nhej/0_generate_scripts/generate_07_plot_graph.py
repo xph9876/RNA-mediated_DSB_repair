@@ -24,42 +24,6 @@ def get_output_dir(layout_name, format, ext):
     ext
   )
 
-# def get_arg_range_x(layout_name, layout_group):
-#   if layout_name == 'universal':
-#     # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", -12, IF(table_7_1[[#This Row],[hguide]]="CD", -12, IF(table_7_1[[#This Row],[hguide]]="A", -12, IF(table_7_1[[#This Row],[hguide]]="B", -12, NA())))), NA())
-#     # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", 13, IF(table_7_1[[#This Row],[hguide]]="CD", 13, IF(table_7_1[[#This Row],[hguide]]="A", 13, IF(table_7_1[[#This Row],[hguide]]="B", 13, NA())))), NA())
-#     if layout_group == '2DSB':
-#       range_x = [-12, 13]
-#     elif layout_group == '1DSB_A':
-#       range_x = [-12, 13]
-#     elif layout_group == '1DSB_B':
-#       range_x = [-12, 13]
-#     elif layout_group == '2DSBanti':
-#       range_x = [-12, 13]
-#     else:
-#       raise Exception('Unknown layout group: ' + str(layout_group))
-#     return '--range_x ' + ' '.join(str(x) for x in range_x)
-#   else:
-#     return ''
-
-# def get_arg_range_y(layout_name, layout_group):
-#   if layout_name == 'universal':
-#     # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", -22, IF(table_7_1[[#This Row],[hguide]]="CD", -22, IF(table_7_1[[#This Row],[hguide]]="A", -23, IF(table_7_1[[#This Row],[hguide]]="B", -22, NA())))), NA())
-#     # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", 22, IF(table_7_1[[#This Row],[hguide]]="CD", 27, IF(table_7_1[[#This Row],[hguide]]="A", 20, IF(table_7_1[[#This Row],[hguide]]="B", 16, NA())))), NA())
-#     if layout_group == '2DSB':
-#       range = [-22, 22]
-#     elif layout_group == '1DSB_A':
-#       range = [-23, 20]
-#     elif layout_group == '1DSB_B':
-#       range = [-22, 16]
-#     elif layout_group == '2DSBanti':
-#       range = [-22, 27]
-#     else:
-#       raise Exception('Unknown layout group: ' + str(layout_group))
-#     return '--range_y ' + ' '.join(str(x) for x in range)
-#   else:
-#     return ''
-
 # =CONCAT("python 2_graph_processing/plot_graph.py ", "-i ", libraries_4, "/", table_7_1[[#This Row],[dir]], " -o ", table_7_1[[#This Row],[output_dir]], IF(var_7_precomputed_layout, CONCAT(" --layout_dir ", layouts, "/", table_7_1[[#This Row],[precomputed_layout_dir]]), ""), " -ext ", var_7_ext, " --layout ", var_7_layout, IF(table_7_1[[#This Row],[reverse_complement]], " --reverse_complement ", ""), " --width ", var_7_width, " --height ", var_7_height, " ",  table_7_1[[#This Row],[range_args]], " ", table_7_1[[#This Row],[universal_layout_y_axis_args]], " ", table_7_1[[#This Row],[universal_layout_x_axis_args]], " ", table_7_1[[#This Row],[universal_layout_max_tick_args]])
 if __name__ == '__main__':
   for script_ext in ['sh', 'ps1']:

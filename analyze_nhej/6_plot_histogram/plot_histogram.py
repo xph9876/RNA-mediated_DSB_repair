@@ -71,7 +71,7 @@ def get_variation_data(
   y_axis_column = 'dist_ref',
   reverse_pos = False,
 ):
-  ref_length = len(data_info['ref_seq_windows'])
+  ref_length = len(data_info['ref_seq_window'])
 
   data_long = file_utils.read_tsv(
     file_names.variation_grouped(data_dir, library_constants.SUBST_WITH)
