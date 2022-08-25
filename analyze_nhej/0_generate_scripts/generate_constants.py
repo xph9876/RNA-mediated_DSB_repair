@@ -149,20 +149,6 @@ EXPERIMENT_INFO.loc[
   'layout_group'
 ] = LAYOUT_GROUP_2DSBanti
 
-EXPERIMENT_INFO['show_universal_layout_axis'] = False
-EXPERIMENT_INFO.loc[
-  EXPERIMENT_INFO['name'].isin(
-    [
-      'WT_sgAB_R1_sense',
-      'WT_sgA_R1_sense',
-      'KO_sgAB_R1_sense',
-      'KO_sgA_R1_sense',
-      'WT_sgCD_R1_antisense'
-    ]
- ),
- 'show_universal_layout_axis'
-] = True
-
 def get_experiment_info(**args):
   experiment_info = EXPERIMENT_INFO
   for key in args:
@@ -173,7 +159,45 @@ def get_experiment_info(**args):
   else:
     raise Exception(str(experiment_info.shape[0]) + ' experiment info results found')
 
-# EXPERIMENT_INFO_COMPARISON = 
+# Make the comparison experiments
+def get_experiment_info_comparison():
+  experiments_comparison = []
+  experiments_comparison_keys = [
+    'cell_line',
+    'control_type',
+    'dsb_type',
+    'guide_rna',
+    'strand',
+    'version',
+    'layout_group',
+  ]
+  for key, experiments in EXPERIMENT_INFO.groupby(experiments_comparison_keys):
+    key_dict = dict(zip(experiments_comparison_keys, key))
+    if key_dict['control_type'] == library_constants.CONTROL_NOT:
+      if key_dict['dsb_type'] == library_constants.DSB_2anti:
+        construct_1_list = [library_constants.CONSTRUCT_ANTISENSE]
+        construct_2_list = [library_constants.CONSTRUCT_SPLICING]
+      else:
+        construct_1_list = [library_constants.CONSTRUCT_SENSE]
+        construct_2_list = [library_constants.CONSTRUCT_BRANCH, library_constants.CONSTRUCT_CMV]
+      for construct_1 in construct_1_list:
+        for construct_2 in construct_2_list:
+          experiment_1 = experiments.loc[experiments['construct'] == construct_1].iloc[0].to_dict()
+          experiment_2 = experiments.loc[experiments['construct'] == construct_2].iloc[0].to_dict()
+          experiment_new = {
+            k: v for k, v in experiment_1.items()
+            if k in experiments_comparison_keys
+          }
+          experiment_new['construct_1'] = construct_1
+          experiment_new['construct_2'] = construct_2
+          experiment_new['construct'] = construct_1 + '_' + construct_2
+          experiment_new['name_1'] = experiment_1['name']
+          experiment_new['name_2'] = experiment_1['name']
+          experiment_new['name'] = get_name(experiment_new)
+          experiments_comparison.append(experiment_new)
+  return pd.DataFrame.from_records(experiments_comparison)
+
+EXPERIMENT_INFO_COMPARISON = get_experiment_info_comparison()
 
 REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {
@@ -223,6 +247,7 @@ RUN_SCRIPTS = {
 
 LIBRARY_INFO.to_excel('library_info.xlsx')
 EXPERIMENT_INFO.to_excel('experiment_info.xlsx')
+EXPERIMENT_INFO_COMPARISON.to_excel('experiment_info_comparison.xlsx')
 
 USE_PRECOMPUTED_LAYOUT = True
 LAYOUT_UNIVERSAL = 'universal'

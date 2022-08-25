@@ -120,7 +120,7 @@ if __name__ == '__main__':
     args.subst_type,
   )
 
-  # Make the combined info
+  # Make the comparison info
   get_window.write_data_info(
     format = library_constants.DATA_COMPARISON,
     cell_line = data_info_1['cell_line'],

@@ -61,4 +61,5 @@ if __name__ == '__main__':
           output_dir = get_output_dir(info['name'])
           file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freqs']} --input {output_dir} --output {output_dir} --subst_type {subst_type} --total_reads {total_reads} --freq_min 1e-5\n")
 
+      # for into in 
       log_utils.log(file_out.name)
