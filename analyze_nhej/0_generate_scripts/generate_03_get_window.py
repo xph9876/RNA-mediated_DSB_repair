@@ -59,16 +59,14 @@ if __name__ == '__main__':
         total_reads = ' '.join([str(x) for x in info['total_reads_list']])
         for subst_type in library_constants.SUBST_TYPES:
           output_dir = get_output_dir(info['name'])
-          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freqs']} --input {output_dir} --output {output_dir} --subst_type {subst_type} --total_reads {total_reads} --freq_min 1e-5\n")
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freq']} --input {output_dir} --output {output_dir} --subst_type {subst_type} --total_reads {total_reads} --freq_min 1e-5\n")
 
       # make comparison directories
       for info in generate_constants.EXPERIMENT_INFO_COMPARISON.to_dict('records'):
         input_dir_1 = get_output_dir(info['name_1'])
         input_dir_2 = get_output_dir(info['name_2'])
         output_dir = get_output_dir(info['name'])
-        # TODO: REFACTOR THE GET_COMPARISON.PY => GET_COMPARISON_FREQ.PY AND HAVE IT MAKE THE MEAN, MEAN_FILTERED BOTH!
-        # DON"T NEED TO REDO WHAT IS DONE IN GET_FREQ.PY, JUST JOIN THE FILTERED FILES ALSO, DON'T FOGET TO COPY OVER DATA_INFO!
         # THEN NEED TO DO ALL DOWN STREAM DATA PROCESSING FOR THE COMPARISON EXPERIMENTS
-        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_comparison']} --input {input_dir_1} {input_dir_2} --output {output_dir} --subst_type {subst_type}\n")
+        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freq_comparison']} --input {input_dir_1} {input_dir_2} --output {output_dir} --subst_type {subst_type}\n")
 
       log_utils.log(file_out.name)

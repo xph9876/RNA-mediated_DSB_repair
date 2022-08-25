@@ -200,7 +200,7 @@ def log_transform_ratio(
   )
   return log_ratios
 
-def get_combined_freq(data_info, node_data):
+def get_max_freq(data_info, node_data):
   return node_data[library_constants.FREQ_COLUMNS[data_info['format']]].max(axis='columns')
 
 def get_node_size(
@@ -216,7 +216,7 @@ def get_node_size(
   if node_size_type == 'freq':
     return pd.Series(
       log_transform_scale(
-        get_combined_freq(data_info, node_data),
+        get_max_freq(data_info, node_data),
         node_size_min_freq,
         node_size_max_freq,
         node_size_min_px,
@@ -256,8 +256,8 @@ def get_node_color(
   node_color_max_freq,
 ):
   if node_color_type == 'freq_group':
-    if data_info['format'] != 'combined':
-      raise Exception('Need a combined data set: ' + data_info['name'])
+    if data_info['format'] != library_constants.DATA_COMPARISON:
+      raise Exception('Need a comparison data set: ' + data_info['name'])
     node_freq_group = get_node_freq_group(node_data)
     node_color = pd.Series(library_constants.SIMILAR_FREQ_COLOR, index=node_data.index)
     node_color.loc[node_freq_group == library_constants.FREQ_GROUP_A] = (
@@ -269,7 +269,7 @@ def get_node_color(
     return node_color
   elif node_color_type == 'freq':
      scaled_freq = log_transform_scale(
-       get_combined_freq(data_info, node_data),
+       get_max_freq(data_info, node_data),
        node_color_min_freq,
        node_color_max_freq,
        0,
@@ -283,8 +283,8 @@ def get_node_color(
       index = node_data.index,
     )
   elif node_color_type == 'freq_ratio':
-    if data_info['format'] != 'combined':
-      raise Exception('Need a combined data set: ' + data_info['name'])
+    if data_info['format'] != library_constants.DATA_COMPARISON:
+      raise Exception('Need a comparison data set: ' + data_info['name'])
     return pd.Series(
       log_transform_ratio(
         node_data['freq_mean_1'],

@@ -257,7 +257,7 @@ def plot_histogram(
   show_title = False,
   reverse_pos = False,
 ):
-  if data_info['format'] != 'individual':
+  if data_info['format'] != library_constants.DATA_INDIVIDUAL:
     raise Exception('Only applicable for individual data sets')
 
   figure, axis = plt.subplots(

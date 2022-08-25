@@ -204,7 +204,7 @@ def get_freq_ratio_label(freq_group, construct_1, construct_2):
 
 ### Data formats ###
 DATA_INDIVIDUAL = 'individual'
-DATA_COMPARISON = 'combined'
+DATA_COMPARISON = 'comparison'
 
 FREQ_COLUMNS = {
   DATA_INDIVIDUAL: ['freq_mean'],
@@ -273,9 +273,9 @@ LABELS = {
 }
 
 def get_data_label(data_info):
-  if data_info['format'] == 'individual':
+  if data_info['format'] == DATA_INDIVIDUAL:
     construct_str = data_info['construct']
-  elif data_info['format'] == 'combined':
+  elif data_info['format'] == DATA_COMPARISON:
     construct_str = '_'.join([data_info['construct_1'], data_info['construct_2']])
   else:
     raise Exception('Unknown format: ' + str(data_info['format']))

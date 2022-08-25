@@ -148,6 +148,7 @@ EXPERIMENT_INFO.loc[
   EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_2anti,
   'layout_group'
 ] = LAYOUT_GROUP_2DSBanti
+EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
 
 def get_experiment_info(**args):
   experiment_info = EXPERIMENT_INFO
@@ -192,8 +193,9 @@ def get_experiment_info_comparison():
           experiment_new['construct_2'] = construct_2
           experiment_new['construct'] = construct_1 + '_' + construct_2
           experiment_new['name_1'] = experiment_1['name']
-          experiment_new['name_2'] = experiment_1['name']
+          experiment_new['name_2'] = experiment_2['name']
           experiment_new['name'] = get_name(experiment_new)
+          experiment_new['format'] = library_constants.DATA_COMPARISON
           experiments_comparison.append(experiment_new)
   return pd.DataFrame.from_records(experiments_comparison)
 
@@ -218,7 +220,7 @@ PYTHON_SCRIPTS = {
   'get_window': os.path.join('2_get_window_data', 'get_window.py'),
   'get_merged': os.path.join('2_get_window_data', 'get_merged.py'),
   'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
-  'get_comparison': os.path.join('2_get_window_data', 'get_comparison.py'),
+  'get_freq_comparison': os.path.join('2_get_window_data', 'get_freq_comparison.py'),
   'get_graph_data': os.path.join('3_get_graph_data', 'get_graph_data.py'),
   'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
   'get_precomputed_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),

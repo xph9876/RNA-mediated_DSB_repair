@@ -27,3 +27,4 @@ pptx*
 # Temp Excel info files
 library_info.xlsx
 experiment_info.xlsx
+experiment_info_comparison.xlsx

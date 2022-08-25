@@ -1692,7 +1692,7 @@ def make_graph_stats_ref_component(
     ['Num seq insertion', graph_stats['num_seq_insertion']],
     ['Num seq deletion', graph_stats['num_seq_deletion']],
   ]
-  if data_info['format'] == 'combined':
+  if data_info['format'] == library_constants.DATA_COMPARISON:
     stat_lines += [
       [
         'Ref seq freq', '{:.3f} & {:.3f}'.format(
@@ -1719,7 +1719,7 @@ def make_graph_stats_ref_component(
         )
       ],
     ]
-  elif data_info['format'] == 'individual':
+  elif data_info['format'] == library_constants.DATA_INDIVIDUAL:
     stat_lines += [
       ['Ref seq freq', '{:.3f}'.format(graph_stats['ref_freq_mean'])],
       ['Non-ref seq freq', '{:.5f}'.format(graph_stats['non_ref_freq_mean'])],
@@ -2525,10 +2525,10 @@ def get_plot_args(
     plot_args['title'] = plot_title
   
 
-  if data_info['format'] == 'combined':
+  if data_info['format'] == library_constants.DATA_COMPARISON:
     plot_args['node_color_type'] = 'freq_ratio'
     plot_args['legend_colorbar_scale'] = legend_colorbar_scale
-  elif data_info['format'] == 'individual':
+  elif data_info['format'] == library_constants.DATA_INDIVIDUAL:
     plot_args['node_color_type'] = 'variation_type'
   else:
     raise Exception('Unknown data format: ' + str(data_info['format']))

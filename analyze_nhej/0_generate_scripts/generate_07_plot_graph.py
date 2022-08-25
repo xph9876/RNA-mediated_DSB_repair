@@ -29,11 +29,14 @@ if __name__ == '__main__':
   for script_ext in ['sh', 'ps1']:
     for output_ext in ['png', 'html']:
       with open(os.path.join('run_07_plot_graph_' + output_ext + os.path.extsep + script_ext), 'w') as file_out:
-        for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
+        for info in (
+          generate_constants.EXPERIMENT_INFO.to_dict('records') +
+          generate_constants.EXPERIMENT_INFO_COMPARISON.to_dict('records')
+        ):
           if info['control_type'] == library_constants.CONTROL_NOT:
             for subst_type in library_constants.SUBST_TYPES:
               input_dir = get_input_dir(info['name'])
-              output_dir = get_output_dir(generate_constants.USE_LAYOUT, 'individual', output_ext)
+              output_dir = get_output_dir(generate_constants.USE_LAYOUT, info['format'], output_ext)
               if generate_constants.USE_LAYOUT == generate_constants.LAYOUT_UNIVERSAL:
                 range_x = {
                   generate_constants.LAYOUT_GROUP_2DSB: [-12, 13],

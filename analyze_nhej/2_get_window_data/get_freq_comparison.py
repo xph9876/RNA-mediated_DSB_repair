@@ -26,7 +26,7 @@ def parse_args():
   )
   parser.add_argument(
     '--input',
-    type = common_utils.check_dir_input,
+    type = common_utils.check_dir,
     help = (
       'Directory of individual experiment frequency data produced with "get_freq.py".'
     ),
@@ -48,11 +48,11 @@ def parse_args():
   args = parser.parse_args()
   return args
 
-def get_combined_data(data_1, data_2, join_columns, freq_columns):
+def get_comparison_data(data_1, data_2, join_columns, freq_columns):
   data_1 = data_1[join_columns + freq_columns]
   data_2 = data_2[join_columns + freq_columns]
 
-  data_combined = pd.merge(
+  data_comparison = pd.merge(
     data_1,
     data_2,
     how = 'outer',
@@ -60,14 +60,14 @@ def get_combined_data(data_1, data_2, join_columns, freq_columns):
     suffixes = ['_1', '_2'],
   )
 
-  freq_columns_combined = (
+  freq_columns_comparison = (
     [x + '_1' for x in freq_columns] +
     [x + '_2' for x in freq_columns]
   )
-  data_combined[freq_columns_combined] = (
-    data_combined[freq_columns_combined].fillna(0)
+  data_comparison[freq_columns_comparison] = (
+    data_comparison[freq_columns_comparison].fillna(0)
   )
-  return data_combined
+  return data_comparison
 
 def write_comparison_data(
   input_dir_1,
@@ -75,27 +75,25 @@ def write_comparison_data(
   output_dir,
   subst_type,
 ):
-  input_file_1 = file_names.window(
-    input_dir_1, library_constants.FREQ_MEAN, subst_type
-  )
-  input_file_2 = file_names.window(
-    input_dir_2, library_constants.FREQ_MEAN, subst_type
-  )
+  for freq_type in [
+    library_constants.FREQ_MEAN,
+    library_constants.FREQ_MEAN_FILTER
+  ]:
+    input_file_1 = file_names.window(input_dir_1, freq_type, subst_type)
+    input_file_2 = file_names.window(input_dir_2, freq_type, subst_type)
 
-  data_1 = file_utils.read_tsv(input_file_1)
-  data_2 = file_utils.read_tsv(input_file_2)
+    data_1 = file_utils.read_tsv(input_file_1)
+    data_2 = file_utils.read_tsv(input_file_2)
 
-  data = get_combined_data(
-    data_1,
-    data_2,
-    ['ref_align', 'read_align'],
-    ['freq_mean'],
-  )
-  output_file = file_names.window(
-    output_dir, library_constants.FREQ_MEAN, subst_type
-  )
-  file_utils.write_tsv(data, output_file)
-  log_utils.log(output_file)
+    data = get_comparison_data(
+      data_1,
+      data_2,
+      ['ref_align', 'read_align'],
+      ['freq_mean'],
+    )
+    output_file = file_names.window(output_dir, freq_type, subst_type)
+    file_utils.write_tsv(data, output_file)
+    log_utils.log(output_file)
 
 if __name__ == '__main__':
   # Parse args
@@ -107,8 +105,15 @@ if __name__ == '__main__':
 
   # Make sure the experiments are compatible
   if not all(
-    data_info_1[x] == data_info_2[x] for x in data_info_1
-    if x not in ['name', 'ref_seq']
+    data_info_1[x] == data_info_2[x]
+    for x in [
+      'cell_line',
+      'dsb_type',
+      'guide_rna',
+      'strand',
+      'control_type',
+      'ref_seq_window',
+    ]
   ):
     raise Exception(f'Incompatible experiments:\n{data_info_1}\n{data_info_2}')
 
@@ -122,6 +127,7 @@ if __name__ == '__main__':
 
   # Make the comparison info
   get_window.write_data_info(
+    dir = args.output,
     format = library_constants.DATA_COMPARISON,
     cell_line = data_info_1['cell_line'],
     dsb_type = data_info_1['dsb_type'],
@@ -129,8 +135,8 @@ if __name__ == '__main__':
     strand = data_info_1['strand'],
     constructs = [data_info_1['construct'], data_info_2['construct']],
     control_type = data_info_1['control_type'],
-    req_seq_window = data_info_1['ref_seq_window'],
-    req_seq = None,
+    ref_seq_window = data_info_1['ref_seq_window'],
+    ref_seq = None,
   )
 
   # Copy over the reference sequence

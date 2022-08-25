@@ -260,6 +260,7 @@ def write_alignment_window(
   log_utils.log(output_file)
 
 def write_data_info(
+  dir,
   format,
   cell_line,
   dsb_type,
@@ -330,6 +331,7 @@ def main():
     subst_type = args.subst_type,
   )
   write_data_info(
+    dir = args.output,
     format = library_constants.DATA_INDIVIDUAL,
     cell_line = args.cell_line,
     dsb_type = args.dsb_type,

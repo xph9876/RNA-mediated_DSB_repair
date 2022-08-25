@@ -28,8 +28,8 @@ def parse_args():
     nargs = '+',
     help = (
       'List of data directories created with make_graph_data.py.\n'
-      'All data sets should have the same reference sequence and\n'
-      ' be individual (not combined) experiments.'
+      'All data sets should have the same window reference sequence and\n'
+      ' be individual (not comparison) experiments.'
     ),
     required = True,
   )
