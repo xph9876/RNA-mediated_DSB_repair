@@ -67,30 +67,35 @@ EDGE_TYPES = {
   },
 }
 
+VARIATION_NONE = 'none'
+VARIATION_MIXED = 'mixed'
+VARIATION_SUBSTITUTION = 'substitution'
+VARIATION_DELETION = 'deletion'
+VARIATION_INSERTION = 'insertion'
 VARIATION_TYPES = {
-  'none': {
+  VARIATION_NONE: {
     'label': 'None',
     'short_label': 'N',
     'color': '#FFFFFF',
   },
-  'mixed': {
+  VARIATION_MIXED: {
       'label': 'Mixed',
       'short_label': 'M',
       'color': '#00FF00',
   },
-  'substitution': {
+  VARIATION_SUBSTITUTION: {
     'label': 'Substitution',
     'short_label': 'S',
     'color': '#808080',
     'color_3d': '#BFBFBF',
   },
-  'deletion': {
+  VARIATION_DELETION: {
     'label': 'Deletion',
     'short_label': 'D',
     'color': '#8080FF',
     'color_3d': '#8080FF',
   },
-  'insertion': {
+  VARIATION_INSERTION: {
     'label': 'Insertion',
     'short_label': 'I',
     # 'color': '#FF8080',

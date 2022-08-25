@@ -10,6 +10,7 @@ def get_output_file(cell_line, dsb_type, version):
   version_str = '' if (version == 'versionNone') else ('_' + version)
   return os.path.join(
     generate_constants.OUTPUT_DIR['pptx'],
+    'graph',
     cell_line + '_' + dsb_type + version_str + os.extsep + 'pptx',
   )
 
