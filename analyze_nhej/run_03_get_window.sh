@@ -238,25 +238,47 @@ python 2_get_window_data/get_freq.py --input data_3_window/WT_sgCD_R2_splicing_n
 python 2_get_window_data/get_freq.py --input data_3_window/WT_sgCD_R2_splicing_new --output data_3_window/WT_sgCD_R2_splicing_new --subst_type withoutSubst --total_reads 4062558 4535123 4280724 4926338 --freq_min 1e-5
 python 2_get_window_data/get_freq.py --input data_3_window/WT_sgCD_R2_splicing_old --output data_3_window/WT_sgCD_R2_splicing_old --subst_type withSubst --total_reads 9334492 9142001 8497185 8346242 --freq_min 1e-5
 python 2_get_window_data/get_freq.py --input data_3_window/WT_sgCD_R2_splicing_old --output data_3_window/WT_sgCD_R2_splicing_old --subst_type withoutSubst --total_reads 9334492 9142001 8497185 8346242 --freq_min 1e-5
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgA_R1_sense data_3_window/KO_sgA_R1_branch --output data_3_window/KO_sgA_R1_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgA_R1_sense data_3_window/KO_sgA_R1_branch --output data_3_window/KO_sgA_R1_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgA_R1_sense data_3_window/KO_sgA_R1_cmv --output data_3_window/KO_sgA_R1_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgA_R1_sense data_3_window/KO_sgA_R1_cmv --output data_3_window/KO_sgA_R1_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgB_R2_sense data_3_window/KO_sgB_R2_branch --output data_3_window/KO_sgB_R2_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgB_R2_sense data_3_window/KO_sgB_R2_branch --output data_3_window/KO_sgB_R2_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgB_R2_sense data_3_window/KO_sgB_R2_cmv --output data_3_window/KO_sgB_R2_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgB_R2_sense data_3_window/KO_sgB_R2_cmv --output data_3_window/KO_sgB_R2_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R1_sense data_3_window/KO_sgAB_R1_branch --output data_3_window/KO_sgAB_R1_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R1_sense data_3_window/KO_sgAB_R1_branch --output data_3_window/KO_sgAB_R1_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R1_sense data_3_window/KO_sgAB_R1_cmv --output data_3_window/KO_sgAB_R1_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R1_sense data_3_window/KO_sgAB_R1_cmv --output data_3_window/KO_sgAB_R1_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R2_sense data_3_window/KO_sgAB_R2_branch --output data_3_window/KO_sgAB_R2_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R2_sense data_3_window/KO_sgAB_R2_branch --output data_3_window/KO_sgAB_R2_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R2_sense data_3_window/KO_sgAB_R2_cmv --output data_3_window/KO_sgAB_R2_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/KO_sgAB_R2_sense data_3_window/KO_sgAB_R2_cmv --output data_3_window/KO_sgAB_R2_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgA_R1_sense data_3_window/WT_sgA_R1_branch --output data_3_window/WT_sgA_R1_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgA_R1_sense data_3_window/WT_sgA_R1_branch --output data_3_window/WT_sgA_R1_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgA_R1_sense data_3_window/WT_sgA_R1_cmv --output data_3_window/WT_sgA_R1_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgA_R1_sense data_3_window/WT_sgA_R1_cmv --output data_3_window/WT_sgA_R1_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgB_R2_sense data_3_window/WT_sgB_R2_branch --output data_3_window/WT_sgB_R2_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgB_R2_sense data_3_window/WT_sgB_R2_branch --output data_3_window/WT_sgB_R2_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgB_R2_sense data_3_window/WT_sgB_R2_cmv --output data_3_window/WT_sgB_R2_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgB_R2_sense data_3_window/WT_sgB_R2_cmv --output data_3_window/WT_sgB_R2_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R1_sense data_3_window/WT_sgAB_R1_branch --output data_3_window/WT_sgAB_R1_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R1_sense data_3_window/WT_sgAB_R1_branch --output data_3_window/WT_sgAB_R1_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R1_sense data_3_window/WT_sgAB_R1_cmv --output data_3_window/WT_sgAB_R1_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R1_sense data_3_window/WT_sgAB_R1_cmv --output data_3_window/WT_sgAB_R1_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R2_sense data_3_window/WT_sgAB_R2_branch --output data_3_window/WT_sgAB_R2_sense_branch --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R2_sense data_3_window/WT_sgAB_R2_branch --output data_3_window/WT_sgAB_R2_sense_branch --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R2_sense data_3_window/WT_sgAB_R2_cmv --output data_3_window/WT_sgAB_R2_sense_cmv --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgAB_R2_sense data_3_window/WT_sgAB_R2_cmv --output data_3_window/WT_sgAB_R2_sense_cmv --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R1_antisense_merged data_3_window/WT_sgCD_R1_splicing_merged --output data_3_window/WT_sgCD_R1_antisense_splicing_merged --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R1_antisense_merged data_3_window/WT_sgCD_R1_splicing_merged --output data_3_window/WT_sgCD_R1_antisense_splicing_merged --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R1_antisense_new data_3_window/WT_sgCD_R1_splicing_new --output data_3_window/WT_sgCD_R1_antisense_splicing_new --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R1_antisense_new data_3_window/WT_sgCD_R1_splicing_new --output data_3_window/WT_sgCD_R1_antisense_splicing_new --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R1_antisense_old data_3_window/WT_sgCD_R1_splicing_old --output data_3_window/WT_sgCD_R1_antisense_splicing_old --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R1_antisense_old data_3_window/WT_sgCD_R1_splicing_old --output data_3_window/WT_sgCD_R1_antisense_splicing_old --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R2_antisense_merged data_3_window/WT_sgCD_R2_splicing_merged --output data_3_window/WT_sgCD_R2_antisense_splicing_merged --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R2_antisense_merged data_3_window/WT_sgCD_R2_splicing_merged --output data_3_window/WT_sgCD_R2_antisense_splicing_merged --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R2_antisense_new data_3_window/WT_sgCD_R2_splicing_new --output data_3_window/WT_sgCD_R2_antisense_splicing_new --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R2_antisense_new data_3_window/WT_sgCD_R2_splicing_new --output data_3_window/WT_sgCD_R2_antisense_splicing_new --subst_type withoutSubst
+python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R2_antisense_old data_3_window/WT_sgCD_R2_splicing_old --output data_3_window/WT_sgCD_R2_antisense_splicing_old --subst_type withSubst
 python 2_get_window_data/get_freq_comparison.py --input data_3_window/WT_sgCD_R2_antisense_old data_3_window/WT_sgCD_R2_splicing_old --output data_3_window/WT_sgCD_R2_antisense_splicing_old --subst_type withoutSubst

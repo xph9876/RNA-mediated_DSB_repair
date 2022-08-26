@@ -136,6 +136,7 @@ if __name__ == '__main__':
     strand = data_info_1['strand'],
     constructs = [data_info_1['construct'], data_info_2['construct']],
     control_type = data_info_1['control_type'],
+    version = data_info_1['version'],
     ref_seq_window = data_info_1['ref_seq_window'],
     ref_seq = None,
   )

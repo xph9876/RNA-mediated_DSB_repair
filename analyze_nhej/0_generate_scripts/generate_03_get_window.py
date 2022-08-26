@@ -60,6 +60,7 @@ if __name__ == '__main__':
         input_dir_1 = get_output_dir(info['name_1'])
         input_dir_2 = get_output_dir(info['name_2'])
         output_dir = get_output_dir(info['name'])
-        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freq_comparison']} --input {input_dir_1} {input_dir_2} --output {output_dir} --subst_type {subst_type}\n")
+        for subst_type in library_constants.SUBST_TYPES:
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_freq_comparison']} --input {input_dir_1} {input_dir_2} --output {output_dir} --subst_type {subst_type}\n")
 
       log_utils.log(file_out.name)
