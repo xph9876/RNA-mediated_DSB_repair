@@ -7,7 +7,6 @@ import common_utils
 import file_utils
 import log_utils
 import alignment_utils
-import cigar_utils
 import fasta_utils
 import alignment_window
 import remove_substitution
@@ -15,13 +14,11 @@ import library_constants
 import file_names
 
 import pandas as pd
-import numpy as np
-import re
 import argparse
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Process data for downstream graph and variation-position analysis.'
+    description = 'Process data for downstream graph and histogram analysis.'
   )
   parser.add_argument(
     '--input',
@@ -188,9 +185,6 @@ def write_alignment_window(
       discarded.
   """
 
-  # out_file_name = file_names.main(output_file, subst_type)
-  # log_utils.log(out_file_name)
-
   data = file_utils.read_tsv(input_file)
   count_columns_old = [x for x in data.columns if x.startswith('Count_')]
   data = data[['Sequence', 'CIGAR'] + count_columns_old]
@@ -253,7 +247,6 @@ def write_alignment_window(
 
   # save the unfiltered repeat data
   data = data.drop('count_min', axis='columns')
-  # file_utils.write_tsv(data, file_names.main_repeats(output_dir, subst_type))
   output_file = file_names.window(
     output_dir,
     library_constants.COUNT,
@@ -271,6 +264,7 @@ def write_data_info(
   strand,
   constructs,
   control_type,
+  version,
   ref_seq,
   ref_seq_window,
 ):
@@ -280,6 +274,7 @@ def write_data_info(
     'dsb_type': dsb_type,
     'guide_rna': guide_rna,
     'strand': strand,
+    'version': version,
     'control_type': control_type,
     'ref_seq': ref_seq,
     'ref_seq_window': ref_seq_window,
@@ -342,6 +337,7 @@ def main():
     strand = args.strand,
     constructs = [args.construct],
     control_type = args.control_type,
+    version = args.version,
     ref_seq = ref_seq,
     ref_seq_window = get_ref_seq_window(
       ref_seq,
@@ -350,11 +346,6 @@ def main():
     ),
   )
   log_utils.new_line()
-
-  # ref_file_out = file_names.ref(args.output)
-  # log_utils.log(ref_file_out)
-  # shutil.copy(args.ref.name, ref_file_out)
-  # log_utils.new_line()
 
 if __name__ == '__main__':
   main()
