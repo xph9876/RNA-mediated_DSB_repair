@@ -21,7 +21,6 @@ def get_output_dir(layout_name, format, ext):
     ext
   )
 
-# =CONCAT("python 2_graph_processing/plot_graph.py ", "-i ", libraries_4, "/", table_7_1[[#This Row],[dir]], " -o ", table_7_1[[#This Row],[output_dir]], IF(var_7_precomputed_layout, CONCAT(" --layout_dir ", layouts, "/", table_7_1[[#This Row],[precomputed_layout_dir]]), ""), " -ext ", var_7_ext, " --layout ", var_7_layout, IF(table_7_1[[#This Row],[reverse_complement]], " --reverse_complement ", ""), " --width ", var_7_width, " --height ", var_7_height, " ",  table_7_1[[#This Row],[range_args]], " ", table_7_1[[#This Row],[universal_layout_y_axis_args]], " ", table_7_1[[#This Row],[universal_layout_x_axis_args]], " ", table_7_1[[#This Row],[universal_layout_max_tick_args]])
 if __name__ == '__main__':
   for script_ext in ['sh', 'ps1']:
     for output_ext in ['png', 'html']:
@@ -83,8 +82,6 @@ if __name__ == '__main__':
                 ' --height ' +
                 str(generate_constants.GRAPH_HEIGHT_PX)
               )
-              # =IF(var_7_layout="universal", CONCAT(" --universal_layout_y_axis_x_pos ", table_7_1[[#This Row],[range_x1]] - 1, " --universal_layout_y_axis_y_range ", table_7_1[[#This Row],[range_y0]] + 2.5, " ", table_7_1[[#This Row],[range_y1]] - 1.5, " "), "")
-              # =IF(table_7_1[[#This Row],[show_universal_layout_x_axes]], CONCAT(" --universal_layout_x_axis_deletion_y_pos ", table_7_1[[#This Row],[range_y0]] + 1.5, " --universal_layout_x_axis_insertion_y_pos ", table_7_1[[#This Row],[range_y1]] - 0.5, " --universal_layout_x_axis_x_range ", table_7_1[[#This Row],[range_x0]] + 0.5, " ", table_7_1[[#This Row],[range_x1]] - 1.5), "")
               if generate_constants.USE_LAYOUT == generate_constants.LAYOUT_UNIVERSAL:
                 arg_universal_layout_axis_pos = (
                   f'--universal_layout_y_axis_x_pos {range_x[1] - 1} ' +
@@ -104,8 +101,6 @@ if __name__ == '__main__':
                   )
               else:
                 arg_universal_layout_axis_pos = ''
-              # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", 7, IF(table_7_1[[#This Row],[hguide]]="CD", 8, IF(table_7_1[[#This Row],[hguide]]="A", 6, IF(table_7_1[[#This Row],[hguide]]="B", 5, NA())))), NA())
-              # =IF(var_7_layout="universal", IF(table_7_1[[#This Row],[hguide]]="AB", 17, IF(table_7_1[[#This Row],[hguide]]="CD", 17, IF(table_7_1[[#This Row],[hguide]]="A", 19, IF(table_7_1[[#This Row],[hguide]]="B", 18, NA())))), NA())
               if generate_constants.USE_LAYOUT == generate_constants.LAYOUT_UNIVERSAL:
                 arg_universal_layout_max_tick_insertion = {
                   generate_constants.LAYOUT_GROUP_2DSB: 7,
@@ -128,7 +123,6 @@ if __name__ == '__main__':
               else:
                 arg_universal_layout_max_tick = ''
               arg_ext = '--ext ' + output_ext
-              # =CONCAT("python 2_graph_processing/plot_graph.py ", "-i ", libraries_4, "/", table_7_1[[#This Row],[dir]], " -o ", table_7_1[[#This Row],[output_dir]], IF(var_7_common_layout, CONCAT(" --layout_dir ", layouts, "/", table_7_1[[#This Row],[common_layout_dir]]), ""), " -ext ", var_7_ext, " --layout ", var_7_layout, IF(table_7_1[[#This Row],[reverse_complement]], " --reverse_complement ", ""), " --width ", var_7_width, " --height ", var_7_height, " ",  table_7_1[[#This Row],[range_args]], " ", table_7_1[[#This Row],[universal_layout_y_axis_args]], " ", table_7_1[[#This Row],[universal_layout_x_axis_args]], " ", table_7_1[[#This Row],[universal_layout_max_tick_args]])
 
               file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['plot_graph']} --input {input_dir} --output {output_dir} {arg_precomputed_layout_dir} {arg_ext} {arg_layout} {arg_reverse_complement} {arg_width_height} {arg_range_x} {arg_range_y} {arg_universal_layout_axis_pos} {arg_universal_layout_max_tick}\n")
         log_utils.log(file_out.name)

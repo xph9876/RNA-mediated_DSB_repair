@@ -22,9 +22,7 @@ if __name__ == '__main__':
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         output_dir = get_output_dir(library_constants.SUBST_WITH)
         input_dir = get_input_dir(info['name'])
-          
 
-      # =CONCAT("python 2_graph_processing/make_histogram_3d.py ", "-i ", libraries_4, "/", table_5_1[[#This Row],[dir]], " -o ", histogram_3d, "/", table_5_1[[#This Row],[reverse_pos]], " -lt ", table_5_1[[#This Row],[label_type]])
         arg_reverse_pos = (
           ''
           if (info['strand'] == library_constants.STRAND_R2) else
