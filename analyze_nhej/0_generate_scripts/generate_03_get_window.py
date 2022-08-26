@@ -53,7 +53,7 @@ if __name__ == '__main__':
             construct = info['construct']
             control_type = info['control_type']
             output_dir = get_output_dir(info['name'])
-            file_out.write(f"python 2_windows/get_merged.py --input {input_dirs} --output {output_dir} --subst_type {subst_type}\n")
+            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_merged']} --input {input_dirs} --output {output_dir} --subst_type {subst_type}\n")
 
       # get freqs
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):

@@ -78,7 +78,6 @@ def main():
     count_columns = [x for x in data[i].columns if x.startswith('count_')]
     
     library_names.append([x.replace('count_', '') for x in count_columns])
-    # data.columns[2:] = [str(i) for i in range(num_columns)]
     data[i] = data[i].rename(
       dict(zip(count_columns, count_columns_temp), axis='columns'),
       axis = 'columns'
@@ -111,6 +110,7 @@ def main():
     raise Exception('Libraries begin merged have different window reference sequences.')
   data_info = data_info[0]
   data_info['ref_seq'] = None
+  data_info['version'] = library_constants.VERSION_MERGED
   output_data_info_file = file_names.data_info(args.output)
   file_utils.write_tsv(pd.DataFrame(data_info, index=[0]), output_data_info_file)
   log_utils.log(output_data_info_file)
