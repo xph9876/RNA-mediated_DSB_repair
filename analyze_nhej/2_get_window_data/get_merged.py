@@ -25,7 +25,6 @@ def parse_args():
   )
   parser.add_argument(
     '--input',
-    # type = argparse.FileType(mode='r'),
     type = common_utils.check_dir,
     help = (
       ' Input directories with "windows_XXX.tsv" output of "get_windows.py".' +
@@ -52,6 +51,13 @@ def parse_args():
       library_constants.SUBST_WITHOUT
     ],
     help = 'Whether to keep or ignore substitutions.',
+    required = True,
+  )
+  parser.add_argument(
+    '--version',
+    type = str,
+    choices = library_constants.VERSIONS,
+    help = 'Version of library.',
     required = True,
   )
   return parser.parse_args()
@@ -110,7 +116,7 @@ def main():
     raise Exception('Libraries begin merged have different window reference sequences.')
   data_info = data_info[0]
   data_info['ref_seq'] = None
-  data_info['version'] = library_constants.VERSION_MERGED
+  data_info['version'] = args.version
   output_data_info_file = file_names.data_info(args.output)
   file_utils.write_tsv(pd.DataFrame(data_info, index=[0]), output_data_info_file)
   log_utils.log(output_data_info_file)

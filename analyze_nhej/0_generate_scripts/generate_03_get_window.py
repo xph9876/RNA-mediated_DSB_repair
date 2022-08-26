@@ -44,16 +44,9 @@ if __name__ == '__main__':
               get_output_dir(info['name'].replace(library_constants.VERSION_MERGED, x))
               for x in [library_constants.VERSION_OLD, library_constants.VERSION_NEW]
             )
-            ref_seq_file = None
-            dsb_pos = None
-            dsb_type = info['dsb_type']
-            strand = info['strand']
-            guide_rna = info['guide_rna']
-            cell_line = info['cell_line']
-            construct = info['construct']
-            control_type = info['control_type']
+            version = library_constants.VERSION_MERGED
             output_dir = get_output_dir(info['name'])
-            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_merged']} --input {input_dirs} --output {output_dir} --subst_type {subst_type}\n")
+            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_merged']} --input {input_dirs} --output {output_dir} --subst_type {subst_type} --version {version}\n")
 
       # get freqs
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
