@@ -204,6 +204,7 @@ def make_precomputed_layout(
     file_names.data_info(data_dir_list[0])
   )
   layout = plot_graph.make_graph_layout(
+    data_dir = data_dir,
     data_info = data_info,
     node_type = 'sequence_data',
     node_subst_type = subst_type,
