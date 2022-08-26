@@ -83,7 +83,7 @@ if __name__ == '__main__':
               labels.append(library_constants.LABELS[row_spec['strand']])
             if row_spec['control_type'] != library_constants.CONTROL_NOT:
               labels.append(library_constants.LABELS[row_spec['control_type']])
-            top_labels.append('\\n'.join(labels))
+            left_labels.append('\\n'.join(labels))
 
           for version in version_list:
             file_list = []
