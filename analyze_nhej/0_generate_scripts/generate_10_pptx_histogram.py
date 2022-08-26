@@ -8,7 +8,7 @@ import generate_08_plot_histogram
 
 
 def get_output_file(cell_line, intron_type, version):
-  version_str = '' if (version == 'versionNone') else ('_' + version)
+  version_str = '' if (version == library_constants.VERSION_NONE) else ('_' + version)
   return os.path.join(
     generate_constants.OUTPUT_DIR['pptx'],
     'histogram',
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         for intron_type in intron_type_list:
           if intron_type == 'sense':
             construct_list = library_constants.CONSTRUCTS_INDIVIDUAL_SENSE
-            version_list = ['versionNone']
+            version_list = [library_constants.VERSION_NONE]
             row_spec_list = [
               {'strand': library_constants.STRAND_R1, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_A},
               {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_B},
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             ]
           elif intron_type == 'antisense':
             construct_list = library_constants.CONSTRUCTS_INDIVIDUAL_ANTISENSE
-            version_list = ['old', 'new', 'merged']
+            version_list = [library_constants.VERSION_OLD, library_constants.VERSION_NEW, library_constants.VERSION_MERGED]
             row_spec_list = [
               {'strand': library_constants.STRAND_R1, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_CD},
               {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_CD},
@@ -93,10 +93,14 @@ if __name__ == '__main__':
                 info = generate_constants.EXPERIMENT_INFO.loc[
                   (generate_constants.EXPERIMENT_INFO['cell_line'] == cell_line) &
                   (generate_constants.EXPERIMENT_INFO['version'] == version) &
+                  (generate_constants.EXPERIMENT_INFO['construct'] == construct) &
                   (generate_constants.EXPERIMENT_INFO['strand'] == row_spec['strand']) &
                   (generate_constants.EXPERIMENT_INFO['control_type'] == row_spec['control_type']) &
                   (generate_constants.EXPERIMENT_INFO['guide_rna'] == row_spec['guide_rna'])
-                ].iloc[0].to_dict()
+                ]
+                if info.shape[0] != 1:
+                  raise Exception(f'Got {info.shape[0]} rows. Expected 1.')
+                info = info.iloc[0].to_dict()
                 for variation_type in [
                   library_constants.VARIATION_INSERTION,
                   library_constants.VARIATION_DELETION,

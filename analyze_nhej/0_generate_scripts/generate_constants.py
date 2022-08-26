@@ -5,25 +5,27 @@ import pandas as pd
 import file_utils
 import library_constants
 
-VERSION_NONE = 'versionNone'
-
 def get_name(info):
   return (
     ((info['library'] + '_') if ('library' in info) else '') +
-    info['cell_line'] +
-    '_' + info['guide_rna'] +
-    '_' + info['strand'] +
-    '_' + info['construct'] +
-    (('_' + info['control_type']) if (info['control_type'] != library_constants.CONTROL_NOT) else '') +
-    (('_' + str(info['version'])) if (info['version'] != VERSION_NONE) else '')
+    library_constants.get_data_label(info)
   )
+  # return (
+  #   ((info['library'] + '_') if ('library' in info) else '') +
+  #   info['cell_line'] +
+  #   '_' + info['guide_rna'] +
+  #   '_' + info['strand'] +
+  #   '_' + info['construct'] +
+  #   (('_' + info['control_type']) if (info['control_type'] != library_constants.CONTROL_NOT) else '') +
+  #   (('_' + str(info['version'])) if (info['version'] != VERSION_NONE) else '')
+  # )
 
 def get_ref_seq_file(info):
   return (
     info['dsb_type'] +
     '_' + info['strand'] +
     '_' + info['construct'] +
-    (('_' + str(info['version'])) if (info['version'] != VERSION_NONE) else '') +
+    (('_' + str(info['version'])) if (info['version'] != library_constants.VERSION_NONE) else '') +
     os.path.extsep + 'fa'
   )
 
@@ -34,26 +36,36 @@ def get_dsb_pos(info):
     (DSB_POS['dsb_type'] == info['dsb_type']) &
     (DSB_POS['strand'] == info['strand']) &
     (DSB_POS['version'] == info['version'])
-  ]['dsb_pos'].iloc[0]
+  ]['dsb_pos']
+  if dsb_pos.shape[0] != 1:
+    raise Exception(f'Got {dsb_pos.shape[0]} values. Expected 1.')
+  dsb_pos = dsb_pos.iloc[0]
   if info['control_type'] == '30bpDown':
     dsb_pos += 30
   return dsb_pos
 
 TOTAL_READS = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'total_reads.tsv'))
 def get_total_reads(info):
-  return TOTAL_READS.loc[
+  x = TOTAL_READS.loc[
     (TOTAL_READS['library'] == info['library']),
     info['strand']
-  ].iloc[0]
+  ]
+  if x.shape[0] != 1:
+    raise Exception(f'Got {x.shape[0]} values. Expected 1.')
+  return x.iloc[0]
 
 MIN_READ_LENGTH = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'min_read_length.tsv'))
 def get_min_read_length(info):
-  return MIN_READ_LENGTH.loc[
+  x = MIN_READ_LENGTH.loc[
     (MIN_READ_LENGTH['dsb_type'] == info['dsb_type']),
     'min_read_length'
-  ].iloc[0]
+  ]
+  if x.shape[0] != 1:
+    raise Exception(f'Got {x.shape[0]} values. Expected 1.')
+  return x.iloc[0]
 
 LIBRARY_INFO = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'library_info.tsv'))
+LIBRARY_INFO['format'] = library_constants.DATA_INDIVIDUAL
 LIBRARY_INFO['name'] = LIBRARY_INFO.apply(get_name, axis='columns')
 LIBRARY_INFO['ref_seq_file'] = LIBRARY_INFO.apply(get_ref_seq_file, axis='columns')
 LIBRARY_INFO['dsb_pos'] = LIBRARY_INFO.apply(get_dsb_pos, axis='columns')
@@ -65,10 +77,9 @@ def get_library_info(**args):
   for key in args:
     if args[key] is not None:
       library_info = library_info.loc[library_info[key] == args[key]]
-  if library_info.shape[0] == 1:
-    return library_info.iloc[0].to_dict()
-  else:
-    raise Exception(str(library_info.shape[0]) + ' library info results found')
+  if library_info.shape[0] != 1:
+    raise Exception(f'Got {library_info.shape[0]} rows. Expected 1.')
+  return library_info.iloc[0].to_dict()
 
 ANTISENSE_MERGED_PAIRS = [
   ("yjl89", "yjl349"),
@@ -88,7 +99,7 @@ for library_1, library_2 in ANTISENSE_MERGED_PAIRS:
     info_merged = info_1.copy()
     info_merged['total_reads'] += info_2['total_reads']
     info_merged['library'] += '_' + info_2['library']
-    info_merged['version'] = 'merged'
+    info_merged['version'] = library_constants.VERSION_MERGED
     info_merged['name'] = get_name(info_merged)
     info_merged['dsb_pos'] = None
     info_merged['ref_seq_file'] = None
@@ -111,7 +122,7 @@ EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   total_reads_list = ('total_reads', list),
   min_read_length = ('min_read_length', 'first'),
 ).reset_index()
-
+EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
 EXPERIMENT_INFO['name'] = EXPERIMENT_INFO.apply(get_name, axis='columns')
 
 LAYOUT_GROUP_2DSB = '2DSB'
@@ -151,14 +162,13 @@ EXPERIMENT_INFO.loc[
 EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
 
 def get_experiment_info(**args):
-  experiment_info = EXPERIMENT_INFO
+  info = EXPERIMENT_INFO
   for key in args:
     if args[key] is not None:
-      experiment_info = experiment_info.loc[experiment_info[key] == args[key]]
-  if experiment_info.shape[0] == 1:
-    return experiment_info.iloc[0].to_dict()
-  else:
-    raise Exception(str(experiment_info.shape[0]) + ' experiment info results found')
+      info = info.loc[info[key] == args[key]]
+  if info.shape[0] != 1:
+    raise Exception(f'Got {info.shape[0]} rows. Expected 1.')
+  return info.iloc[0].to_dict()
 
 # Make the comparison experiments
 def get_experiment_info_comparison():
@@ -183,8 +193,14 @@ def get_experiment_info_comparison():
         construct_2_list = [library_constants.CONSTRUCT_BRANCH, library_constants.CONSTRUCT_CMV]
       for construct_1 in construct_1_list:
         for construct_2 in construct_2_list:
-          experiment_1 = experiments.loc[experiments['construct'] == construct_1].iloc[0].to_dict()
-          experiment_2 = experiments.loc[experiments['construct'] == construct_2].iloc[0].to_dict()
+          experiment_1 = experiments.loc[experiments['construct'] == construct_1]
+          experiment_2 = experiments.loc[experiments['construct'] == construct_2]
+          if experiment_1.shape[0] != 1:
+            raise Exception(f'Got {experiment_1.shape[0]} rows. Expected 1.')
+          if experiment_2.shape[0] != 1:
+            raise Exception(f'Got {experiment_2.shape[0]} rows. Expected 1.')
+          experiment_1 = experiment_1.iloc[0].to_dict()
+          experiment_2 = experiment_2.iloc[0].to_dict()
           experiment_new = {
             k: v for k, v in experiment_1.items()
             if k in experiments_comparison_keys
@@ -194,8 +210,8 @@ def get_experiment_info_comparison():
           experiment_new['construct'] = construct_1 + '_' + construct_2
           experiment_new['name_1'] = experiment_1['name']
           experiment_new['name_2'] = experiment_2['name']
-          experiment_new['name'] = get_name(experiment_new)
           experiment_new['format'] = library_constants.DATA_COMPARISON
+          experiment_new['name'] = get_name(experiment_new)
           experiments_comparison.append(experiment_new)
   return pd.DataFrame.from_records(experiments_comparison)
 
@@ -217,7 +233,7 @@ OUTPUT_DIR = {
 
 PYTHON_SCRIPTS = {
   'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
-  'combine_repeats': os.path.join('1_process_nhej', 'combine_repeats.py'),
+  'combine_repeat': os.path.join('1_process_nhej', 'combine_repeat.py'),
   'get_window': os.path.join('2_get_window_data', 'get_window.py'),
   'get_merged': os.path.join('2_get_window_data', 'get_merged.py'),
   'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
@@ -230,25 +246,11 @@ PYTHON_SCRIPTS = {
   'get_pptx': os.path.join('7_get_pptx', 'get_pptx.py'),
 }
 
-OUTPUT_SCRIPTS = {
-  'filter_nhej': 'run_01_filter_nhej',
-  'combine_repeats': 'run_02_combine_repeats',
-  'get_windows': 'run_03_get_windows',
-  'get_windows': 'run_03_get_windows',
-  'graph_data': 'run_04_graph_data',
-}
-
 # Make sure all scripts exist
 for x in PYTHON_SCRIPTS.values():
   if not os.path.exists(x):
     raise Exception('Could not find script: ' + str(x))
 del x
-
-RUN_SCRIPTS = {
-  'filter_nhej': 'data_1_filter_nhej',
-  'combine_repeats': 'data_2_combine_repeats',
-  'windows': 'data_3_windows',
-}
 
 LIBRARY_INFO.to_excel('library_info.xlsx')
 EXPERIMENT_INFO.to_excel('experiment_info.xlsx')

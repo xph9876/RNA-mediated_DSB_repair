@@ -11,7 +11,7 @@ if __name__ == '__main__':
     with open(os.path.join('run_01_process_nhej' + os.path.extsep + ext), 'w') as file_out:
       log_utils.log(file_out.name)
       for info in library_constants.LIBRARY_INFO.to_dict('records'):
-        if info['version'] == 'merged':
+        if info['version'] == library_constants.VERSION_MERGED:
           libraries = info['library'].split('_')
           libraries = []
           file_out.write(f"python 1_process_nhej/merge_libraries.py  --quiet\n")

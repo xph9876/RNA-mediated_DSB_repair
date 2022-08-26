@@ -22,8 +22,8 @@ if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(os.path.join('run_02_combine_repeat' + os.path.extsep + ext), 'w') as file_out:
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
-        if info['version'] != 'merged':
+        if info['version'] != library_constants.VERSION_MERGED:
           input_files = get_input_files(info['name'])
           output_file = get_output_file(info['name'])
-          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['combine_repeats']} --input {input_files} --output {output_file} --quiet\n")
+          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['combine_repeat']} --input {input_files} --output {output_file} --quiet\n")
       log_utils.log(file_out.name)

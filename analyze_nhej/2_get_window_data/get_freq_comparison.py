@@ -113,6 +113,7 @@ if __name__ == '__main__':
       'strand',
       'control_type',
       'ref_seq_window',
+      'version',
     ]
   ):
     raise Exception(f'Incompatible experiments:\n{data_info_1}\n{data_info_2}')

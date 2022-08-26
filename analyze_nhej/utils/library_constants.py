@@ -1,5 +1,16 @@
 import numpy as np
 
+VERSION_NONE = 'versionNone'
+VERSION_OLD = 'old'
+VERSION_NEW = 'new'
+VERSION_MERGED = 'merged'
+VERSIONS = [
+  VERSION_NONE,
+  VERSION_OLD,
+  VERSION_NEW,
+  VERSION_MERGED,
+]
+
 SUBST_WITH = 'withSubst'
 SUBST_WITHOUT = 'withoutSubst'
 SUBST_TYPES = [SUBST_WITH, SUBST_WITHOUT]
@@ -306,18 +317,18 @@ def get_data_label(data_info):
     construct_str = '_'.join([data_info['construct_1'], data_info['construct_2']])
   else:
     raise Exception('Unknown format: ' + str(data_info['format']))
-  if data_info['control_type'] == CONTROL_NOT:
-    control_str = None
-  else:
-    control_str = data_info['control_type']
+  control_str = None if (data_info['control_type'] == CONTROL_NOT) else data_info['control_type']
+  version_str = None if (data_info['version'] == VERSION_NONE) else data_info['version']
   str_list = [
     data_info['cell_line'],
     data_info['guide_rna'],
     data_info['strand'],
     construct_str,
-    control_str
+    control_str,
+    version_str,
   ]
   return '_'.join(x for x in str_list if x is not None)
+  return data_info['name']
 
 ### Constants for 3D variation-position histograms ###
 HISTOGRAM_TITLE_FONT_SIZE = 16

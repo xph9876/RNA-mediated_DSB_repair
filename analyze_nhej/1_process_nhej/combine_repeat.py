@@ -58,8 +58,9 @@ def main():
     for i in range(num_repeats)
   ]
 
-  for i in range(num_repeats):
-    log_utils.log(f"Num sequences {i}: {data[i].shape[0]}")
+  if not args.quiet:
+    for i in range(num_repeats):
+      log_utils.log(f"Num sequences {names[i]}: {data[i].shape[0]}")
 
   data = pd.concat(data, axis='columns', join='inner', keys=names)
   data.columns = data.columns.map(lambda x: '_'.join([x[1], x[0]]))

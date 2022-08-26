@@ -27,7 +27,7 @@ def parse_args():
     '--input',
     type = argparse.FileType(mode='r'),
     help = (
-      'Table of sequences produced with combine_repeats.py.' +
+      'Table of sequences produced with combine_repeat.py.' +
       ' Column format: Sequence, CIGAR, Count_1, Count_2, ..., etc.' +
       ' All the columns after CIGAR should be the counts for each repeat.'
     ),
@@ -137,11 +137,14 @@ def parse_args():
     help = 'Cell in this library.',
     required = True,
   )
+  parser.add_argument(
+    '--version',
+    type = str,
+    choices = library_constants.VERSIONS,
+    help = 'Version of library.',
+    required = True,
+  )
   args = parser.parse_args()
-  # args.subst_type += 'Subst'
-  # args.guide_rna = 'sg' + args.guide_rna
-  # if args.control_type == 'none':
-    # args.control_type = library_constants.CONTROL_NOT
   return args
 
 def write_alignment_window(

@@ -5,7 +5,7 @@ import log_utils
 import generate_constants
 
 if __name__ == '__main__':
-  input_dir = generate_constants.OUTPUT_DIR['combine_repeats']
+  input_dir = generate_constants.OUTPUT_DIR['combine_repeat']
   output_dir = generate_constants.OUTPUT_DIR['get_freqs']
   for ext in ['sh', 'ps1']:
     with open(os.path.join('run_03_get_freqs' + os.path.extsep + ext), 'w') as file_out:

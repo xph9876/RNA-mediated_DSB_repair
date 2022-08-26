@@ -6,3 +6,5 @@ python 0_generate_scripts/generate_05_histogram_data.py
 python 0_generate_scripts/generate_06_precomputed_layout.py
 python 0_generate_scripts/generate_07_plot_graph.py
 python 0_generate_scripts/generate_08_plot_histogram.py
+python 0_generate_scripts/generate_09_pptx_graph.py
+python 0_generate_scripts/generate_10_pptx_histogram.py

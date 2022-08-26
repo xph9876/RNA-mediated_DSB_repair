@@ -436,7 +436,7 @@ def get_slide(
     # Size legends
     if any(legend['type'] == 'node_size' for legend in legend_list):
       for orientation in ['h', 'v']:
-        y_legend_new_pt = get_pptx_legend.make_size_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.get_size_legend_pptx(
           slide = slide,
           x_pt = x_legend_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -467,7 +467,7 @@ def get_slide(
       if legend['type'] == 'node_size':
         pass # already handled above
       elif legend['type'] == 'node_outline':
-        y_legend_new_pt = get_pptx_legend.make_outline_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.get_outline_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -486,7 +486,7 @@ def get_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'edge_type':
-        y_legend_new_pt = get_pptx_legend.make_edge_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.get_edge_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -505,7 +505,7 @@ def get_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'variation_type':
-        y_legend_new_pt = get_pptx_legend.make_variation_color_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.get_variation_color_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -525,7 +525,7 @@ def get_slide(
           orientation = orientation,
         )
       elif legend['type'] == 'node_type':
-        y_legend_new_pt = get_pptx_legend.make_node_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.get_node_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,
@@ -553,7 +553,7 @@ def get_slide(
         else:
           raise Exception('Impossible')
         color_bar_file = legend['color_bar_file']
-        y_legend_new_pt = get_pptx_legend.make_freq_ratio_legend_pptx(
+        y_legend_new_pt = get_pptx_legend.get_freq_ratio_legend_pptx(
           slide = slide,
           x_pt = x_pt + legend_x_offset_pt[orientation],
           y_pt = y_legend_pt,

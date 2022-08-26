@@ -7,7 +7,11 @@ import generate_constants
 import generate_07_plot_graph
 
 def get_output_file(cell_line, dsb_type, version):
-  version_str = '' if (version == 'versionNone') else ('_' + version)
+  version_str = (
+    ''
+    if (version == library_constants.VERSION_NONE) else
+    ('_' + version)
+  )
   return os.path.join(
     generate_constants.OUTPUT_DIR['pptx'],
     'graph',
@@ -38,15 +42,15 @@ if __name__ == '__main__':
           if dsb_type == library_constants.DSB_TYPE_1:
             constructs_individual = library_constants.CONSTRUCTS_INDIVIDUAL_SENSE
             constructs_comparison = library_constants.CONSTRUCTS_COMPARISON_SENSE
-            version_list = ['versionNone']
+            version_list = [library_constants.VERSION_NONE]
           elif dsb_type == library_constants.DSB_TYPE_2:
             constructs_individual = library_constants.CONSTRUCTS_INDIVIDUAL_SENSE
             constructs_comparison = library_constants.CONSTRUCTS_COMPARISON_SENSE
-            version_list = ['versionNone']
+            version_list = [library_constants.VERSION_NONE]
           elif dsb_type == library_constants.DSB_TYPE_2anti:
             constructs_individual = library_constants.CONSTRUCTS_INDIVIDUAL_ANTISENSE
             constructs_comparison = library_constants.CONSTRUCTS_COMPARISON_ANTISENSE
-            version_list = ['old', 'new', 'merged']
+            version_list = [library_constants.VERSION_OLD, library_constants.VERSION_NEW, library_constants.VERSION_MERGED]
           else:
             raise Exception('Unknown dsb_type: ' + dsb_type)
           
@@ -76,14 +80,18 @@ if __name__ == '__main__':
               experiment_info = experiment_info.loc[
                 (experiment_info['cell_line'] == cell_line) &
                 (experiment_info['dsb_type'] == dsb_type) &
-                (experiment_info['version'] == version)
+                (experiment_info['version'] == version) &
+                (experiment_info['control_type'] == library_constants.CONTROL_NOT)
               ]
               for strand in library_constants.STRANDS:
                 for construct in construct_list:
                   info = experiment_info.loc[
                     (experiment_info['strand'] == strand) &
                     (experiment_info['construct'] == construct)
-                  ].iloc[0].to_dict()
+                  ]
+                  if info.shape[0] != 1:
+                    raise Exception(f'Got {info.shape[0]} rows. Expected 1.')
+                  info = info.iloc[0].to_dict()
                   file_list.append(get_input_file(
                     experiment_name = info['name'],
                     layout_name = generate_constants.USE_LAYOUT,
