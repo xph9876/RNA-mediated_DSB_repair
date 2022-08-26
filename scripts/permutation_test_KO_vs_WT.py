@@ -5,21 +5,27 @@ import sys
 import pandas as pd
 import numpy as np
 import xlsxwriter
+import itertools as it
 
+
+# calc ratio
+def calc(wt1, wt2, db1, db2):
+    r1 = np.sum(db1)/np.sum(wt1)
+    r2 = np.sum(db2)/np.sum(wt2)
+    return r1/r2
+    
 
 # each permutation
 def permute(wt, db):
     np.random.shuffle(wt)
     np.random.shuffle(db)
-    r1 = np.sum(db[:4])/np.sum(wt[:4])
-    r2 = np.sum(db[4:8])/np.sum(wt[4:8])
-    return r1/r2
+    return calc(wt[:4], wt[4:], db[:4], db[4:])
 
 def main():
     parser = argparse.ArgumentParser(description='Perform permutation test to compare WT/DB ratio of each MMEJ of RNaseH2 WT and KO')
     parser.add_argument('freq', type=argparse.FileType('r'), help='MMEJ frequency TSV file')
     parser.add_argument('-o', default='MMEJ_permutation_test.xlsx', help='Output xlsx name (MMEJ_permutation_test.xlsx)')
-    parser.add_argument('-n', default=1000, type=int, help='Number of permutations (1,000)')
+    parser.add_argument('-n', default=0, type=int, help='Number of permutations. If not set, traverse all possible permutations instead')
     parser.add_argument('-p', default=0.05, type=float, help='Significant level for P value (0.05)')
     args = parser.parse_args()
 
@@ -67,9 +73,16 @@ def main():
                 ratio = (np.sum(ko_db) / np.sum(ko_wt)) / (np.sum(wt_db) / np.sum(wt_wt))
                 # calc permutation
                 res = []
-                for _ in range(args.n):
-                    sample = permute(wt_wt+ko_wt, wt_db+ko_db)
-                    res.append(sample)
+                if not args.n:
+                    for wt1 in it.combinations(wt_wt+ko_wt, 4):
+                        wt2 = [x for x in wt_wt+ko_wt if x not in wt1]
+                        for db1 in it.combinations(wt_db+ko_db, 4):
+                            db2 = [x for x in wt_db+ko_db if x not in db1]
+                            res.append(calc(wt1,wt2,db1,db2))
+                else:
+                    for _ in range(args.n):
+                        sample = permute(wt_wt+ko_wt, wt_db+ko_db)
+                        res.append(sample)
                 pvalue = len([x for x in res if x <= ratio]) / len(res)
                 # write
                 ws.write(row, 0, cut)
