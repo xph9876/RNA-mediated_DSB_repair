@@ -13,8 +13,6 @@ import file_names
 import pandas as pd
 import argparse
 
-# NOTE: WILL NEED TO MAKE SURE THE METADATA GET TRANSFERED OVER CORRECTLY. SUCH AS REFERENCE SEQUENCE.
-
 def parse_args():
   parser = argparse.ArgumentParser(
     description = (

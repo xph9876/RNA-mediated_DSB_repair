@@ -140,9 +140,3 @@ if __name__ == '__main__':
     ref_seq_window = data_info_1['ref_seq_window'],
     ref_seq = None,
   )
-
-  # Copy over the reference sequence
-  # ref_file_out = file_names.ref(args.output)
-  # log_utils.log(ref_file_out)
-  # shutil.copy(file_names.ref(args.input[0]), ref_file_out)
-  # log_utils.new_line()

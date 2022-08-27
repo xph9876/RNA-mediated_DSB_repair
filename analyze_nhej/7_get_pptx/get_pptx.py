@@ -5,11 +5,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../2_gr
 
 import argparse
 
-import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
-import plotly.subplots as ps
-
 import common_utils
 import file_utils
 import file_names

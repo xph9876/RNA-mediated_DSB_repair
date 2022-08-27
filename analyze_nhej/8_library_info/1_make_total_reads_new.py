@@ -9,6 +9,7 @@ import pandas as pd
 import log_utils
 import file_utils
 
+# TODO: MAKE A SCRIPT SHOWING HOW MANY READS LOST IN EACH STAGE
 
 data_output = []
 for library_file in glob.glob('libraries_2/*'):

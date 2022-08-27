@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
-import itertools
 import pandas as pd
 import argparse
 import shutil
@@ -175,15 +174,6 @@ def write_variation_grouped(output_dir, subst_type):
   out_file_name = file_names.variation_grouped(output_dir, subst_type)
   file_utils.write_tsv(variation_data, out_file_name)
   log_utils.log(out_file_name)
-
-def exhaustive_cycle_search(nodes, edge_list, cycle_size):
-  found_cycles = {}
-  for node_subset in itertools.combinations(nodes, cycle_size):
-    for i in range(cycle_size):
-      j = (i + 1) % cycle_size
-      if (node_subset[i], node_subset[j]) in edge_list:
-        found_cycles.add(tuple(sorted(node_subset)))
-  return len(found_cycles)
 
 def main():
   args = parse_args()

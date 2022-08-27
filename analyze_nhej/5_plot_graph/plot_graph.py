@@ -1753,7 +1753,6 @@ def make_graph_stats_ref_component(
     font_size = library_constants.GRAPH_LEGEND_FONT_SIZE * font_size_scale,
     font_family = 'Monospace',
     text = (
-      # data_set['label']['main'] + '<br>' +
       '<span style="text-decoration: underline;">'
         'Graph Invariants (ref component only)'
       '</span><br>' +

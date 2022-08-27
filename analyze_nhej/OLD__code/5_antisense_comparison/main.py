@@ -1,6 +1,4 @@
 import pandas as pd
-# import csv
-# import numpy as np
 
 def analysis_1():
   for name in ['R1_antisense', 'R1_splicing', 'R2_antisense', 'R2_splicing']:

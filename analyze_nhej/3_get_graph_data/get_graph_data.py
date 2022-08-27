@@ -50,12 +50,6 @@ def get_sequence_data(data, data_format):
   deletion = []
   indel = []
 
-  # freq_cols = data.columns[data.columns.str.startswith('freq_')]
-  # data['freq_mean'] = data[freq_cols].mean(axis='columns')
-  # data['freq_min'] = data[freq_cols].min(axis='columns')
-  # data = data.loc[data['freq_min'] > min_freq]
-  # data = data[['ref_align', 'read_align', 'freq_mean']]
-
   for row in data.to_dict('records'):
     num_ins, num_del, num_subst = (
       alignment_utils.count_variations(row['ref_align'], row['read_align'])
@@ -238,155 +232,6 @@ def write_graph_stats(output_dir, subst_type):
   file_utils.write_tsv(graph_stats, out_file_name)
   log_utils.log(out_file_name)
 
-# def split_seqs_into_variations(sequence_data):
-#   """
-#     Split sequences into it's individual variations.
-#   """
-#   variation_data = sequence_data.copy()
-#   variation_data = variation_data.rename({'id': 'seq_id'}, axis='columns')
-
-#   # Explode the different variations
-#   variation_data = variation_data.rename(
-#     {
-#       'ref_align': 'ref_align',
-#       'read_align': 'read_align',
-#       'mid_align': 'mid_align',
-#       'variation_type': 'variation_type_seq',
-#     },
-#     axis = 'columns',
-#   )
-#   if variation_data.shape[0] > 0:
-#     variation_data['variation_info'] = (
-#       variation_data.apply(
-#         lambda x: [
-#           dict(zip(['variation_pos', 'variation_type', 'variation_letter'], info_tuple))
-#           for info_tuple in alignment_utils.get_variation_info(x['ref_align'], x['read_align'])
-#         ],
-#         axis = 'columns',
-#       )
-#     )
-#   else:
-#     variation_data['variation_info'] = []
-
-#   variation_data = variation_data.loc[variation_data['variation_info'].apply(len) > 0]
-#   variation_data = variation_data.explode('variation_info', ignore_index=True)
-#   if variation_data.shape[0] > 0:
-#     variation_data[['variation_pos', 'variation_type', 'variation_letter']] = (
-#       variation_data['variation_info'].apply(
-#         lambda x: pd.Series([x['variation_pos'], x['variation_type'], x['variation_letter']])
-#       )
-#     )
-#   else:
-#     variation_data['variation_pos'] = []
-#     variation_data['variation_type'] = []
-#     variation_data['variation_letter'] = []
-#   variation_data = variation_data.drop('variation_info', axis='columns')
-
-#   # Add the variation IDs
-#   variation_data['id'] = (
-#     variation_data['seq_id'] + '_V' +
-#     (variation_data.groupby('seq_id')['seq_id'].cumcount() + 1).astype(str)
-#   )
-
-#   # Reorder the columns
-#   columns = ['id', 'seq_id']
-#   columns += list(variation_data.columns[~variation_data.columns.isin(columns)])
-#   variation_data = variation_data[columns]
-
-#   return variation_data
-
-# def write_variation(dir, subst_type):
-#   """
-#     Make data on individual variations and write to file.
-#     Sequence data should already be created.
-#   """
-#   out_file_name = file_names.variation(dir, subst_type)
-#   log_utils.log(out_file_name)
-
-#   sequence_data = file_utils.read_tsv(file_names.sequence_data(dir, subst_type))
-#   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
-#   variation_data = split_seqs_into_variations(sequence_data)
-
-#   variation_data = pd.concat(
-#     [
-#       variation_data,
-#       get_freq_ranks(
-#         variation_data,
-#         library_constants.FREQ_COLUMNS[data_info['format']],
-#         library_constants.FREQ_RANK_COLUMNS[data_info['format']],
-#       )
-#     ],
-#     axis = 'columns',
-#   )
-#   file_utils.write_tsv(variation_data, out_file_name)
-
-# def write_variation_grouped(dir, subst_type):
-#   """
-#     Groups the variation data by position and number of variations on sequence.
-#     This data is used for the 3D variation-position histograms.
-#     Variation data should have already been made.
-#   """
-#   out_file_name = file_names.variation_grouped(dir, subst_type)
-
-#   log_utils.log(out_file_name)
-
-#   variation_data = file_utils.read_tsv(file_names.variation(dir, subst_type))
-#   data_info = file_utils.read_tsv_dict(file_names.data_info(dir))
-#   freq_column_list = library_constants.FREQ_COLUMNS[data_info['format']]
-#   variation_data = variation_data[[
-#     'id',
-#     *freq_column_list,
-#     'dist_ref',
-#     'variation_pos',
-#     'variation_type',
-#     'variation_letter',
-#   ]]
-  
-#   aggregate_args = {}
-#   for freq_column in freq_column_list:
-#     aggregate_args[freq_column] = (freq_column, 'sum')
-#   aggregate_args['var_id'] = ('id', common_utils.join_with_comma)
-#   variation_data = variation_data.groupby([
-#     'dist_ref',
-#     'variation_pos',
-#     'variation_type',
-#     'variation_letter',
-#   ]).aggregate(**aggregate_args).reset_index()
-
-#   freq_min = variation_data[freq_column_list].min(axis='columns')
-#   freq_min = freq_min.sort_values(ascending=False)
-#   variation_data = variation_data.loc[freq_min.index]
-#   variation_data['id'] = (
-#     'GV' + pd.Series(range(1, variation_data.shape[0] + 1), dtype=str)
-#   )
-
-#   variation_data = pd.concat(
-#     [
-#       variation_data,
-#       get_freq_ranks(
-#         variation_data,
-#         freq_column_list,
-#         library_constants.FREQ_RANK_COLUMNS[data_info['format']],
-#       )
-#     ],
-#     axis = 'columns',
-#   )
-
-#   variation_data = variation_data[
-#     ['id', 'var_id'] +
-#     list(variation_data.columns[~variation_data.columns.isin(['id', 'var_id'])])
-#   ]
-#   file_utils.write_tsv(variation_data, out_file_name)
-
-# def exhaustive_cycle_search(nodes, edge_list, cycle_size):
-#   found_cycles = {}
-#   for node_subset in itertools.combinations(nodes, cycle_size):
-#     for i in range(cycle_size):
-#       j = (i + 1) % cycle_size
-#       if (node_subset[i], node_subset[j]) in edge_list:
-#         found_cycles.add(tuple(sorted(node_subset)))
-#   return len(found_cycles)
-
 def main():
   args = parse_args()
 
@@ -404,8 +249,6 @@ def main():
   write_distance_matrix(args.output, args.subst_type)
   write_graph_stats(args.output, args.subst_type)
 
-  # write_variation(args.dir, args.subst_type)
-  # write_variation_grouped(args.dir, args.subst_type)
   log_utils.new_line()
 
 if __name__ == '__main__':

@@ -10,15 +10,6 @@ def get_name(info):
     ((info['library'] + '_') if ('library' in info) else '') +
     library_constants.get_data_label(info)
   )
-  # return (
-  #   ((info['library'] + '_') if ('library' in info) else '') +
-  #   info['cell_line'] +
-  #   '_' + info['guide_rna'] +
-  #   '_' + info['strand'] +
-  #   '_' + info['construct'] +
-  #   (('_' + info['control_type']) if (info['control_type'] != library_constants.CONTROL_NOT) else '') +
-  #   (('_' + str(info['version'])) if (info['version'] != VERSION_NONE) else '')
-  # )
 
 def get_ref_seq_file(info):
   return (

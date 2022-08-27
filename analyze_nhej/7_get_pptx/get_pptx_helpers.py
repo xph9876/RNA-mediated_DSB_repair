@@ -1,13 +1,9 @@
-import pandas as pd
-import numpy as np
-
 import pptx
 import pptx.util
 import pptx.chart.data
 import pptx.enum.shapes
 import pptx.dml.color
 import pptx.dml.effect
-import PIL
 
 import pptx.shapes.connector
 import pptx.enum.shapes

@@ -153,7 +153,6 @@ def write_alignment_window(
   anchor_size,
   anchor_mismatches,
   subst_type,
-  # freq_min_threshold,
 ):
   """
     Performs preprocessing steps for the NHEJ graphs.

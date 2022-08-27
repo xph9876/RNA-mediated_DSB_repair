@@ -3,8 +3,6 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../2_graph_processing/'))) # allow importing the graphs dir
 
-
-import pandas as pd
 import numpy as np
 
 import pptx
@@ -13,7 +11,6 @@ import pptx.chart.data
 import pptx.enum.shapes
 import pptx.dml.color
 import pptx.dml.effect
-import PIL
 
 import pptx.shapes.connector
 import pptx.enum.shapes
@@ -21,6 +18,8 @@ import pptx.enum.text
 import pptx.enum.dml
 import pptx.dml.color
 import pptx.util
+
+import PIL
 
 import get_pptx_helpers
 
@@ -165,8 +164,7 @@ def get_edge_legend_pptx(
 ):
   items = []
 
-  # Substitution edges not being shown,
-  # indel edges being show solid
+  # Substitution edges not being shown
   # items.append({
   #   'type': 'line',
   #   'text': 'Substitution',
@@ -180,6 +178,7 @@ def get_edge_legend_pptx(
     'text': '1 nt. in/del',
     'color': '000000',
     'line_dash': 'solid',
+    # In/del edges being shown solid
     # 'line_dash': 'dash',
     'line_width': line_width_pt,
     'size': line_size_pt,
@@ -450,6 +449,7 @@ def get_freq_ratio_legend_pptx(
   legend_title_font_size_pt = 8,
   legend_label_font_size_pt = 10,
   orientation = 'v',
+  fixed_aspect = False,
 ):
 
   get_pptx_helpers.add_textbox_pptx(
@@ -463,16 +463,16 @@ def get_freq_ratio_legend_pptx(
   )
   y_pt += title_height_pt
 
-  # IN CASE WE WANT A FIXED ASPECT RATIO
-  # image = PIL.Image.open(color_bar_file)
-  # image_width_px = image.width
-  # image_height_px = image.height
-  # ratio = min(
-  #   color_bar_width_pt / image_width_px,
-  #   color_bar_height_pt / image_height_px,
-  # )
-  # color_bar_width_pt = ratio * image_width_px
-  # color_bar_height_pt = ratio * image_height_px
+  if fixed_aspect:
+    image = PIL.Image.open(color_bar_file)
+    image_width_px = image.width
+    image_height_px = image.height
+    ratio = min(
+      color_bar_width_pt / image_width_px,
+      color_bar_height_pt / image_height_px,
+    )
+    color_bar_width_pt = ratio * image_width_px
+    color_bar_height_pt = ratio * image_height_px
 
   if orientation == 'v':
     color_bar = slide.shapes.add_picture(
@@ -506,7 +506,6 @@ def get_freq_ratio_legend_pptx(
       x_label_pt = (
         x_pt + (i_rev / (num_ticks - 1)) * color_bar_major_axis_pt - label_width_pt / 2
       )
-      # y_label_pt = y_pt + color_bar_minor_axis_pt - 
       y_label_pt = y_pt
       text_align = 'center'
     else:
