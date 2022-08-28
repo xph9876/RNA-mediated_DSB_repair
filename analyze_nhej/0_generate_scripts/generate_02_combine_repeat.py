@@ -6,10 +6,10 @@ import library_constants
 import generate_constants
 import generate_01_filter_nhej
 
-def get_input_files(name):
+def get_input_files(name_list):
   return ' '.join(
-    generate_01_filter_nhej.get_output_file(x + '_' + name)
-    for x in info['library_list']
+    generate_01_filter_nhej.get_output_file(x)
+    for x in name_list
   )
 
 def get_output_file(name):
@@ -18,13 +18,12 @@ def get_output_file(name):
     name + os.extsep + 'tsv',
   )
 
-
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(os.path.join('run_02_combine_repeat' + os.path.extsep + ext), 'w', encoding='utf-8') as file_out:
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         if info['version'] != library_constants.VERSION_MERGED:
-          input_files = get_input_files(info['name'])
+          input_files = get_input_files(info['library_name_list'])
           output_file = get_output_file(info['name'])
           file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['combine_repeat']} --input {input_files} --output {output_file} --quiet\n")
       log_utils.log(file_out.name)

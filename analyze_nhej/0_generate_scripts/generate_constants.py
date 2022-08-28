@@ -122,6 +122,7 @@ EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   'version',
 ]).aggregate(
   library_list = ('library', list),
+  library_name_list = ('name', list),
   dsb_pos = ('dsb_pos', 'first'),
   ref_seq_file = ('ref_seq_file', 'first'),
   total_reads_list = ('total_reads', list),
@@ -251,11 +252,11 @@ PYTHON_SCRIPTS = {
   'get_pptx': os.path.join('7_get_pptx', 'get_pptx.py'),
 }
 
-# Make sure all scripts exist
-for x in PYTHON_SCRIPTS.values():
-  if not os.path.exists(x):
-    raise Exception('Could not find script: ' + str(x))
-del x
+def check_scripts_exits():
+  for x in PYTHON_SCRIPTS.values():
+    if not os.path.exists(x):
+      raise Exception('Could not find script: ' + str(x))
+check_scripts_exits()
 
 LIBRARY_INFO.to_excel('library_info.xlsx')
 EXPERIMENT_INFO.to_excel('experiment_info.xlsx')
