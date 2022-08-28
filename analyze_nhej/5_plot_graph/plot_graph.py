@@ -2635,11 +2635,9 @@ def parse_args():
   )
   parser.add_argument(
     '--subst_type',
-    choices = ['with', 'without'],
-    help = (
-      'Whether to plot data with or without substitutions.'
-    ),
-    default = 'without',
+    choices = library_constants.SUBST_TYPES,
+    help = 'Whether to plot data with or without substitutions.',
+    default = library_constants.SUBST_WITHOUT,
   )
   parser.add_argument(
     '--node_max_freq',
@@ -2823,10 +2821,19 @@ def parse_args():
     if len(args.range_y) != 2:
       raise Exception(f'Need 2 values for range_y. Got {len(args.range_y)}')
   if args.variation_types is None:
-    args.variation_types = ['insertion', 'deletion', 'none']
+    args.variation_types = [
+      library_constants.VARIATION_INSERTION,
+      library_constants.VARIATION_DELETION,
+      library_constants.VARIATION_NONE,
+    ]
   else:
     for var_type in args.variation_types:
-      if not(var_type in ['insertion', 'deletion', 'substitution', 'none']):
+      if var_type not in [
+        library_constants.VARIATION_INSERTION,
+        library_constants.VARIATION_DELETION,
+        library_constants.VARIATION_SUBSTITUTION,
+        library_constants.VARIATION_NONE,
+      ]:
         raise Exception(f'Unknown variation type: {var_type}')
   if args.universal_layout_y_axis_y_range is not None:
     if len(args.universal_layout_y_axis_y_range) != 2:
@@ -2844,7 +2851,6 @@ def parse_args():
       )
   else:
     args.universal_layout_x_axis_x_range = [None, None]
-  args.subst_type += 'Subst'
   return args
 
 def main():
