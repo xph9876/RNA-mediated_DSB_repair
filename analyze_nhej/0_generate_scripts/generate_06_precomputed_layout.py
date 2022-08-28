@@ -19,7 +19,7 @@ def get_output_dir(layout_name, layout_group):
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open(os.path.join('run_06_precomputed_layout' + os.path.extsep + ext), 'w') as file_out:
+    with open(os.path.join('run_06_precomputed_layout' + os.path.extsep + ext), 'w', encoding='utf-8') as file_out:
       layout_group_experiments = dict(list(generate_constants.EXPERIMENT_INFO.groupby('layout_group')))
       for group_name in generate_constants.LAYOUT_GROUPS:
         experiments = layout_group_experiments[group_name]

@@ -32,7 +32,7 @@ ARG_LEGEND = '--legends node_size freq_ratio_sense_branch freq_ratio_sense_cmv n
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open('run_09_pptx_graph' + os.extsep + ext, 'w') as file_out:
+    with open('run_09_pptx_graph' + os.extsep + ext, 'w', encoding='utf-8') as file_out:
       for dsb_type in library_constants.DSB_TYPES:
         if dsb_type == library_constants.DSB_TYPE_2anti:
           cell_line_list = [library_constants.CELL_LINE_WT]

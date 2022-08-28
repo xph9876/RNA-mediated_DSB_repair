@@ -5,7 +5,16 @@ import pandas as pd
 import file_utils
 import library_constants
 
-def get_name(info):
+def get_name_library(info):
+  name = (
+    ((info['library'] + '_') if ('library' in info) else '') +
+    library_constants.get_data_label(info)
+  )
+  for version in library_constants.VERSIONS:
+    name = name.replace('_' + version, '')
+  return name
+
+def get_name_experiment(info):
   return (
     ((info['library'] + '_') if ('library' in info) else '') +
     library_constants.get_data_label(info)
@@ -57,7 +66,7 @@ def get_min_read_length(info):
 
 LIBRARY_INFO = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'library_info.tsv'))
 LIBRARY_INFO['format'] = library_constants.DATA_INDIVIDUAL
-LIBRARY_INFO['name'] = LIBRARY_INFO.apply(get_name, axis='columns')
+LIBRARY_INFO['name'] = LIBRARY_INFO.apply(get_name_library, axis='columns')
 LIBRARY_INFO['ref_seq_file'] = LIBRARY_INFO.apply(get_ref_seq_file, axis='columns')
 LIBRARY_INFO['dsb_pos'] = LIBRARY_INFO.apply(get_dsb_pos, axis='columns')
 LIBRARY_INFO['total_reads'] = LIBRARY_INFO.apply(get_total_reads, axis='columns')
@@ -72,31 +81,36 @@ def get_library_info(**args):
     raise Exception(f'Got {library_info.shape[0]} rows. Expected 1.')
   return library_info.iloc[0].to_dict()
 
-ANTISENSE_MERGED_PAIRS = [
-  ("yjl89", "yjl349"),
-  ("yjl90", "yjl350"),
-  ("yjl91", "yjl351"),
-  ("yjl92", "yjl352"),
-  ("yjl93", "yjl353"),
-  ("yjl94", "yjl354"),
-  ("yjl95", "yjl355"),
-  ("yjl96", "yjl356"),
-]
-LIBRARY_INFO_ANTISENSE_MERGED = []
-for library_1, library_2 in ANTISENSE_MERGED_PAIRS:
-  for strand in library_constants.STRANDS:
-    info_1 = get_library_info(library = library_1, strand = strand)
-    info_2 = get_library_info(library = library_2, strand = strand)
-    info_merged = info_1.copy()
-    info_merged['total_reads'] += info_2['total_reads']
-    info_merged['library'] += '_' + info_2['library']
-    info_merged['version'] = library_constants.VERSION_MERGED
-    info_merged['name'] = get_name(info_merged)
-    info_merged['dsb_pos'] = None
-    info_merged['ref_seq_file'] = None
-    LIBRARY_INFO_ANTISENSE_MERGED.append(info_merged)
-LIBRARY_INFO_ANTISENSE_MERGED = pd.DataFrame.from_records(LIBRARY_INFO_ANTISENSE_MERGED)
-LIBRARY_INFO = pd.concat([LIBRARY_INFO, LIBRARY_INFO_ANTISENSE_MERGED], axis='index').reset_index(drop=True)
+ANTISENSE_MERGED_PAIRS = {
+  ('yjl89', 'yjl349'): 'yjl89n349',
+  ('yjl90', 'yjl350'): 'yjl90n350',
+  ('yjl91', 'yjl351'): 'yjl91n351',
+  ('yjl92', 'yjl352'): 'yjl92n352',
+  ('yjl93', 'yjl353'): 'yjl93n353',
+  ('yjl94', 'yjl354'): 'yjl94n354',
+  ('yjl95', 'yjl355'): 'yjl95n355',
+  ('yjl96', 'yjl356'): 'yjl96n356',
+}
+def get_library_info_antisense_merged():
+  info_list = []
+  for (library_1, library_2), library_new in ANTISENSE_MERGED_PAIRS.items():
+    for strand in library_constants.STRANDS:
+      info_1 = get_library_info(library = library_1, strand = strand)
+      info_2 = get_library_info(library = library_2, strand = strand)
+      info_merged = info_1.copy()
+      info_merged['total_reads'] += info_2['total_reads']
+      info_merged['library'] = library_new
+      info_merged['version'] = library_constants.VERSION_MERGED
+      info_merged['name'] = get_name_library(info_merged)
+      info_merged['dsb_pos'] = None
+      info_merged['ref_seq_file'] = None
+      info_list.append(info_merged)
+  return pd.DataFrame.from_records(info_list)
+LIBRARY_INFO_ANTISENSE_MERGED = get_library_info_antisense_merged()
+LIBRARY_INFO = pd.concat(
+  [LIBRARY_INFO, LIBRARY_INFO_ANTISENSE_MERGED],
+  axis = 'index'
+).reset_index(drop=True)
 
 EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   'cell_line',
@@ -114,7 +128,7 @@ EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   min_read_length = ('min_read_length', 'first'),
 ).reset_index()
 EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
-EXPERIMENT_INFO['name'] = EXPERIMENT_INFO.apply(get_name, axis='columns')
+EXPERIMENT_INFO['name'] = EXPERIMENT_INFO.apply(get_name_experiment, axis='columns')
 
 LAYOUT_GROUP_2DSB = '2DSB'
 LAYOUT_GROUP_1DSB_A = '1DSB_A'
@@ -202,7 +216,7 @@ def get_experiment_info_comparison():
           experiment_new['name_1'] = experiment_1['name']
           experiment_new['name_2'] = experiment_2['name']
           experiment_new['format'] = library_constants.DATA_COMPARISON
-          experiment_new['name'] = get_name(experiment_new)
+          experiment_new['name'] = get_name_experiment(experiment_new)
           experiments_comparison.append(experiment_new)
   return pd.DataFrame.from_records(experiments_comparison)
 

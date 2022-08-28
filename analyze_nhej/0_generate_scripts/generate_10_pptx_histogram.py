@@ -31,7 +31,7 @@ VARIATION_TYPES = [
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open('run_10_pptx_histogram' + os.extsep + ext, 'w') as file_out:
+    with open('run_10_pptx_histogram' + os.extsep + ext, 'w', encoding='utf-8') as file_out:
       for cell_line in library_constants.CELL_LINES:
         if cell_line == library_constants.CELL_LINE_WT:
           intron_type_list = ['sense', 'antisense']
