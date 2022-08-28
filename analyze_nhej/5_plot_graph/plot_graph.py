@@ -2959,8 +2959,8 @@ def main():
 
   if args.output is not None:
     file_out = os.path.join(args.output, file_names.graph_figure(data_label, args.ext))
-    log_utils.log(file_out)
     file_utils.write_plotly(figure, file_out)
+    log_utils.log(file_out)
 
   if ((args.crop_x is not None)) or ((args.crop_y is not None)):
     if args.ext == 'html':

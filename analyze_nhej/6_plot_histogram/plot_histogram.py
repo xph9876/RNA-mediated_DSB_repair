@@ -303,8 +303,8 @@ def plot_histogram(
       fontsize = library_constants.HISTOGRAM_TITLE_FONT_SIZE * font_size_scale,
     )
 
-  log_utils.log(file_out)
   file_utils.write_pyplot(figure, file_out)
+  log_utils.log(file_out)
 
 
 def parse_args():
