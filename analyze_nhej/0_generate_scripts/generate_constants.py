@@ -271,3 +271,13 @@ USE_LAYOUT = LAYOUT_UNIVERSAL
 
 GRAPH_HEIGHT_PX = 1800
 GRAPH_WIDTH_PX = 2400
+
+OUTPUT_ENCODING = {
+  'sh': 'utf-8',
+  'ps1': 'utf_8_sig',
+}
+
+ARG_NEWLINE = {
+  'sh': '\\n',
+  'ps1': '`n',
+}

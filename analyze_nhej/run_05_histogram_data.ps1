@@ -1,4 +1,4 @@
-python 4_get_histogram_data\get_histogram_data.py --input data_4_graph\KO_sgA_R1_branch_30bpDown --output data_5_histogram\KO_sgA_R1_branch_30bpDown --subst_type withSubst
+﻿python 4_get_histogram_data\get_histogram_data.py --input data_4_graph\KO_sgA_R1_branch_30bpDown --output data_5_histogram\KO_sgA_R1_branch_30bpDown --subst_type withSubst
 python 4_get_histogram_data\get_histogram_data.py --input data_4_graph\KO_sgA_R1_branch_30bpDown --output data_5_histogram\KO_sgA_R1_branch_30bpDown --subst_type withoutSubst
 python 4_get_histogram_data\get_histogram_data.py --input data_4_graph\KO_sgA_R1_cmv_30bpDown --output data_5_histogram\KO_sgA_R1_cmv_30bpDown --subst_type withSubst
 python 4_get_histogram_data\get_histogram_data.py --input data_4_graph\KO_sgA_R1_cmv_30bpDown --output data_5_histogram\KO_sgA_R1_cmv_30bpDown --subst_type withoutSubst

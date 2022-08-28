@@ -32,7 +32,11 @@ ARG_LEGEND = '--legends node_size freq_ratio_sense_branch freq_ratio_sense_cmv n
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open('run_09_pptx_graph' + os.extsep + ext, 'w', encoding='utf-8') as file_out:
+    with open(
+      file = 'run_09_pptx_graph' + os.extsep + ext,
+      mode = 'w',
+      encoding = generate_constants.OUTPUT_ENCODING[ext],
+    ) as file_out:
       for dsb_type in library_constants.DSB_TYPES:
         if dsb_type == library_constants.DSB_TYPE_2anti:
           cell_line_list = [library_constants.CELL_LINE_WT]
@@ -98,8 +102,10 @@ if __name__ == '__main__':
                     format = format,
                   ))
                   label_list.append(
-                    library_constants.LABELS[info['guide_rna']] + '\\n' +
-                    library_constants.LABELS[strand] + '\\n' +
+                    library_constants.LABELS[info['guide_rna']] +
+                    generate_constants.ARG_NEWLINE[ext] +
+                    library_constants.LABELS[strand] +
+                    generate_constants.ARG_NEWLINE[ext] +
                     library_constants.LABELS[construct]
                   )
             if dsb_type == library_constants.DSB_TYPE_2anti:

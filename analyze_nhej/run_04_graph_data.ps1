@@ -1,4 +1,4 @@
-python 3_get_graph_data\get_graph_data.py --input data_3_window\KO_sgA_R1_branch_30bpDown --output data_4_graph\KO_sgA_R1_branch_30bpDown --subst_type withSubst
+﻿python 3_get_graph_data\get_graph_data.py --input data_3_window\KO_sgA_R1_branch_30bpDown --output data_4_graph\KO_sgA_R1_branch_30bpDown --subst_type withSubst
 python 3_get_graph_data\get_graph_data.py --input data_3_window\KO_sgA_R1_cmv_30bpDown --output data_4_graph\KO_sgA_R1_cmv_30bpDown --subst_type withSubst
 python 3_get_graph_data\get_graph_data.py --input data_3_window\KO_sgA_R1_sense_30bpDown --output data_4_graph\KO_sgA_R1_sense_30bpDown --subst_type withSubst
 python 3_get_graph_data\get_graph_data.py --input data_3_window\KO_sgB_R2_branch_30bpDown --output data_4_graph\KO_sgB_R2_branch_30bpDown --subst_type withSubst

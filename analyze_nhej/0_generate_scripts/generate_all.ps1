@@ -1,4 +1,4 @@
-python 0_generate_scripts/generate_01_filter_nhej.py
+﻿python 0_generate_scripts/generate_01_filter_nhej.py
 python 0_generate_scripts/generate_02_combine_repeat.py
 python 0_generate_scripts/generate_03_get_window.py
 python 0_generate_scripts/generate_04_graph_data.py

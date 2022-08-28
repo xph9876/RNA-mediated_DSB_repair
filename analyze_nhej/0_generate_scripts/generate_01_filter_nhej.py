@@ -19,7 +19,11 @@ def get_output_file(name):
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open(os.path.join('run_01_process_nhej' + os.path.extsep + ext), 'w', encoding='utf-8') as file_out:
+    with open(
+      file = os.path.join('run_01_process_nhej' + os.path.extsep + ext),
+      mode = 'w',
+      encoding = generate_constants.OUTPUT_ENCODING[ext],
+    ) as file_out:
       for info in generate_constants.LIBRARY_INFO.to_dict('records'):
         if info['version'] != library_constants.VERSION_MERGED:
           input_file = get_input_file(info['name'])

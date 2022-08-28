@@ -100,6 +100,7 @@ TITLE_HEIGHT_PT = 30
 MARGIN_TOP_HEIGHT_PT = 20
 MARGIN_LEFT_WIDTH_PT = 60
 MARGIN_LEFT_SPILL_OVER_PT = 10
+MARGIN_RIGHT_SPILL_OVER_PT = 10
 MARGIN_RIGHT_WIDTH_PT = 100
 
 LEGEND_TITLE_HEIGHT_PT = 20
@@ -146,6 +147,7 @@ def get_slide(
   margin_top_height_pt = MARGIN_TOP_HEIGHT_PT,
   margin_left_width_pt = MARGIN_LEFT_WIDTH_PT,
   margin_left_spill_over_pt = MARGIN_LEFT_SPILL_OVER_PT,
+  margin_right_spill_over_pt = MARGIN_RIGHT_SPILL_OVER_PT,
 ):
   num_grids = len(image_grid_list)
 
@@ -413,17 +415,22 @@ def get_slide(
 
     if margin_show_left:
       # Left margin
+      cell_width_pt_left_margin = (
+        margin_left_width_pt +
+        margin_left_spill_over_pt +
+        margin_right_spill_over_pt
+      )
       get_pptx_helpers.add_textbox_grid_pptx(
         slide = slide,
         text_grid = np.array(margin_label_left_list[i]).reshape(-1, 1),
         x_pt = -margin_left_spill_over_pt,
         y_pt = content_y_pt,
-        cell_width_pt = margin_left_width_pt + margin_left_spill_over_pt,
+        cell_width_pt = cell_width_pt_left_margin,
         cell_height_pt = cell_height_pt,
         cell_width_spacing_pt = 0,
         cell_height_spacing_pt = 0,
         text_height_pt = cell_height_pt,
-        text_width_pt = margin_left_width_pt + margin_left_spill_over_pt,
+        text_width_pt = cell_width_pt_left_margin,
         font_size_pt = margin_left_font_size_pt,
       )
 

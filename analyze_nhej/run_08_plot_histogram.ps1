@@ -1,4 +1,4 @@
-python 6_plot_histogram\plot_histogram.py --input data_5_histogram\KO_sgA_R1_branch_30bpDown --output plot\histogram\withSubst --reverse_pos --label_type absolute
+﻿python 6_plot_histogram\plot_histogram.py --input data_5_histogram\KO_sgA_R1_branch_30bpDown --output plot\histogram\withSubst --reverse_pos --label_type absolute
 python 6_plot_histogram\plot_histogram.py --input data_5_histogram\KO_sgA_R1_cmv_30bpDown --output plot\histogram\withSubst --reverse_pos --label_type absolute
 python 6_plot_histogram\plot_histogram.py --input data_5_histogram\KO_sgA_R1_sense_30bpDown --output plot\histogram\withSubst --reverse_pos --label_type absolute
 python 6_plot_histogram\plot_histogram.py --input data_5_histogram\KO_sgB_R2_branch_30bpDown --output plot\histogram\withSubst  --label_type absolute

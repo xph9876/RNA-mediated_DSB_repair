@@ -18,7 +18,11 @@ def get_output_dir(name):
 
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
-    with open(os.path.join('run_03_get_window' + os.path.extsep + ext), 'w', encoding='utf-8') as file_out:
+    with open(
+      file = os.path.join('run_03_get_window' + os.path.extsep + ext),
+      mode = 'w',
+      encoding = generate_constants.OUTPUT_ENCODING[ext],
+    ) as file_out:
       # get windows
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         if info['version'] != library_constants.VERSION_MERGED:

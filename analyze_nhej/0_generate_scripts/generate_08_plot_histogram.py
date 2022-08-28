@@ -18,7 +18,11 @@ def get_output_dir(subst_type):
 
 if __name__ == '__main__':
   for script_ext in ['sh', 'ps1']:
-    with open(os.path.join('run_08_plot_histogram' + os.path.extsep + script_ext), 'w', encoding='utf-8') as file_out:
+    with open(
+      file = os.path.join('run_08_plot_histogram' + os.path.extsep + script_ext),
+      mode = 'w',
+      encoding = generate_constants.OUTPUT_ENCODING[script_ext],
+    ) as file_out:
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         output_dir = get_output_dir(library_constants.SUBST_WITH)
         input_dir = get_input_dir(info['name'])
