@@ -75,7 +75,7 @@ if __name__ == '__main__':
             for variation in VARIATION_TYPES:
               top_labels.append(
                 library_constants.LABELS[construct] +
-                ' ' +
+                generate_constants.ARG_NEWLINE[ext] +
                 library_constants.LABELS[variation]
               )
 
