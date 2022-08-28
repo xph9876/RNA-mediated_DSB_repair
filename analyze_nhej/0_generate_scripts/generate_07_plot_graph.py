@@ -95,7 +95,9 @@ if __name__ == '__main__':
                 'WT_sgA_R1_sense',
                 'KO_sgAB_R1_sense',
                 'KO_sgA_R1_sense',
-                'WT_sgCD_R1_antisense',
+                'WT_sgCD_R1_antisense_old',
+                'WT_sgCD_R1_antisense_new',
+                'WT_sgCD_R1_antisense_merged',
               ]:
                 arg_universal_layout_axis_pos += (
                   f' --universal_layout_x_axis_deletion_y_pos {range_y[0] + 1.5}' +
