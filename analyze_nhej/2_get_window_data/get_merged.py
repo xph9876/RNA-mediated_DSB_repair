@@ -55,7 +55,17 @@ def parse_args():
     '--version',
     type = str,
     choices = library_constants.VERSIONS,
-    help = 'Version of library.',
+    help = 'Version id of the merged library.',
+    required = True,
+  )
+  parser.add_argument(
+    '--new_library_names',
+    type = str,
+    help = (
+      'Names of the new merged libraries.' +
+      ' Must be the same as the number of count columns in the data.'
+    ),
+    nargs = '+',
     required = True,
   )
   return parser.parse_args()
@@ -80,6 +90,12 @@ def main():
     if data[i].shape[1] != num_columns:
       raise Exception('Different number of columns in data sets')
     count_columns = [x for x in data[i].columns if x.startswith('count_')]
+
+    if len(count_columns) != len(args.new_library_names):
+      raise Exception(
+        'Number of new names does not match number of count columns in ' +
+        args.input[i]
+      )
     
     library_names.append([x.replace('count_', '') for x in count_columns])
     data[i] = data[i].rename(
@@ -87,8 +103,9 @@ def main():
       axis = 'columns'
     )
   
-  library_names = list(zip(*library_names)) # transpose
-  count_columns_new = ['count_' + '|'.join(x) for x in library_names]
+  # library_names = list(zip(*library_names)) # transpose
+  # count_columns_new = ['count_' + '|'.join(x) for x in args.new_library_names]
+  count_columns_new = ['count_' + x for x in args.new_library_names]
 
   data = pd.concat(data, axis='index')
   data = data.rename(dict(zip(count_columns_temp, count_columns_new)), axis='columns')

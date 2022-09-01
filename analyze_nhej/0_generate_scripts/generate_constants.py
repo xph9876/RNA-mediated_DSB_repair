@@ -111,6 +111,9 @@ LIBRARY_INFO = pd.concat(
   [LIBRARY_INFO, LIBRARY_INFO_ANTISENSE_MERGED],
   axis = 'index'
 ).reset_index(drop=True)
+LIBRARY_INFO['name_experiment'] = LIBRARY_INFO.apply(
+  get_name_experiment, axis = 'columns'
+)
 
 EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   'cell_line',

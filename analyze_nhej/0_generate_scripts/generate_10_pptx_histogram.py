@@ -6,7 +6,6 @@ import library_constants
 import generate_constants
 import generate_08_plot_histogram
 
-
 def get_output_file(cell_line, intron_type, version):
   version_str = '' if (version == library_constants.VERSION_NONE) else ('_' + version)
   return os.path.join(

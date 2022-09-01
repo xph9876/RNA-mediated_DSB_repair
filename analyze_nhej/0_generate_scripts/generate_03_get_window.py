@@ -50,7 +50,8 @@ if __name__ == '__main__':
             )
             version = library_constants.VERSION_MERGED
             output_dir = get_output_dir(info['name'])
-            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_merged']} --input {input_dirs} --output {output_dir} --subst_type {subst_type} --version {version}\n")
+            new_library_names = ' '.join(info['library_list'])
+            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_merged']} --input {input_dirs} --output {output_dir} --subst_type {subst_type} --version {version} --new_library_names {new_library_names}\n")
 
       # get freqs
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
