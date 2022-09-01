@@ -20,10 +20,10 @@ def check_subst_type(subst_type):
     raise Exception('Not a valid subst type: ' + str(subst_type))
 
 FREQ = 'freq'
-FREQ_MEAN = 'freq_mean'
-FREQ_MEAN_FILTER = 'freq_mean_filter'
+FREQ_FILTER = 'freq_filter'
+FREQ_FILTER_MEAN = 'freq_filter_mean'
 COUNT = 'count'
-FREQ_TYPES = [COUNT, FREQ, FREQ_MEAN, FREQ_MEAN_FILTER]
+FREQ_TYPES = [COUNT, FREQ, FREQ_FILTER, FREQ_FILTER_MEAN]
 
 def check_freq_type(freq_type):
   if freq_type not in FREQ_TYPES:

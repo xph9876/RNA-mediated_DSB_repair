@@ -18,11 +18,11 @@ def main():
       f' using the input total reads. Outputs 3 files:' +
       f' (1) windows_{library_constants.FREQ}.tsv: contains the all the sequences' +
       f' with the counts converted to frequencies.' +
-      f' (2) windows_{library_constants.FREQ_MEAN}.tsv:'
-      f' contains the means of the frequencies in the previous file (over all repeats).' +
-      f' (3) windows_{library_constants.FREQ_MEAN_FILTER}.tsv: ' +
+      f' (2) windows_{library_constants.FREQ_FILTER}.tsv:' +
       f' the previous file with the sequences removed whose frequency is <= FREQ_MIN' +
-      f' in any of the repeats.'
+      f' in any of the repeats.' +
+      f' (3) windows_{library_constants.FREQ_FILTER_MEAN}.tsv: ' +
+      f' contains the means of the frequencies in the previous file (over all repeats).'
     )
   )
   parser.add_argument(
@@ -65,7 +65,7 @@ def main():
     default = 1e-5,
     help = (
       f'Minimum frequency for output in' +
-      f' windows_{library_constants.FREQ_MEAN_FILTER}.' +
+      f' windows_{library_constants.FREQ_FILTER_MEAN}.' +
       f' Sequences with frequences <= this are discarded.'
     ),
   )
@@ -100,25 +100,21 @@ def main():
   file_utils.write_tsv(data, output_file)
   log_utils.log(output_file)
 
-  data['freq_mean'] = data[freq_cols].mean(axis='columns')
-  data['freq_min'] = data[freq_cols].min(axis='columns')
-  data = data.sort_values('freq_mean', ascending = False)
+  data = data.loc[data[freq_cols].min(axis='columns') > args.freq_min]
   
   output_file = file_names.window(
     args.input,
-    library_constants.FREQ_MEAN,
+    library_constants.FREQ_FILTER,
     args.subst_type,
   )
-  file_utils.write_tsv(
-    data[['ref_align', 'read_align', 'freq_mean']],
-    output_file,
-  )
+  file_utils.write_tsv(data, output_file)
   log_utils.log(output_file)
 
-  data = data.loc[data['freq_min'] > args.freq_min]
+  data['freq_mean'] = data[freq_cols].mean(axis='columns')
+  data = data.sort_values('freq_mean', ascending = False)
   output_file = file_names.window(
     args.input,
-    library_constants.FREQ_MEAN_FILTER,
+    library_constants.FREQ_FILTER_MEAN,
     args.subst_type,
   )
   file_utils.write_tsv(

@@ -7,7 +7,8 @@ import library_constants
 
 def get_name_library(info):
   name = (
-    ((info['library'] + '_') if ('library' in info) else '') +
+    info['library'] +
+    '_' +
     library_constants.get_data_label(info)
   )
   for version in library_constants.VERSIONS:
@@ -15,10 +16,7 @@ def get_name_library(info):
   return name
 
 def get_name_experiment(info):
-  return (
-    ((info['library'] + '_') if ('library' in info) else '') +
-    library_constants.get_data_label(info)
-  )
+  return library_constants.get_data_label(info)
 
 def get_ref_seq_file(info):
   return (
@@ -238,6 +236,7 @@ OUTPUT_DIR = {
   'plot_graph': os.path.join('plot', 'graph'),
   'plot_histogram': os.path.join('plot', 'histogram'),
   'pptx': 'pptx',
+  'library_summary': 'data_7_library_summary',
 }
 
 PYTHON_SCRIPTS = {

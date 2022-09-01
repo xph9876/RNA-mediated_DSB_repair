@@ -76,8 +76,7 @@ def write_comparison_data(
   subst_type,
 ):
   for freq_type in [
-    library_constants.FREQ_MEAN,
-    library_constants.FREQ_MEAN_FILTER
+    library_constants.FREQ_FILTER_MEAN
   ]:
     input_file_1 = file_names.window(input_dir_1, freq_type, subst_type)
     input_file_2 = file_names.window(input_dir_2, freq_type, subst_type)
