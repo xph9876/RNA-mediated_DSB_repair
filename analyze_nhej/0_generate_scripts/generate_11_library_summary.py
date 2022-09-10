@@ -56,7 +56,7 @@ if __name__ == '__main__':
       count_data['total'] = get_total_reads(library_info)
       count_data['filter_nhej'] = get_filter_nhej_counts(library_info)
       count_data['combine_repeat'] = get_combine_repeat_counts(library_info)
-      count_data['window'] = get_window_counts(library_info)
+      count_data['window_extract'] = get_window_counts(library_info)
       count_data['window_filter'] = get_window_counts_filter(library_info)
       count_data_list.append(count_data)
 

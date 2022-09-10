@@ -13,7 +13,7 @@ def main():
   parser = argparse.ArgumentParser(
     description = (
       'Combine biological repeats of the same experiment.' +
-      ' Keep only the sequences present in all 4 repeats.' +
+      ' Keeps sequences present in any of the 4 repeats.' +
       ' The counts from the input data are converted to frequencies'
       ' using the total reads for each library.'
     )
@@ -62,7 +62,7 @@ def main():
     for i in range(num_repeats):
       log_utils.log(f"Num sequences {names[i]}: {data[i].shape[0]}")
 
-  data = pd.concat(data, axis='columns', join='inner', keys=names)
+  data = pd.concat(data, axis='columns', join='outer', keys=names)
   data.columns = data.columns.map(lambda x: '_'.join([x[1], x[0]]))
   data = data.reset_index()
   
@@ -75,7 +75,7 @@ def main():
     index = data.index,
   )
   for i in range(num_repeats):
-    data_combined['Count_' + names[i]] = data['Count_' + names[i]]
+    data_combined['Count_' + names[i]] = data['Count_' + names[i]].fillna(0)
 
   if not args.quiet:
     log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")
