@@ -9,3 +9,4 @@
 .\run_08_plot_histogram.ps1
 .\run_09_pptx_graph.ps1
 .\run_10_pptx_histogram.ps1
+.\run_11_plot_graph_main_png.ps1
