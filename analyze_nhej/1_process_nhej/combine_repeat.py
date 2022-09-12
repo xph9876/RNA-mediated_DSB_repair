@@ -13,9 +13,7 @@ def main():
   parser = argparse.ArgumentParser(
     description = (
       'Combine biological repeats of the same experiment.' +
-      ' Keeps sequences present in any of the 4 repeats.' +
-      ' The counts from the input data are converted to frequencies'
-      ' using the total reads for each library.'
+      ' Keeps sequences present in any of the 4 repeats.'
     )
   )
   parser.add_argument(
