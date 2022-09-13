@@ -51,7 +51,25 @@ Arguments:
 
 Scripts for further processing the raw NHEJ data in order to extract window around the DSB, convert raw counts to frequencies, merge experiments which have been sequenced twice, and precompute other data used for downstream visulizations.
 
-#### get_freq (CONTIUE HERE)
+### get_window.py NEXT!!
+
+#### get_freq.py
+
+Convert the raw read counts in the input data into frequencies using the input total reads. Outputs 3 files: (1) windows_freq.tsv: contains the all the sequences with the counts converted to frequencies. (2) windows_freq_filter.tsv: the previous file with the sequences removed whose frequency is <= FREQ_MIN in any of the repeats. (3) windows_freq_filter_mean.tsv: contains the means of the frequencies in the previous file (over all repeats).
+
+Arguments:
+
+* --input: Directory with output tables from get_window.py or get_merged.py.
+
+* --total_reads: Total reads for each file. Must be the same number of arguments as the number of Count columns in the tables in INPUT.
+
+* --output: Output directory.
+
+* --subst_type: Whether to process the files with/without substitutions.
+
+* --freq_min: Minimum frequency for output in windows_freq_filter_mean.tsv. Sequences with frequences <= FREQ_MIN are discarded.
+
+
 
 * filte
 * **run_01_process_nhej** - Filter the raw SAM files to retain the NHEJ patterns.

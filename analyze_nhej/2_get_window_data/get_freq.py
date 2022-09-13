@@ -28,7 +28,7 @@ def main():
   parser.add_argument(
     '--input',
     type = common_utils.check_dir,
-    help = 'Director with output from get_window.py or get_merged.py.',
+    help = 'Directory with output from get_window.py or get_merged.py.',
     required = True,
   )
   parser.add_argument(
