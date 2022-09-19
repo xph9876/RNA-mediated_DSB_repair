@@ -2541,7 +2541,7 @@ def parse_args():
   parser.add_argument(
     '--input',
     type = common_utils.check_dir,
-    help = 'Directory with the data files produced with make_graph_data.py.',
+    help = 'Directory with the data files produced with get_graph_data.py.',
     required = True,
   )
   parser.add_argument(

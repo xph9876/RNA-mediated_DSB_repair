@@ -16,7 +16,7 @@ import library_constants
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Process data for the graph analysis.'
+    description = 'Process data for the histogram analysis.'
   )
   parser.add_argument(
     '--input',

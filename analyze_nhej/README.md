@@ -2,7 +2,9 @@
 
 ## Description
 
-This folder contains the processing pipeline for the NHEJ (nonhomologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The run*.[sh|ps1] scripts in the main directory are for reproducing the computations with datasets used in the [publication](#citation). Note *.sh scripts are intended to be run with Unis bash, while *.ps1 scripts are intended to be run with Windows PowerShell (although there is no semantic difference is how the Python scripts are called from either file type).
+TODO: italicize all file names.
+
+This folder contains the processing pipeline for the NHEJ (nonhomologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The *run&ast;.sh* and *run&ast;.ps* scripts in the main directory are for reproducing the computations with datasets used in the [publication](#citation). Note *.sh scripts are intended to be run with Unix bash, while *.ps1 scripts are intended to be run with Windows PowerShell (although there is no semantic difference is how the Python scripts are called from either file type).
 
 ## Prerequisties
 
@@ -108,17 +110,361 @@ Arguments:
 
 * --freq_min: Minimum frequency for output in windows_freq_filter_mean.tsv. Sequences with frequences <= FREQ_MIN are discarded.
 
-#### get_merged.py (NEXT)
+#### get_merged.py
+
+Merge together library files from samples that have beem sequenced twice. Operates on the output of get_window.py.
+
+Arguments:
+
+* --input: Input directories with "windows_*.tsv" output of get_window.py. There must be the same number of columns in all input data sets. The "count" columns must be in the same order they should be merged in.
+
+* --output: Output directory. Files will be named in the same manner as get_window.py.
+
+* --subst_type: Whether to operate on file with or with substitutions.
+
+* --version: Version ID of the merged output (e.g., "merged"). Used only for the metadata output data_info.tsv.
+
+* --new_library_names: Names of the new merged libraries. Must be the same number of arguments as the number of count columns in the data.
+
+#### get_freq_comparison.py
+
+Combine two individual experiment directories to make a comparison experiment directory for comparison graphs. The experiments must be compatible: have all the same attributes except for the constructs which must be different. Operates of the output of get_freq.py. The tables from the two libraries are merged by joining on the alignment columns.
+
+Arguments:
+
+* --input: Directory of individual experiment frequency data produced with get_freq.py.
+
+* --output: Output directory. Output files parallel the structure of get_freq.py output, except they have two frequencies columns for the two compared libraries.
+
+* --subst_type: Whether to operate on files with/without substitutions.
 
 ### 3_get_graph_data
 
-#### get_graph_data.py
+#### *get_graph_data.py*
+
+Precompute the necessary data for the variation-distance graphs. Uses as input the output of the [2_get_window_data](#2getwindowdata) stage and outputs the following files:
+
+* sequence_data_*.tsv: Table of the vertex data for the variation distance graphs. Each row represents a single vertex.
+
+* edge_data_*.tsv: Table of edge data for variation-distance graphs. Each row represents a single edge.
+
+* distance_matrix_*.tsv: Table of pairwise Levenshtein distances of the vertices.
+
+* graph_stats_*.tsv: Summary statistics of the graph (e.g., number of vertices).
+
+Arguments
+
+* --input: Directory with output from [2_get_window_data](#2getwindowdata) stage.
+
+* --output: Output directory.
+
+* --subst_type: Whether to process the files with/without substitutions.
 
 ### 4_get_histogram_data
 
-### 5_get_histogram_data
+#### *get_histogram_data.py*
+
+Precomputes the necessary data for the variation-position histgrams. Uses as input the output of the [3_get_graph_data](#3getgraphdata) stage and outputs the following files:
+
+* *variation_&ast;.tsv*: Contains data on individual variations of each sequence window in the *sequence_&ast;.tsv* files. Each row represents a single variation (insertion, deletion, or substitution) in a sequence alignment.
+
+* *variation_grouped_&ast;.tsv*: The same as data as the corresponding *variation_&ast;.tsv* grouped by (1) position of variation on the reference sequence, (2) total number of variations in the parent sequence, and (3) the type of variation (insertion, deletion, or substitution). The frequencies have have the aggregate of all individual variations with the same grouping characteristics.
+
+Arguments:
+
+* --input: Directory with output from [3_get_graph_data](#3getgraphdata).
+
+* --output: Output directory.
+
+* --subst_type: Whether to process the files with/without substitutions.
+
+### 5_plot_graph
+
+Code for laying out and plotting variation-distance graphs. Uses output from [3_get_graph_data](#3getgraphdata).
+
+#### *get_precomputed_layout.py*
+
+Precomputes the layout for groups of experiments by taking the union of all sequences in all input experiments and laying them out. This allows experiments with the same reference sequence to have the same coordinates for the same sequence. All experiments should have the same window reference sequence and be individual (not comparison) experiments. There are multiple possible layouts:
+
+* radial: Arranges vetices in a radial grid around the reference sequence. Insertion (deletion) vertices are placed above (below) the reference sequence. Heuristics are used to improve aesthesics of vertex placement, though this may not easily egeneralize to new data.
+
+* mds: Uses multi-dimensional scaling (MDS) to embed the pairwise Levenshtein distance matrix into 2D. 
+
+* kamada: Uses the [*NetworkX*](http://networkx.org) package's implementation of the Kamada-Kawaii algorithm to layout the graph. Reference: T. Kamada and S. Kawai. An algorithm for drawing general undirected graphs. *Inform. Process. Lett.*, 31:7–15, 1989.
+
+* universal: Uses a deterministic layout descibed in the Methods of the [publicaton](#citation).
+
+Arguments:
+
+* --input: List of data directories created with [*get_graph_data.py*](#getgraphdatapy).
+
+* --output: Output directory. Two files are created within this directory paralleling the output of [*get_graph_data.py*](#getgraphdatapy): *sequence_data_&ast;.py* and *edge_data_&ast;.py*.
+
+* --reverse_complement: Whether to reverse complement the sequence in the corresponding input. If present, the number of values must be the same as the number of input directories. "1" mean reverse complement the sequences and "0" means do not. Used for making a common layout for data sets that have window reference sequences that are the reverse complements of each other.
+
+* --subst_type: Whether to process files with/without substitutions.
+
+* --layout: One of "radial", "mds", "kamada", or "universal". See above for a description of each layout.
+
+#### *plot_graph.py*
+
+Does layout and plotting of the processed graph data from [3_get_graph_data](#3getgraphdata).
+
+* --input: Directory with the data files produced with [3_get_graph_data](#3getgraphdata).
+
+* --output: Output directory. Optional, if not given no output will be written.
+
+* --ext
+    '--ext',
+    choices = ['png', 'html'],
+    default = 'png',
+    help = (
+      'Which types of file to generate from the Plotly library:' +
+      ' static PNG or interactive HTML.'
+    ),
+  )
+  parser.add_argument(
+    '--title',
+    action = 'store_true',
+    help = (
+      'If present, adds a title to the plot showing the type of'
+      ' and the name of the data set.'
+    )
+  )
+  parser.add_argument(
+    '--layout',
+    choices = ['kamada', 'radial', 'mds', 'universal', 'fractal'],
+    default = 'radial',
+    help = 'The algorithm to use for laying out the graph.'
+  )
+  parser.add_argument(
+    '--universal_layout_y_axis_x_pos',
+    type = float,
+    help = (
+      'If present, shows a y-axis at the given x position' +
+      ' on the universal layout showing the distances to the reference.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_x_axis_deletion_y_pos',
+    type = float,
+    help = (
+      'If present, shows a x-axis for deletions at the given y position' +
+      ' on the universal layout showing the midpoints of the deleted ranges.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_x_axis_insertion_y_pos',
+    type = float,
+    help = (
+      'If present, shows a x-axis for insertions at the given y position' +
+      ' on the universal layout showing the first nucleotide of inserted sequences.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_y_axis_y_range',
+    nargs = '+',
+    type = float,
+    help = (
+      'If showing an y-axis for the universal layout,' +
+      ' the min and max y-position of the line.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_x_axis_x_range',
+    nargs = '+',
+    type = float,
+    help = (
+      'If showing an x-axis for the universal layout,' +
+      ' the min and max x-position of the line.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_y_axis_deletion_max_tick',
+    type = int,
+    help = (
+      'If showing an y-axis for the universal layout,' +
+        ' the max tick value for the deletion side.'
+    )
+  )
+  parser.add_argument(
+    '--universal_layout_y_axis_insertion_max_tick',
+    type = int,
+    help = (
+      'If showing an y-axis for the universal layout,' +
+        ' the max tick value for the insertion side.'
+    )
+  )
+  parser.add_argument(
+    '--subst_type',
+    choices = library_constants.SUBST_TYPES,
+    help = 'Whether to plot data with or without substitutions.',
+    default = library_constants.SUBST_WITHOUT,
+  )
+  parser.add_argument(
+    '--node_max_freq',
+    type = float,
+    help = (
+      'Max frequency to determine node size.' +
+      'Higher frequencies are clipped to this value.'
+    ),
+    default = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  )
+  parser.add_argument(
+    '--node_min_freq',
+    type = float,
+    help = (
+      'Min frequency to determine node size.' +
+      'Lower frequencies are clipped to this value.'
+    ),
+    default = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  )
+  parser.add_argument(
+    '--node_max_px',
+    type = float,
+    help = 'Largest node size as determined by the frequency.',
+    default = library_constants.GRAPH_NODE_SIZE_MAX_PX,
+  )
+  parser.add_argument(
+    '--node_min_px',
+    type = float,
+    help = 'Smallest node size as determined by the frequency.',
+    default = library_constants.GRAPH_NODE_SIZE_MIN_PX,
+  )
+  parser.add_argument(
+    '--node_outline_scale',
+    type = float,
+    default = library_constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
+    help = (
+      'How much to scale the node outline width (thickness).' +
+      ' Values > 1 increase the width; values < 1 decrease the width.'
+    ),
+  )
+  parser.add_argument(
+    '--variation_types',
+    nargs = '+',
+    help = (
+      'The variation types that should be included in the graph.'
+      ' This should be a list of the types:'
+      ' "insertion", "deletion", "substitution", "none".' +
+      ' Default value: "insertion", "deletion", "none".' +
+      ' "none" means the reference sequence.',
+    ),
+  )
+  parser.add_argument(
+    '--edge_scale',
+    type = float,
+    help = (
+      'How much to scale the edges width (thickness).' +
+      ' Values > 1 increase the width; values < 1 decrease the width.'
+    )
+  )
+  parser.add_argument(
+    '--width_px',
+    type = int,
+    default = library_constants.GRAPH_WIDTH_PX,
+    help = 'The width of the plot in pixels.'
+  )
+  parser.add_argument(
+    '--height_px',
+    type = int,
+    default = library_constants.GRAPH_HEIGHT_PX,
+    help = 'The height of the plot in pixels.'
+  )
+  parser.add_argument(
+    '--line_width_scale',
+    type = float,
+    default = library_constants.GRAPH_LINE_WIDTH_SCALE,
+    help = (
+      'How much to scale the line widths (aka thickness).' +
+      ' Values > 1 increase the width; values < 1 decrease the width.'
+    ),
+  )
+  parser.add_argument(
+    '--font_size_scale',
+    type = float,
+    default = library_constants.GRAPH_FONT_SIZE_SCALE,
+    help = (
+      'How much to scale the font size.' +
+      ' Values > 1 increase the font size; values < 1 decrease it.'
+    ),
+  )
+  parser.add_argument(
+    '--precomputed_layout_dir',
+    type = common_utils.check_dir,
+    default = None,
+    help = (
+      'If present, gives the directory where the precomputed layouts are.' +
+      ' If not present the layout is computed newly.'
+    )
+  )
+  parser.add_argument(
+    '--reverse_complement',
+    action = 'store_true',
+    help = (
+      'If present, uses the reverse complement of sequences when determining the'
+      ' node positions, and displaying labels and hover text.' +
+      ' This affects the precomputed layout, universal layout, and fractal layout.'
+    )
+  )
+  parser.add_argument(
+    '--crop_x',
+    nargs = '+',
+    type = float,
+    help = (
+      'Range of the horizontal dimension to crop.' +
+      ' Specified with normalized coords in range [0, 1].'
+    ),
+  )
+  parser.add_argument(
+    '--crop_y',
+    nargs = '+',
+    type = float,
+    help = (
+      'Range of the vertical dimension to crop.' +
+      ' Specified in normalized coords in range [0, 1].'
+    ),
+  )
+  parser.add_argument(
+    '--range_x',
+    type = float,
+    nargs = '*',
+    help = (
+      'Range of x-axis for plotting.'
+      'If not specified chosen automatically to either show all nodes or a preset value'
+      ' for the layout.'
+    ),
+  )
+  parser.add_argument(
+    '--range_y',
+    type = float,
+    nargs = '*',
+    help = (
+      'Range of y-axis for plotting.'
+      'If not specified chosen automatically to either show all nodes or a preset value'
+      ' for the layout.'
+    ),
+  )
+  parser.add_argument(
+    '--legend',
+    action = 'store_true',
+    help = 'Whether to show a legend on the figure.'
+  )
+  parser.add_argument(
+    '--legend_color_bar_scale',
+    type = float,
+    default = library_constants.GRAPH_LEGEND_COLORBAR_SCALE,
+    help = 'How much to scale the legend color bar (for freq ratio coloring).'
+  )
+  parser.add_argument(
+    '--separate_components',
+    action = 'store_true',
+    help = 'If present separate the connected components of the graph.'
+  )
 
 ### 6_plot_histogram
+
+### 7_get_pptx
 
 ### 7_get_pptx
 

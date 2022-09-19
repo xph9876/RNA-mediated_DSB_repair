@@ -20,7 +20,7 @@ import plot_graph
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Make common layouts for graphs.'
+    description = 'Make precomputed layouts for graphs.'
   )
   parser.add_argument(
     '--input',
@@ -41,7 +41,7 @@ def parse_args():
       'Whether to reverse complement the sequence in the data sets.' +
       ' If present, the number of values must be the same as the number of input directories.' +
       ' "1" mean reverse complement the sequence and "0" means do not.'
-      ' Used for making a common layout for data sets that have reference sequences'
+      ' Used for making a layout for data sets that have reference sequences'
       ' that are the reverse complements of each other.'
     ),
   )
