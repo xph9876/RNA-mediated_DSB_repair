@@ -29,10 +29,15 @@ Takes as input a SAM file and filters only alignments that are defined as being 
 Arguments:
 
 * --ref_seq_file: FASTA file with the reference sequence used to align the INPUT SAM file. Should contain a single nucleotide sequence in FASTA format.
+
 * --sam_file: Aligned SAM input file. Must be created with [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (specific flags from Bowtie2 are used). Every read must be aligned with exactly the same reference sequence.
+
 * --output: Output file. The result is a tab-separated file with columns: Sequence: nucleotide sequence of the read; CIGAR: CIGAR string for the alignment produced by Bowtie2 (see Bowtie2 documentation); Count: number of reads with the same sequence; Num_Subst: number of substitutions (AKA mismatches) in the alignment. Note, if multiple reads with identical nucleotide sequences and different CIGARs occur in SAM_FILE, then they will be a single row in the output representing the sequence with the Count column as the number of such reads and the CIGAR column arbitrarily selected from one of the CIGARs.
+
 * --min_length: Minimum length of a read to pass filtering. Reads shorter than this are discarded.
+
 * --dsb_pos: Position on reference sequence immediately upstream of DSB site (i.e., the DSB is between 1-based position DSB_POS and DSB_POS + 1.).
+
 * --quiet: If present, do not output extra log message showing how many reads were discarded due to each filter criteria.
 
 #### combine_repeats.py
@@ -51,7 +56,41 @@ Arguments:
 
 Scripts for further processing the raw NHEJ data in order to extract window around the DSB, convert raw counts to frequencies, merge experiments which have been sequenced twice, and precompute other data used for downstream visulizations.
 
-### get_window.py NEXT!!
+### get_window.py
+
+Extract DSB-sequence for the NHEJ variation-distance graphs while discarding sequences that do not have proper anchors flanking the window.
+
+Arguments:
+
+* --input: TSV file output of combine_repeat.py. The columns must be: "Sequence", "CIGAR", "Count_&lt;X1&gt;", "Count_&lt;X2&gt;", etc. All the columns after "CIGAR" should be the counts for each repeat where &lt;Xi&gt; denotes the name of the library.
+
+* --ref_seq_file: Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.
+
+* --output: Output directory. The output file will be TSV format and named like "window_*.py", with the suffix after "window_" indicating the characteristics of the file (e.g., with/without subsitutions, mean/count, or filtered). The library metadata is also output in "data_info.tsv".
+
+* --dsb_pos: Position on reference sequence immediately upstream of DSB site (i.e., the DSB is between 1-based position DSB_POS and DSB_POS + 1.).
+
+* --window_size: Size of window around DSB site to extract. The nucleotides at the positions {DSB_POS - WINDOW_SIZE + 1, ..., DSB_POS + WINDOW_SIZE} are extracted. The actual number of nucleotides extracted may vary depending on how many insertions/deletion the alignment of the sequence has.
+
+* --anchor_size: Size of anchor on left/right of the window to check for mismatches. Reads with more than the allowed number of mismatches on the left/right anchor will be discarded. The mismatches on the left/right are counted separately.
+
+* --anchor_mismatches: Maximum number of mismatches allowed on the left/right anchor sequences. Reads with more than the allowed number of mismatches on the left/right anchor will be discarded. The mismatches on the left/right are counted separately.
+
+* --subst_type: Whether to keep or ignore alignment substitutions. If ignoring aligment substitutions, the corresponding nucleotide on the read is replaced with the reference sequenec nucleotide.
+
+* --construct: Name of construct (e.g., Sense, Antisense, etc.,). Used only in the library metadata.
+
+* --control_type: Whether this data is a control experiment and what type (e.g., noDSB, etc.,). Used only in the library metadata.
+
+* --dsb_type: Whether this data is 1 DSB, 2 DSB, or 2 DSB antisense. Used only in the library metadata.
+
+* --guide_rna: Type of guide RNA used in this experiment (e.g., sgRNA A, sgRNA B, etc.,). Used only in the library metadata.
+
+* --strand: Strand of the reads in this library (e.g., R1 for forward, R2 for reverse). Used only in the library metadata.
+
+* --cell_line: Cell in this library (e.g., WT or KO).
+
+* --version: Version indicator since some libraries were sequenced twice (e.g., old, new, merged, none).
 
 #### get_freq.py
 
@@ -69,7 +108,19 @@ Arguments:
 
 * --freq_min: Minimum frequency for output in windows_freq_filter_mean.tsv. Sequences with frequences <= FREQ_MIN are discarded.
 
+#### get_merged.py (NEXT)
 
+### 3_get_graph_data
+
+#### get_graph_data.py
+
+### 4_get_histogram_data
+
+### 5_get_histogram_data
+
+### 6_plot_histogram
+
+### 7_get_pptx
 
 * filte
 * **run_01_process_nhej** - Filter the raw SAM files to retain the NHEJ patterns.

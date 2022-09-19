@@ -25,8 +25,9 @@ def parse_args():
     type = argparse.FileType(mode='r'),
     help = (
       'Table of sequences produced with combine_repeat.py.' +
-      ' Column format: Sequence, CIGAR, Count_1, Count_2, ..., etc.' +
-      ' All the columns after CIGAR should be the counts for each repeat.'
+      ' Column format: Sequence, CIGAR, Count_<X1>, Count_<X2>, ..., etc.' +
+      ' All the columns after CIGAR should be the counts for each repeat where' +
+      ' <Xi> denotes the name of the library.'
     ),
     required = True,
   )
@@ -56,9 +57,11 @@ def parse_args():
     type = int,
     default = 10,
     help = (
-      'Size of window around DSB site to extract.\n'
-      'The nucleotides in the range [DSB_POS - WINDOW_SIZE + 1, DSB_POS + WINDOW_SIZE]\n'
-      'are extracted (2 * WINDOW_SIZE in all).'
+      'Size of window around DSB site to extract.' +
+      ' The nucleotides at the positions' +
+      ' {DSB_POS - WINDOW_SIZE + 1, ..., DSB_POS + WINDOW_SIZE} are extracted.' +
+      ' The actual number of nucleotides extracted may vary depending' +
+      ' on how many insertions/deletion the alignment of the sequence has.'
     ),
   )
   parser.add_argument(
@@ -66,9 +69,7 @@ def parse_args():
     type = int,
     default = 20,
     help = (
-      'Size of anchor on left/right of the window to check for mismatches.\n'
-      'Reads with more than the allowed number of mismatches on the left/right anchor\n'
-      'will be discarded. The mismatches on the left/right are counted separately.'
+      'Size of anchor on left/right of the window to check for mismatches.'
     ),
   )
   parser.add_argument(
@@ -155,14 +156,10 @@ def write_alignment_window(
   subst_type,
 ):
   """
-    Performs preprocessing steps for the NHEJ graphs.
+    Extract DSB-sequence for the NHEJ variation-distance graphs while
+    while discarding sequences that do not have proper anchors flanking the window.
     The input file must have data with columns: "Sequence", "CIGAR", ...,
-    where the columns after CIGAR are the frequency columns with prefix "Freq_".
-    Steps:
-      1. Extract a window around the dsb position.
-      2. Optionally remove substitutions.
-      3. Take the mean of the repeat frequencies.
-      4. Remove sequences under the minimum frequency threshold.
+    where the columns after CIGAR are the count columns with prefix "Count_".
 
     Parameters
     ----------
