@@ -194,6 +194,8 @@ Precomputes the layout for groups of experiments by taking the union of all sequ
 
 * universal: Uses a deterministic layout descibed in the Methods of the [publicaton](#citation).
 
+See code of [*plot_graph.py*](#plotgraphpy) for the implementation of each layout.
+
 Arguments:
 
 * --input: List of data directories created with [*get_graph_data.py*](#getgraphdatapy).
@@ -212,125 +214,40 @@ Does layout and plotting of the processed graph data from [3_get_graph_data](#3g
 
 * --input: Directory with the data files produced with [3_get_graph_data](#3getgraphdata).
 
-* --output: Output directory. Optional, if not given no output will be written.
+* --output: Output directory. Optional, if not given no output will be written. If given, the output files is named the same as the INPUT directory with the appropriate files extension (e.g., .png or .html).
 
-* --ext
-    '--ext',
-    choices = ['png', 'html'],
-    default = 'png',
-    help = (
-      'Which types of file to generate from the Plotly library:' +
-      ' static PNG or interactive HTML.'
-    ),
-  )
-  parser.add_argument(
-    '--title',
-    action = 'store_true',
-    help = (
-      'If present, adds a title to the plot showing the type of'
-      ' and the name of the data set.'
-    )
-  )
-  parser.add_argument(
-    '--layout',
-    choices = ['kamada', 'radial', 'mds', 'universal', 'fractal'],
-    default = 'radial',
-    help = 'The algorithm to use for laying out the graph.'
-  )
-  parser.add_argument(
-    '--universal_layout_y_axis_x_pos',
-    type = float,
-    help = (
-      'If present, shows a y-axis at the given x position' +
-      ' on the universal layout showing the distances to the reference.'
-    )
-  )
-  parser.add_argument(
-    '--universal_layout_x_axis_deletion_y_pos',
-    type = float,
-    help = (
-      'If present, shows a x-axis for deletions at the given y position' +
-      ' on the universal layout showing the midpoints of the deleted ranges.'
-    )
-  )
-  parser.add_argument(
-    '--universal_layout_x_axis_insertion_y_pos',
-    type = float,
-    help = (
-      'If present, shows a x-axis for insertions at the given y position' +
-      ' on the universal layout showing the first nucleotide of inserted sequences.'
-    )
-  )
-  parser.add_argument(
-    '--universal_layout_y_axis_y_range',
-    nargs = '+',
-    type = float,
-    help = (
-      'If showing an y-axis for the universal layout,' +
-      ' the min and max y-position of the line.'
-    )
-  )
-  parser.add_argument(
-    '--universal_layout_x_axis_x_range',
-    nargs = '+',
-    type = float,
-    help = (
-      'If showing an x-axis for the universal layout,' +
-      ' the min and max x-position of the line.'
-    )
-  )
-  parser.add_argument(
-    '--universal_layout_y_axis_deletion_max_tick',
-    type = int,
-    help = (
-      'If showing an y-axis for the universal layout,' +
-        ' the max tick value for the deletion side.'
-    )
-  )
-  parser.add_argument(
-    '--universal_layout_y_axis_insertion_max_tick',
-    type = int,
-    help = (
-      'If showing an y-axis for the universal layout,' +
-        ' the max tick value for the insertion side.'
-    )
-  )
-  parser.add_argument(
-    '--subst_type',
-    choices = library_constants.SUBST_TYPES,
-    help = 'Whether to plot data with or without substitutions.',
-    default = library_constants.SUBST_WITHOUT,
-  )
-  parser.add_argument(
-    '--node_max_freq',
-    type = float,
-    help = (
-      'Max frequency to determine node size.' +
-      'Higher frequencies are clipped to this value.'
-    ),
-    default = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
-  )
-  parser.add_argument(
-    '--node_min_freq',
-    type = float,
-    help = (
-      'Min frequency to determine node size.' +
-      'Lower frequencies are clipped to this value.'
-    ),
-    default = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
-  )
-  parser.add_argument(
-    '--node_max_px',
-    type = float,
-    help = 'Largest node size as determined by the frequency.',
-    default = library_constants.GRAPH_NODE_SIZE_MAX_PX,
-  )
-  parser.add_argument(
-    '--node_min_px',
-    type = float,
-    help = 'Smallest node size as determined by the frequency.',
-    default = library_constants.GRAPH_NODE_SIZE_MIN_PX,
-  )
+* --ext: File type of output. Choices: "png" or "html". The library used to produce the output is [Plotly](https://plotly.com/). PNG output is a static image. HTML output is interactive and allows zooming/panning and proide more detail on vertices/edges through hover boxes.
+
+* --title: If present, shows a title describing the experiment using the metadata stored in the INPUT directory.
+
+* --layout: Layout algorithms to use for representing graph vertices in 2D. Choices: "kamada", "radial", "mds", "universal", "fractal". See [*get_precomputed_layout.py*](#getprecomputedlayoutpy) for more details on each layout. Fractal is currently undocumented since it currenlty only lays out insertion vertices.
+
+* --universal_layout_y_axis_x_pos: If present, shows a y-axis at the given x position on the universal layout showing the distances to the reference. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+
+* --universal_layout_x_axis_deletion_y_pos: If present, shows an x-axis for deletions at the given y position on the universal layout showing the approximate position of the deleted ranges. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+
+* --universal_layout_x_axis_insertion_y_pos: If present, shows an x-axis for insertions at the given y position on the universal layout showing the first nucleotide of inserted sequences. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+
+* --universal_layout_y_axis_y_range: If showing an y-axis (using --universal_layout_y_axis_x_pos) for the universal layout, the min and max y-position of the line. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+
+* --universal_layout_x_axis_x_range: If showing an x-axis for the universal layout, the min and max x-position of the line. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+
+* --universal_layout_y_axis_deletion_max_tick: If showing an y-axis for the universal layout, the max tick value for the deletion side. The ticks correspond to the number of deletions in the sequences in the corresponding row.
+
+* --universal_layout_y_axis_insertion_max_tick: If showing an y-axis for the universal layout, the max tick value for the insertions side. The ticks correspond to the number of insertions in the sequences in the corresponding row.
+
+* --subst_type: Whether to use the data files with or without substitutions.
+
+* --node_max_freq: Max frequency to determine vertex size. All vertices with frequency >= this value get the largest possible vertex size.
+
+* --node_min_freq: Max frequency to determine vertex size. All vertices with frequency <= this value get the smallest possible vertex size.
+
+* --node_max_px: Largest possible vertex size in pixels.
+
+* --node_min_px: Smallest possible vertex size in pixels.
+
+* --node_outline_scale: 
+
   parser.add_argument(
     '--node_outline_scale',
     type = float,

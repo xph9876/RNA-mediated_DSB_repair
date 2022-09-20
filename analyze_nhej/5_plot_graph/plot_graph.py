@@ -2587,8 +2587,8 @@ def parse_args():
     '--universal_layout_x_axis_deletion_y_pos',
     type = float,
     help = (
-      'If present, shows a x-axis for deletions at the given y position' +
-      ' on the universal layout showing the midpoints of the deleted ranges.'
+      'If present, shows an x-axis for deletions at the given y position on' +
+      ' the universal layout showing the approximate position of the deleted ranges.'
     )
   )
   parser.add_argument(
