@@ -180,11 +180,9 @@ Arguments:
 
 ### 5_plot_graph
 
-Code for laying out and plotting variation-distance graphs. Uses output from [3_get_graph_data](#3getgraphdata).
+Code for laying out and plotting variation-distance graphs. Uses output from [3_get_graph_data](#3getgraphdata). For more information about how the vertex sizes, vertex colors, edges, and layouts are computed please see the [publication](#citation).
 
-#### *get_precomputed_layout.py*
-
-Precomputes the layout for groups of experiments by taking the union of all sequences in all input experiments and laying them out. This allows experiments with the same reference sequence to have the same coordinates for the same sequence. All experiments should have the same window reference sequence and be individual (not comparison) experiments. There are multiple possible layouts:
+A brief description of the layouts:
 
 * radial: Arranges vetices in a radial grid around the reference sequence. Insertion (deletion) vertices are placed above (below) the reference sequence. Heuristics are used to improve aesthesics of vertex placement, though this may not easily egeneralize to new data.
 
@@ -192,7 +190,13 @@ Precomputes the layout for groups of experiments by taking the union of all sequ
 
 * kamada: Uses the [*NetworkX*](http://networkx.org) package's implementation of the Kamada-Kawaii algorithm to layout the graph. Reference: T. Kamada and S. Kawai. An algorithm for drawing general undirected graphs. *Inform. Process. Lett.*, 31:7–15, 1989.
 
-* universal: Uses a deterministic layout descibed in the Methods of the [publicaton](#citation).
+* universal: Uses a deterministic layout described in the Methods of the [publicaton](#citation).
+
+* fractal: Currently only lays out insertions vertices in a fractal like grid by repeatedly subdividing a square into 4 smaller squares. Each successive nucleotide of the inserted sequence determines which square is selected. "A: goes top-left, "C" goes top-right, "G" goes bottom-left, and "T" goes bottom-right.
+
+#### *get_precomputed_layout.py*
+
+Precomputes the layout for groups of experiments by taking the union of all sequences in all input experiments and laying them out. This allows experiments with the same reference sequence to have the same coordinates for the same sequence. All experiments should have the same window reference sequence and be individual (not comparison) experiments. 
 
 See code of [*plot_graph.py*](#plotgraphpy) for the implementation of each layout.
 
@@ -206,7 +210,7 @@ Arguments:
 
 * --subst_type: Whether to process files with/without substitutions.
 
-* --layout: One of "radial", "mds", "kamada", or "universal". See above for a description of each layout.
+* --layout: One of "radial", "mds", "kamada", or "universal". See the introduction of [5_plot_graph](#5plotgraph) for a description of each layout.
 
 #### *plot_graph.py*
 
@@ -222,15 +226,15 @@ Does layout and plotting of the processed graph data from [3_get_graph_data](#3g
 
 * --layout: Layout algorithms to use for representing graph vertices in 2D. Choices: "kamada", "radial", "mds", "universal", "fractal". See [*get_precomputed_layout.py*](#getprecomputedlayoutpy) for more details on each layout. Fractal is currently undocumented since it currenlty only lays out insertion vertices.
 
-* --universal_layout_y_axis_x_pos: If present, shows a y-axis at the given x position on the universal layout showing the distances to the reference. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+* --universal_layout_y_axis_x_pos: If present, shows a y-axis at the given x position on the universal layout showing the distances to the reference. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
 
-* --universal_layout_x_axis_deletion_y_pos: If present, shows an x-axis for deletions at the given y position on the universal layout showing the approximate position of the deleted ranges. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+* --universal_layout_x_axis_deletion_y_pos: If present, shows an x-axis for deletions at the given y position on the universal layout showing the approximate position of the deleted ranges. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
 
-* --universal_layout_x_axis_insertion_y_pos: If present, shows an x-axis for insertions at the given y position on the universal layout showing the first nucleotide of inserted sequences. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+* --universal_layout_x_axis_insertion_y_pos: If present, shows an x-axis for insertions at the given y position on the universal layout showing the first nucleotide of inserted sequences. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
 
-* --universal_layout_y_axis_y_range: If showing an y-axis (using --universal_layout_y_axis_x_pos) for the universal layout, the min and max y-position of the line. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+* --universal_layout_y_axis_y_range: If showing an y-axis for the universal layout, the min and max y-position of the line. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
 
-* --universal_layout_x_axis_x_range: If showing an x-axis for the universal layout, the min and max x-position of the line. Note, the scale of this value depends on the universal layout algorithm in plot_graph.py. The units are scaled to be the region [-20, 20] x [-20, 20] for typical sequences in our data set. The postion of the axis must thus be tweaked by hand to look right.
+* --universal_layout_x_axis_x_range: If showing an x-axis for the universal layout, the min and max x-position of the line. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
 
 * --universal_layout_y_axis_deletion_max_tick: If showing an y-axis for the universal layout, the max tick value for the deletion side. The ticks correspond to the number of deletions in the sequences in the corresponding row.
 
@@ -246,144 +250,157 @@ Does layout and plotting of the processed graph data from [3_get_graph_data](#3g
 
 * --node_min_px: Smallest possible vertex size in pixels.
 
-* --node_outline_scale: 
+* --node_outline_scale: How much to scale the node outline width (thickness). Values > 1 increase the width; values < 1 decrease the width.
 
-  parser.add_argument(
-    '--node_outline_scale',
-    type = float,
-    default = library_constants.GRAPH_NODE_OUTLINE_WIDTH_SCALE,
-    help = (
-      'How much to scale the node outline width (thickness).' +
-      ' Values > 1 increase the width; values < 1 decrease the width.'
-    ),
-  )
-  parser.add_argument(
-    '--variation_types',
-    nargs = '+',
-    help = (
-      'The variation types that should be included in the graph.'
-      ' This should be a list of the types:'
-      ' "insertion", "deletion", "substitution", "none".' +
-      ' Default value: "insertion", "deletion", "none".' +
-      ' "none" means the reference sequence.',
-    ),
-  )
-  parser.add_argument(
-    '--edge_scale',
-    type = float,
-    help = (
-      'How much to scale the edges width (thickness).' +
-      ' Values > 1 increase the width; values < 1 decrease the width.'
-    )
-  )
-  parser.add_argument(
-    '--width_px',
-    type = int,
-    default = library_constants.GRAPH_WIDTH_PX,
-    help = 'The width of the plot in pixels.'
-  )
-  parser.add_argument(
-    '--height_px',
-    type = int,
-    default = library_constants.GRAPH_HEIGHT_PX,
-    help = 'The height of the plot in pixels.'
-  )
-  parser.add_argument(
-    '--line_width_scale',
-    type = float,
-    default = library_constants.GRAPH_LINE_WIDTH_SCALE,
-    help = (
-      'How much to scale the line widths (aka thickness).' +
-      ' Values > 1 increase the width; values < 1 decrease the width.'
-    ),
-  )
-  parser.add_argument(
-    '--font_size_scale',
-    type = float,
-    default = library_constants.GRAPH_FONT_SIZE_SCALE,
-    help = (
-      'How much to scale the font size.' +
-      ' Values > 1 increase the font size; values < 1 decrease it.'
-    ),
-  )
-  parser.add_argument(
-    '--precomputed_layout_dir',
-    type = common_utils.check_dir,
-    default = None,
-    help = (
-      'If present, gives the directory where the precomputed layouts are.' +
-      ' If not present the layout is computed newly.'
-    )
-  )
-  parser.add_argument(
-    '--reverse_complement',
-    action = 'store_true',
-    help = (
-      'If present, uses the reverse complement of sequences when determining the'
-      ' node positions, and displaying labels and hover text.' +
-      ' This affects the precomputed layout, universal layout, and fractal layout.'
-    )
-  )
-  parser.add_argument(
-    '--crop_x',
-    nargs = '+',
-    type = float,
-    help = (
-      'Range of the horizontal dimension to crop.' +
-      ' Specified with normalized coords in range [0, 1].'
-    ),
-  )
-  parser.add_argument(
-    '--crop_y',
-    nargs = '+',
-    type = float,
-    help = (
-      'Range of the vertical dimension to crop.' +
-      ' Specified in normalized coords in range [0, 1].'
-    ),
-  )
-  parser.add_argument(
-    '--range_x',
-    type = float,
-    nargs = '*',
-    help = (
-      'Range of x-axis for plotting.'
-      'If not specified chosen automatically to either show all nodes or a preset value'
-      ' for the layout.'
-    ),
-  )
-  parser.add_argument(
-    '--range_y',
-    type = float,
-    nargs = '*',
-    help = (
-      'Range of y-axis for plotting.'
-      'If not specified chosen automatically to either show all nodes or a preset value'
-      ' for the layout.'
-    ),
-  )
-  parser.add_argument(
-    '--legend',
-    action = 'store_true',
-    help = 'Whether to show a legend on the figure.'
-  )
-  parser.add_argument(
-    '--legend_color_bar_scale',
-    type = float,
-    default = library_constants.GRAPH_LEGEND_COLORBAR_SCALE,
-    help = 'How much to scale the legend color bar (for freq ratio coloring).'
-  )
-  parser.add_argument(
-    '--separate_components',
-    action = 'store_true',
-    help = 'If present separate the connected components of the graph.'
-  )
+* --variation_types: The variation types that should be included in the graph. This should be a list of the types: "insertion", "deletion", "substitution", "none". Default value: ["insertion", "deletion", "none"]. "none" means the reference sequence.
+
+* --edge_scale: How much to scale the edges width (thickness). Values > 1 increase the width; values < 1 decrease the width.
+
+* --width_px: The width of the plot in pixels.
+
+* --height_px: The height of the plot in pixels.
+
+* --line_width_scale: How much to scale the line widths (aka thickness). Values > 1 increase the width; values < 1 decrease the width.
+
+* --font_size_scale: How much to scale the font size. Values > 1 increase the font size; values < 1 decrease it.
+
+* --precomputed_layout_dir: If present, gives the directory where the precomputed layouts are. This directory must contain the output of [*get_precompued_layout.py*](#getprecomputedlayoutpy). If not present, the layout is computed newly.
+
+* --reverse_complement: If present, uses the reverse complement of sequences when determining the node positions, and displaying labels and hover text. This affects the precomputed layout, universal layout, and fractal layout.
+
+* --crop_x: Range of the horizontal dimension to crop. Specified with normalized coords in range [0, 1]. Cropping is applied as the last step, so does not affect other coordinates specified in the arguments.
+
+* --crop_y: Range of the vertical dimension to crop. Specified in normalized coords in range [0, 1]. Cropping is applied as the last step, so does not affect other coordinates specified in the arguments.
+
+* --range_x: Range of x-axis for plotting. If not specified will be chosen to either show all nodes or a preset value for the layout, depending on the layout. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
+
+* --range_y: Range of y-axis for plotting. If not specified will be chosen to either show all nodes or a preset value for the layout, depending on the layout. Note, this value is in vertex coordinate space which has been arbitrarily set to be typically be in the region [-20, 20] x [-20, 20] for sequences in our data set. The value must thus be tweaked by hand to look right.
+
+* --legend: If present, show a legend on the figure.
+
+* --legend_color_bar_scale: How much to scale the legend color bar (for freq ratio coloring). Values > 1 increase the size and values < decrease the size.
+
+* --separate_components: If present, separate the connected components of the graph. Currently, this means that the plot is partitioned into a grid with the reference sequence component getting the largest space and other componnets getting smaller spaces along the border.
 
 ### 6_plot_histogram
 
-### 7_get_pptx
+#### *plot_histogram.py*
+
+Plots the 3D histograms showing the variation type/position/frequency of the DSB-sequence windows of experiments. Uses the output of [4_get_histogram_data](#4gethistogramdata). Uses [matplotlib](https://matplotlib.org/) for the plotting.
+
+Arguments:
+
+* --input: Directory with the data files which are output from [4_get_histogram_data](#4gethistogramdata).
+
+* --output: Output directory. Three images are output for each of the 3 variations: insertion, deletion, substitution. The files are named with the name of the INPUT directory and the variations type.
+
+* --reverse_pos: If presetnt, reverse the x-axis positions. Useful if the input is from reverse strand data and you want to compare it with forward strand data.
+
+* --label_type: Whether to index the x-axis by "absolute" positions on the reference sequence from 1 to ref_length, or "relative" positions from -ref_length/2 to ref_length/2 (skipping 0). The relative labeling assumes that the DSB is between ref_length/2 and ref_length/2 + 1.
 
 ### 7_get_pptx
+
+#### *get_pptx.py*
+
+Arrange images into a grid with labels and legend in a PPTX file. Uses the [python-pptx](https://python-pptx.readthedocs.io/) package.
+
+Arguments:
+
+* --input: List of images to include in the grid.
+
+* --top_margin_labels: Labels in the top margins of the grids. Number of arguments must be the same as the sum of the NUM_COLS arguments.
+
+* --left_margin_labels: Labels in the left margins of the grids. Number of arguments must be the same as the sum of the NUM_COLS arguments.
+
+parser.add_argument(
+    '--output',
+    help = 'Output PPTX file.',
+    required = True,
+  )
+  parser.add_argument(
+    '--num_grids',
+    required = True,
+    type = int,
+    help = 'Number of separate grids to create',
+  )
+  parser.add_argument(
+    '--num_rows',
+    nargs = '+',
+    required = True,
+    type = int,
+    help = (
+      'Number of rows in each grid.' +
+      ' Number of arguments should match the number of grids.'
+    ),
+  )
+  parser.add_argument(
+    '--num_cols',
+    nargs = '+',
+    required = True,
+    type = int,
+    help = (
+      'Number of columns in each grid.' +
+      ' Number of arguments should match the number of grids.'
+    ),
+  )
+  parser.add_argument(
+    '--total_width',
+    nargs = '+',
+    type = float,
+    help = (
+      'Fraction of the page width to use for each grid .' +
+      ' Number of arguments should match the number of grids.'
+    ),
+  )
+  parser.add_argument(
+    '--node_max_freq',
+    type = float,
+    help = (
+      'Max frequency to determine node size.' +
+      ' Higher frequencies are clipped to this value.'
+    ),
+    default = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
+  )
+  parser.add_argument(
+    '--node_min_freq',
+    type = float,
+    help = (
+      'Min frequency to determine node size.' +
+      ' Lower frequencies are clipped to this value.'
+    ),
+    default = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
+  )
+  parser.add_argument(
+    '--node_max_px',
+    type = float,
+    help = 'Largest node size as determined by the frequency.',
+    default = library_constants.GRAPH_NODE_SIZE_MAX_PX,
+  )
+  parser.add_argument(
+    '--node_min_px',
+    type = float,
+    help = 'Smallest node size as determined by the frequency.',
+    default = library_constants.GRAPH_NODE_SIZE_MIN_PX,
+  )
+  parser.add_argument(
+    '--title',
+    default = None,
+    help = 'Page title',
+  )
+  parser.add_argument(
+    '--legends',
+    nargs = '+',
+    choices = list(LEGENDS),
+    default = None,
+    help = 'Legends to draw outside the page.',
+  )
+  parser.add_argument(
+    '--template',
+    default = os.path.join(os.path.dirname(__file__), 'template.pptx'),
+    help = 'The PPTX file to use as a template. Controls the page size.',
+  )
+  args = parser.parse_args()
+  return args
 
 * filte
 * **run_01_process_nhej** - Filter the raw SAM files to retain the NHEJ patterns.

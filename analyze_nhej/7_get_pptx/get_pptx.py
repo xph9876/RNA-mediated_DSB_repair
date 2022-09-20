@@ -581,7 +581,7 @@ def get_slide(
 
 def parse_args():
   parser = argparse.ArgumentParser(
-    description = 'Create powerpoint figures from the graphs.'
+    description = 'Create powerpoint figures from images.'
   )
   parser.add_argument(
     '--input',
