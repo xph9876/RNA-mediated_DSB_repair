@@ -2,17 +2,47 @@
 
 ## Description
 
-TODO: italicize all file names.
-
-This folder contains the processing pipeline for the NHEJ (nonhomologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The *run&ast;.sh* and *run&ast;.ps* scripts in the main directory are for reproducing the computations with datasets used in the [publication](#citation). Note *.sh scripts are intended to be run with Unix bash, while *.ps1 scripts are intended to be run with Windows PowerShell (although there is no semantic difference is how the Python scripts are called from either file type).
+This folder contains the processing pipeline for the NHEJ (nonhomologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The *run&ast;.sh* and *run&ast;.ps* scripts in the main directory are for reproducing the computations with datasets used in the [publication](#citation). Note *&ast;.sh* scripts are intended to be run with Unix bash, while *&ast;.ps1* scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
 
 ## Prerequisties
 
-TODO: mention the package names/versions in the requirement.txt
+Tested OS: Windows 10 Home.
+
+Python version: Python 3.10.6.
+
+Python packages:
+* kaleido (0.2.1)
+* matplotlib (3.5.3)
+* networkx (2.8.6)
+* numpy (1.23.2)
+* pandas (1.4.3)
+* Pillow (9.2.0)
+* plotly (5.10.0)
+* psutil (5.9.1)
+* python-Levenshtein (0.12.2)
+* python-pptx (0.6.21)
+* requests (2.28.1)
+* scikit-learn (1.1.2)
+* scipy (1.9.1)
+* XlsxWriter (3.0.3)
+
+The full output of ```pip freeze``` is given in *python_packages.txt*. Note, for PNG image output from the plotly library on Windows, a backend known as [*orca*](https://github.com/plotly/orca) had to be used due to to problems with the [*kaleido*](https://github.com/plotly/Kaleido) backend. Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of orca.
 
 ## Citation
 
-TODO
+Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In preparation*.
+
+## Reproducing Analyses
+
+To reproduce the NHEJ analyses of the [publication](#citation), the output SAM files of the trimming and alignment stages of the pipeline must be copied to the *data_0_sam* directory. Each SAM file must be named in the format: *&lt;library&gt;&lowbar;&lt;cell_line&gt;&lowbar;&lt;guide_rna&gt;&lowbar;&lt;construct&gt;.sam* where
+
+* *&lt;library&gt;*: Name of the libary (alphanumeric).
+* *&lt;cell_line&gt;*: Cell line. "WT" for wild type and "KO" for knock-out.
+* *&lt;guide_rna&gt;*: Guide RNA. Choices: "sgA", "sgB", "sgAB", or "sgCD".
+* *&lt;strand&gt;*: Strand. "R1" for forward and "R2" for reverse.
+* *&lt;construct&gt;*: Plasmid construct. "sense" for Sense, "branch" for BranchΔ, "cmv" for pCMVΔ, "antisense" for "Antisense", "splicing" for 5'-SplicingΔ.
+
+Example: *yjl89_WT_sgCD_R1_antisense.sam*. CONTINUE HERE. Explain that all the SAM files must be present for scripts to run.
 
 ## Pipeline Stages
 

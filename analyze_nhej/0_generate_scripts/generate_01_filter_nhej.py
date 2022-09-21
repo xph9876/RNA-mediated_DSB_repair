@@ -7,7 +7,7 @@ import generate_constants
 
 def get_input_file(name):
   return os.path.join(
-    generate_constants.OUTPUT_DIR['raw'],
+    generate_constants.OUTPUT_DIR['sam'],
     name + os.extsep + 'sam'
   )
 

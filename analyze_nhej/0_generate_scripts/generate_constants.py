@@ -226,7 +226,7 @@ EXPERIMENT_INFO_COMPARISON = get_experiment_info_comparison()
 
 REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {
-  'raw': 'data_0_raw',
+  'sam': 'data_0_sam',
   'filter_nhej': 'data_1_filter_nhej',
   'combine_repeat': 'data_2_combine_repeat',
   'window': 'data_3_window',
