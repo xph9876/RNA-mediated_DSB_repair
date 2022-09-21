@@ -28,13 +28,15 @@ Python packages:
 
 The full output of ```pip freeze``` is given in *python_packages.txt*. Note, for PNG image output from the plotly library on Windows, a backend known as [*orca*](https://github.com/plotly/orca) had to be used due to to problems with the [*kaleido*](https://github.com/plotly/Kaleido) backend. Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of orca.
 
-## Citation
+## Publication Citation
 
 Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In preparation*.
 
 ## Reproducing Analyses
 
-To reproduce the NHEJ analyses of the [publication](#citation), the output SAM files of the trimming and alignment stages of the pipeline must be copied to the *data_0_sam* directory. Each SAM file must be named in the format: *&lt;library&gt;&lowbar;&lt;cell_line&gt;&lowbar;&lt;guide_rna&gt;&lowbar;&lt;construct&gt;.sam* where
+To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form *&ast;.sh* and *&ast;.ps1* (such as *run_01_process_nhej.ps1*/*run_01_process_nhej.sh*) must be run in the order indicated by their numbering. ,  These scripts also serve as usage examples for the Python scripts. *0_generate_scripts/run_all.sh* and *0_generate_scripts/run_all.ps1* run all stages.
+
+For the scripts to be run successfully, all SAM files from the trimming and alignment stages of the pipeline must be placed in the *data_0_sam* directory. Each SAM file must be named in the format: *&lt;library&gt;&lowbar;&lt;cell_line&gt;&lowbar;&lt;guide_rna&gt;&lowbar;&lt;construct&gt;.sam* where
 
 * *&lt;library&gt;*: Name of the libary (alphanumeric).
 * *&lt;cell_line&gt;*: Cell line. "WT" for wild type and "KO" for knock-out.
@@ -42,13 +44,13 @@ To reproduce the NHEJ analyses of the [publication](#citation), the output SAM f
 * *&lt;strand&gt;*: Strand. "R1" for forward and "R2" for reverse.
 * *&lt;construct&gt;*: Plasmid construct. "sense" for Sense, "branch" for BranchΔ, "cmv" for pCMVΔ, "antisense" for "Antisense", "splicing" for 5'-SplicingΔ.
 
-Example: *yjl89_WT_sgCD_R1_antisense.sam*. The scripts such as "run_0
+Example: *yjl89_WT_sgCD_R1_antisense.sam*. All SAM files used in 
 
 ## Pipeline Stages
 
 ### 0_generate_scripts
 
-Meta-scripts used to generate the *&ast;.sh* and *&ast;.ps1* scripts for running the data processing pipeline on the data sets for the [publication](#citation). These are not required if using any of the pipline stages individually. All *generate_&ast;.py* scripts are run without arguments. *0_generate_scripts/run_all.sh* and *0_generate_scripts/run_all.ps1* runs all stages.
+Meta-scripts used to generate the *&ast;.sh* and *&ast;.ps1* scripts for running the data processing pipeline on the data sets for the [publication](#citation). These are not required if using any of the pipline stages individually. All *generate_&ast;.py* scripts are run without arguments. 
 
 ### 1_process_nhej
 
@@ -368,7 +370,3 @@ Arguments:
 * --legends: Which legends to draw in the file. These legends include the vertex size legend, vertex variation type color legend, vertex frequency ratio color legend, and edge legend. Note, the legends are drawn outside the page limits so they will have to be positioned by hand.
 
 * --template: The PPTX file to use as a template. Currently, this is only used for determining the page size.
-
-Running
--------
-To run all stages of the pipeline use the "run_all.bat" file (Windows cmd) or "run_all.sh" file (Unix bash). To run one of the individual stages above use the corresponding "run*.bat" file (Windows cmd) or "run*.sh" file (Unix bash). To run individual Python files in the pipeline use Python 3 and refer to the .bat or .sh scripts for the usage, or run the files without any arguments to print a help message. These scripts have been tested on Windows 11, Python 3.10.4. Note, the steps in the pipeline must be run in proper order as later stages depend on output from previous stages.
