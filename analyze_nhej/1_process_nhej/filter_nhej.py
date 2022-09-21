@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 import sys
 import os
@@ -164,23 +162,22 @@ def main():
     description = 'Filter sequences having mutations near DSB site.'
   )
   parser.add_argument(
-    '-ref',
+    '--ref_seq_file',
     type = argparse.FileType(mode='r'),
     help = 'Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.',
     required = True,
   )
   parser.add_argument(
-    '-sam',
+    '--sam_file',
     type = argparse.FileType(mode='r'),
     help = (
-      'Aligned SAM file.' +
+      'Aligned SAM input file.' +
       ' Must be created with Bowtie2 (specific flags from Bowtie2 are used).'
       ' Every read must be aligned with exactly the same reference sequence.'
     ),
     required = True,
   )
   parser.add_argument(
-    '-o',
     '--output',
     type = common_utils.check_file_output,
     required = True,
@@ -196,7 +193,7 @@ def main():
     )
   )
   parser.add_argument(
-    '-dsb',
+    '--dsb_pos',
     type = int,
     required = True,
     help = (
@@ -205,7 +202,6 @@ def main():
     ),
   )
   parser.add_argument(
-    '-q',
     '--quiet',
     help = 'Do not output log messages.',
     action = 'store_true',
@@ -214,13 +210,10 @@ def main():
   # parse command line arguments
   args = parser.parse_args()
 
-  log_utils.log(args.sam.name + ' -> ' + args.output.name)
-
-  if args.quiet:
-    log_utils.set_log_file(None)
+  log_utils.log(args.sam_file.name)
 
   # read reference sequence from fasta file
-  ref_seq = fasta_utils.read_fasta_seq(args.ref)
+  ref_seq = fasta_utils.read_fasta_seq(args.ref_seq_file)
   
   # For logging
   rejected_header = 0
@@ -235,10 +228,11 @@ def main():
   # categorize
   read_counts = collections.defaultdict(int)
   read_num_subst = {}
-  total_lines = file_utils.count_lines(args.sam.name)
-  for line_num, line in enumerate(args.sam):
+  total_lines = file_utils.count_lines(args.sam_file.name)
+  for line_num, line in enumerate(args.sam_file):
     if (line_num % 100000) == 0:
-      log_utils.log(f"Progress: {line_num} / {total_lines}")
+      if not args.quiet:
+        log_utils.log(f"Progress: {line_num} / {total_lines}")
 
     if line.startswith('@'): # header line of SAM
       rejected_header += 1
@@ -273,18 +267,20 @@ def main():
     num_ins = len(ins_pos)
     num_del = len(del_pos)
     num_subst = len(subst_pos)
-    assert num_indel_sam == num_ins + num_del, 'Incorrect count of insertions and/or deletions'
-    assert num_subst_sam == num_subst, 'Incorrect count of substitutions'
+    if num_indel_sam != (num_ins + num_del):
+        raise Exception('Incorrect count of insertions and/or deletions')
+    if num_subst_sam != num_subst:
+        raise Exception('Incorrect count of substitutions')
 
     if num_ins + num_del > 0:
-      dsb_touches = check_dsb_touches_indel(args.dsb, ins_pos, del_pos)
+      dsb_touches = check_dsb_touches_indel(args.dsb_pos, ins_pos, del_pos)
       if not dsb_touches:
         if num_ins > 0:
           # insertions special case
           new_ref_align, new_read_align = check_insertion_special_case(
             ref_align,
             read_align,
-            args.dsb,
+            args.dsb_pos,
             num_subst = num_subst,
           )
           if new_ref_align is not None:
@@ -302,7 +298,7 @@ def main():
           new_read_align = check_deletion_special_case(
             ref_align,
             read_align,
-            args.dsb,
+            args.dsb_pos,
             num_del = num_del,
             num_subst = num_subst,
           )
@@ -328,7 +324,8 @@ def main():
     read_counts[read_seq, cigar] += 1
     read_num_subst[read_seq, cigar] = num_subst
 
-  assert len(read_counts) > 0, 'No sequences captured'
+  if len(read_counts) == 0:
+    raise Exception('No sequences captured')
 
   output_file = args.output
   read_seq_and_cigars = sorted(read_counts.keys(), key = lambda x: -read_counts[x])
@@ -337,7 +334,9 @@ def main():
     count = read_counts[read_seq, cigar]
     num_subst = read_num_subst[read_seq, cigar]
     output_file.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
-  
+  log_utils.log('------>')
+  log_utils.log(args.output.name)
+
   total_accepted = sum(read_counts.values())
   total_rejected = (
     rejected_header +
@@ -347,19 +346,21 @@ def main():
     rejected_dsb_not_touch +
     rejected_not_consecutive
   )
-  assert total_rejected == (total_lines - total_accepted), "Line counts do not match"
+  if total_rejected != (total_lines - total_accepted):
+    raise Exception("Line counts of accepted + rejected != total lines")
 
-  log_utils.log(f'Total lines: {total_lines}')
-  log_utils.log(f'    Accepted: {total_accepted}')
-  log_utils.log(f'        Insertion special case: {accepted_insertion_special}')
-  log_utils.log(f'        Deletion special case: {accepted_deletion_special}')
-  log_utils.log(f'    Rejected: {total_rejected}')
-  log_utils.log(f'        Header: {rejected_header}')
-  log_utils.log(f'        No alignment: {rejected_no_alignment}')
-  log_utils.log(f'        POS != 1: {rejected_pos_not_1}')
-  log_utils.log(f'        Too short: {rejected_too_short}')
-  log_utils.log(f'        DSB not touch: {rejected_dsb_not_touch}')
-  log_utils.log(f'        Not consecutive: {rejected_not_consecutive}')
+  if not args.quiet:
+    log_utils.log(f'Total lines: {total_lines}')
+    log_utils.log(f'    Accepted: {total_accepted}')
+    log_utils.log(f'        Insertion special case: {accepted_insertion_special}')
+    log_utils.log(f'        Deletion special case: {accepted_deletion_special}')
+    log_utils.log(f'    Rejected: {total_rejected}')
+    log_utils.log(f'        Header: {rejected_header}')
+    log_utils.log(f'        No alignment: {rejected_no_alignment}')
+    log_utils.log(f'        POS != 1: {rejected_pos_not_1}')
+    log_utils.log(f'        Too short: {rejected_too_short}')
+    log_utils.log(f'        DSB not touch: {rejected_dsb_not_touch}')
+    log_utils.log(f'        Not consecutive: {rejected_not_consecutive}')
   log_utils.new_line()
 
 if __name__ == '__main__':

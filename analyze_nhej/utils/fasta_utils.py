@@ -16,6 +16,7 @@ def read_fasta_seq(fasta_file):
   fasta_file.readline() # skip the first line which should be the seq id
   seq = ''
   for line in fasta_file:
-    assert line[0] != '>', f'There should be only one sequence in reference Fasta file {fasta_file.name}!'
+    if line[0] == '>':
+      raise Exception(f'There should be only one sequence in reference FASTA file {fasta_file.name}!')
     seq += line.rstrip()
   return seq
