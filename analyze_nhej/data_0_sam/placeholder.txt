@@ -1,0 +1,1 @@
+Place trimmed and aligned SAM files here. See analyze_nhej/README.md for more details.
