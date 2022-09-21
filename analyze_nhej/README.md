@@ -18,13 +18,13 @@ TODO
 
 ### 0_generate_scripts
 
-Meta-scripts used to generate the \*.[sh|ps1] scripts for running the data processing pipeline on the data sets for the [publication](#citation). These are not required if using any of the pipline stages individually. All generate_\*.py scripts are run without arguments. 0_generate_scripts/run_all.[sh|ps1] runs them all.
+Meta-scripts used to generate the *&ast;.sh* and *&ast;.ps1* scripts for running the data processing pipeline on the data sets for the [publication](#citation). These are not required if using any of the pipline stages individually. All *generate_&ast;.py* scripts are run without arguments. *0_generate_scripts/run_all.sh* and *0_generate_scripts/run_all.ps1* runs all stages.
 
 ### 1_process_nhej
 
 Initial processing of raw SAM files which have been aligned to a reference sequence.
 
-#### filter_nhej.py
+#### *filter_nhej.py*
 
 Takes as input a SAM file and filters only alignments that are defined as being produced via NHEJ (see methods of the [publication](#citation) for the exact definition).
 
@@ -42,13 +42,13 @@ Arguments:
 
 * --quiet: If present, do not output extra log message showing how many reads were discarded due to each filter criteria.
 
-#### combine_repeats.py
+#### *combine_repeat.py*
 
-Combines tables produced with [filter_nhej.py](#filternhejpy) representing biological repeats into a single file. The input must be tab-separate file produced with the  script and the ouput.
+Combines tables produced with [*filter_nhej.py*](#filternhejpy) representing biological repeats into a single file. The input must be tab-separate file produced with the  script and the ouput.
 
 Arguments:
 
-* --input: List of tab-separated files output from script [filter_nhej.py](#filternhejpy). Must have columns: Sequence, CIGAR, Count, Num_Subst. The files names must be of the form &lt;name&gt;&lowbar;&ast;, where &lt;name&gt; is the name of the library. 
+* --input: List of tab-separated files output from script [*filter_nhej.py*](#filternhejpy). Must have columns: Sequence, CIGAR, Count, Num_Subst. The files names must be of the form &lt;name&gt;&lowbar;&ast;, where &lt;name&gt; is the name of the library. 
 
 * --output: Output tab-separated file. The output Count columns will be of the form Count_&lt;name&gt;, where &lt;name&gt; is the name of the library (see INPUT).
 
@@ -58,17 +58,17 @@ Arguments:
 
 Scripts for further processing the raw NHEJ data in order to extract window around the DSB, convert raw counts to frequencies, merge experiments which have been sequenced twice, and precompute other data used for downstream visulizations.
 
-### get_window.py
+### *get_window.py*
 
 Extract DSB-sequence for the NHEJ variation-distance graphs while discarding sequences that do not have proper anchors flanking the window.
 
 Arguments:
 
-* --input: TSV file output of combine_repeat.py. The columns must be: "Sequence", "CIGAR", "Count_&lt;X1&gt;", "Count_&lt;X2&gt;", etc. All the columns after "CIGAR" should be the counts for each repeat where &lt;Xi&gt; denotes the name of the library.
+* --input: TSV file output of [*combine_repeat.py*](#combinerepeatpy). The columns must be: "Sequence", "CIGAR", "Count_&lt;X1&gt;", "Count_&lt;X2&gt;", etc. All the columns after "CIGAR" should be the counts for each repeat where &lt;Xi&gt; denotes the name of the library.
 
 * --ref_seq_file: Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.
 
-* --output: Output directory. The output file will be TSV format and named like "window_*.py", with the suffix after "window_" indicating the characteristics of the file (e.g., with/without subsitutions, mean/count, or filtered). The library metadata is also output in "data_info.tsv".
+* --output: Output directory. The output file will be TSV format and named like *window_&ast;.py*, with the suffix after *window_* indicating the characteristics of the file (e.g., with/without subsitutions, mean/count, or filtered). The library metadata is also output in *data_info.tsv*.
 
 * --dsb_pos: Position on reference sequence immediately upstream of DSB site (i.e., the DSB is between 1-based position DSB_POS and DSB_POS + 1.).
 
@@ -94,13 +94,13 @@ Arguments:
 
 * --version: Version indicator since some libraries were sequenced twice (e.g., old, new, merged, none).
 
-#### get_freq.py
+#### *get_freq.py*
 
-Convert the raw read counts in the input data into frequencies using the input total reads. Outputs 3 files: (1) windows_freq.tsv: contains the all the sequences with the counts converted to frequencies. (2) windows_freq_filter.tsv: the previous file with the sequences removed whose frequency is <= FREQ_MIN in any of the repeats. (3) windows_freq_filter_mean.tsv: contains the means of the frequencies in the previous file (over all repeats).
+Convert the raw read counts in the input data into frequencies using the input total reads. Outputs 3 files: (1) *windows_freq.tsv*: contains the all the sequences with the counts converted to frequencies. (2) *windows_freq_filter.tsv*: the previous file with the sequences removed whose frequency is <= FREQ_MIN in any of the repeats. (3) *windows_freq_filter_mean.tsv*: contains the means of the frequencies in the previous file (over all repeats).
 
 Arguments:
 
-* --input: Directory with output tables from get_window.py or get_merged.py.
+* --input: Directory with output tables from *get_window.py* or *get_merged.py*.
 
 * --total_reads: Total reads for each file. Must be the same number of arguments as the number of Count columns in the tables in INPUT.
 
@@ -110,15 +110,15 @@ Arguments:
 
 * --freq_min: Minimum frequency for output in windows_freq_filter_mean.tsv. Sequences with frequences <= FREQ_MIN are discarded.
 
-#### get_merged.py
+#### *get_merged.py*
 
-Merge together library files from samples that have beem sequenced twice. Operates on the output of get_window.py.
+Merge together library files from samples that have beem sequenced twice. Operates on the output of [*get_window.py*](#getwindowpy).
 
 Arguments:
 
-* --input: Input directories with "windows_*.tsv" output of get_window.py. There must be the same number of columns in all input data sets. The "count" columns must be in the same order they should be merged in.
+* --input: Input directories with *windows_&ast;.tsv* output of [*get_window.py*](#getwindowpy). There must be the same number of columns in all input data sets. The "count" columns must be in the same order they should be merged in.
 
-* --output: Output directory. Files will be named in the same manner as get_window.py.
+* --output: Output directory. Files will be named in the same manner as [*get_window.py*](#getwindowpy).
 
 * --subst_type: Whether to operate on file with or with substitutions.
 
@@ -126,15 +126,15 @@ Arguments:
 
 * --new_library_names: Names of the new merged libraries. Must be the same number of arguments as the number of count columns in the data.
 
-#### get_freq_comparison.py
+#### *get_freq_comparison.py*
 
-Combine two individual experiment directories to make a comparison experiment directory for comparison graphs. The experiments must be compatible: have all the same attributes except for the constructs which must be different. Operates of the output of get_freq.py. The tables from the two libraries are merged by joining on the alignment columns.
+Combine two individual experiment directories to make a comparison experiment directory for comparison graphs. The experiments must be compatible: have all the same attributes except for the constructs which must be different. Operates of the output of [*get_freq.py*](#getfreqpy). The tables from the two libraries are merged by joining on the alignment columns.
 
 Arguments:
 
-* --input: Directory of individual experiment frequency data produced with get_freq.py.
+* --input: Directory of individual experiment frequency data produced with [*get_freq.py*](#getfreqpy).
 
-* --output: Output directory. Output files parallel the structure of get_freq.py output, except they have two frequencies columns for the two compared libraries.
+* --output: Output directory. Output files parallel the structure of output from [*get_freq.py*](#getfreqpy), except they have two frequencies columns for the two compared libraries.
 
 * --subst_type: Whether to operate on files with/without substitutions.
 
@@ -144,15 +144,15 @@ Arguments:
 
 Precompute the necessary data for the variation-distance graphs. Uses as input the output of the [2_get_window_data](#2getwindowdata) stage and outputs the following files:
 
-* sequence_data_*.tsv: Table of the vertex data for the variation distance graphs. Each row represents a single vertex.
+* *sequence_data_&ast.tsv*: Table of the vertex data for the variation distance graphs. Each row represents a single vertex.
 
-* edge_data_*.tsv: Table of edge data for variation-distance graphs. Each row represents a single edge.
+* *edge_data_&ast;.tsv*: Table of edge data for variation-distance graphs. Each row represents a single edge.
 
-* distance_matrix_*.tsv: Table of pairwise Levenshtein distances of the vertices.
+* *distance_matrix_&ast;.tsv*: Table of pairwise Levenshtein distances of the vertices.
 
-* graph_stats_*.tsv: Summary statistics of the graph (e.g., number of vertices).
+* *graph_stats_&ast;.tsv*: Summary statistics of the graph (e.g., number of vertices).
 
-Arguments
+Arguments:
 
 * --input: Directory with output from [2_get_window_data](#2getwindowdata) stage.
 
@@ -215,6 +215,8 @@ Arguments:
 #### *plot_graph.py*
 
 Does layout and plotting of the processed graph data from [3_get_graph_data](#3getgraphdata).
+
+Arguments:
 
 * --input: Directory with the data files produced with [3_get_graph_data](#3getgraphdata).
 
@@ -312,109 +314,30 @@ Arguments:
 
 * --left_margin_labels: Labels in the left margins of the grids. Number of arguments must be the same as the sum of the NUM_COLS arguments.
 
-parser.add_argument(
-    '--output',
-    help = 'Output PPTX file.',
-    required = True,
-  )
-  parser.add_argument(
-    '--num_grids',
-    required = True,
-    type = int,
-    help = 'Number of separate grids to create',
-  )
-  parser.add_argument(
-    '--num_rows',
-    nargs = '+',
-    required = True,
-    type = int,
-    help = (
-      'Number of rows in each grid.' +
-      ' Number of arguments should match the number of grids.'
-    ),
-  )
-  parser.add_argument(
-    '--num_cols',
-    nargs = '+',
-    required = True,
-    type = int,
-    help = (
-      'Number of columns in each grid.' +
-      ' Number of arguments should match the number of grids.'
-    ),
-  )
-  parser.add_argument(
-    '--total_width',
-    nargs = '+',
-    type = float,
-    help = (
-      'Fraction of the page width to use for each grid .' +
-      ' Number of arguments should match the number of grids.'
-    ),
-  )
-  parser.add_argument(
-    '--node_max_freq',
-    type = float,
-    help = (
-      'Max frequency to determine node size.' +
-      ' Higher frequencies are clipped to this value.'
-    ),
-    default = library_constants.GRAPH_NODE_SIZE_MAX_FREQ,
-  )
-  parser.add_argument(
-    '--node_min_freq',
-    type = float,
-    help = (
-      'Min frequency to determine node size.' +
-      ' Lower frequencies are clipped to this value.'
-    ),
-    default = library_constants.GRAPH_NODE_SIZE_MIN_FREQ,
-  )
-  parser.add_argument(
-    '--node_max_px',
-    type = float,
-    help = 'Largest node size as determined by the frequency.',
-    default = library_constants.GRAPH_NODE_SIZE_MAX_PX,
-  )
-  parser.add_argument(
-    '--node_min_px',
-    type = float,
-    help = 'Smallest node size as determined by the frequency.',
-    default = library_constants.GRAPH_NODE_SIZE_MIN_PX,
-  )
-  parser.add_argument(
-    '--title',
-    default = None,
-    help = 'Page title',
-  )
-  parser.add_argument(
-    '--legends',
-    nargs = '+',
-    choices = list(LEGENDS),
-    default = None,
-    help = 'Legends to draw outside the page.',
-  )
-  parser.add_argument(
-    '--template',
-    default = os.path.join(os.path.dirname(__file__), 'template.pptx'),
-    help = 'The PPTX file to use as a template. Controls the page size.',
-  )
-  args = parser.parse_args()
-  return args
+* --output: Output PPTX file
 
-* filte
-* **run_01_process_nhej** - Filter the raw SAM files to retain the NHEJ patterns.
-* run_02_combine_repeats - Combine repeat experiments and retain only common sequences.
-3. run_03_make_main_data_withSubst, run_03_make_main_data_withoutSubst - Make processed/filtered data files for the variation-position graphs and 3D histograms. The "withSubst" script keeps the substitutions, and "withoutSubst" script ignores them.
-4. run_04_make_graph_data_withSubst, run_04_make_graph_data_withoutSubst - Make processed data files for generating the variation-position graphs. The "withSubst"/"withoutSubst" script uses the respective output of the previous stage.
-5. run_05_make_main_data_combined_withSubst, run_05_make_main_data_combined_withoutSubst - Makes the combined data files for comparing 2 experiments.
-6. run_05_make_graph_data_combined_withSubst, run_05_make_graph_data_combined_withoutSubst - Makes the combined data files for comparing 2 experiments.
-7. run_07_make_historam_3d - Plots the 3D variation-position histograms.
-8. run_08_common_layout - Create the common layouts for the plotting the variation-position graphs. This insures that comparable experiments have vertices with the same variation placed in the same position.
-9. run_09_plot_graph - Plots the variation-position graphs.
-10. run_10_make_pptx_graph - Arranges the variation-position graphs in a grid in PPTX files.
-11. run_11_make_pptx_histograms - Arranges the variation-position histograms in a grid in PPTX files.
-12. run_12_plot_graph_main - Plots some of the variation-position graphs (slightly modified to reduce white space).
+* --num_grids: Number of separate grids to create. Each grid is stacked vertically below the previous.
+
+* --num_rows: Number of rows in each grid. The Number of arguments should equal NUM_GRIDS.
+
+* --num_cols: Number of columns in each grid. The Number of arguments should equal NUM_GRIDS.
+
+* --total_width: Fraction of the page width to use for each grid. The Number of arguments should equal NUM_GRIDS.
+
+* --node_max_freq: The corresponding argument from [*plot_graph.py*](#plotgraphpy). Used to create the PPTX vertex size legends using PPTX shapes. The Number of arguments should equal NUM_GRIDS.
+
+
+* --node_min_freq: The corresponding argument from [*plot_graph.py*](#plotgraphpy). Used to create the PPTX vertex size legends using PPTX shapes. The Number of arguments should equal NUM_GRIDS.
+
+* --node_max_px: The corresponding argument from [*plot_graph.py*](#plotgraphpy). Used to create the PPTX vertex size legends using PPTX shapes. The Number of arguments should equal NUM_GRIDS.
+
+* --node_min_px: The corresponding argument from [*plot_graph.py*](#plotgraphpy). Used to create the PPTX vertex size legends using PPTX shapes. The Number of arguments should equal NUM_GRIDS.
+
+* --title: Page title. Displayed at the top of the page.
+
+* --legends: Which legends to draw in the file. These legends include the vertex size legend, vertex variation type color legend, vertex frequency ratio color legend, and edge legend. Note, the legends are drawn outside the page limits so they will have to be positioned by hand.
+
+* --template: The PPTX file to use as a template. Currently, this is only used for determining the page size.
 
 Running
 -------
