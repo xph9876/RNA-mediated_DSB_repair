@@ -29,21 +29,6 @@ def check_freq_type(freq_type):
   if freq_type not in FREQ_TYPES:
     raise Exception('Not a valid freq type: ' + str(freq_type))
 
-VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN = 'dist_ref'
-VARIATION_POSITION_LAYOUT_DISTANCE_LABEL = {
-  'dist_ref': (
-    'Variations'
-  ),
-  'indel': (
-    'In/Dels'
-  ),
-}
-VARIATION_POSITION_LAYOUT_POSITION_RANGE = (0, 20)
-VARIATION_POSITION_LAYOUT_DISTANCE_RANGE = {
-  'indel': (0, 20),
-  'dist_ref': (0, 20),
-}[VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN]
-
 def get_position_labels(label_type, ref_length):
   if label_type == 'relative':
     return (

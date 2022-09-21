@@ -14,8 +14,6 @@ import numpy as np
 import sklearn.decomposition
 import sklearn.manifold
 
-import circlify
-
 import PIL
 
 import library_constants
@@ -111,57 +109,11 @@ LAYOUT_PROPERTIES = {
     'normalize': False,
     'has_edges': True, 
   },
-  'variation_position_layout_square': {
-    'only_2d': True,
-    'do_pca': False,
-    'normalize': False,
-    'has_edges': False, 
-  },
-  'variation_position_layout_vertical': {
-    'only_2d': True,
-    'do_pca': False,
-    'normalize': False,
-    'has_edges': False, 
-  },
-  'variation_position_layout_circle_pack': {
-    'only_2d': True,
-    'do_pca': False,
-    'normalize': False,
-    'has_edges': False, 
-  },
 }
 
 def group_graph_nodes_by(graph, data_name):
   data = pd.series(dict(graph.nodes(data_name)))
   return list(data.groupby(data).groups.values())
-
-# Pack circles using the circlify library
-def pack_circles_origin(data):
-  data = [
-    {
-      'id': id,
-      'radius': d['radius'],
-      'area': d['radius'] ** 2,
-    }
-    for id, d in data.items()
-  ]
-  data = list(sorted(data, key=lambda x: x['radius'], reverse=True))
-  circles = circlify.circlify(
-    data,
-    datum_field='area',
-    id_field='id',
-  )
-  scale_factor = []
-  for c in circles:
-    scale_factor.append(c.ex['radius'] / c.r)
-  # Take the mean of all scale factors for more stability
-  # though they should all be almost identical
-  scale_factor = np.mean(scale_factor)
-  data = {d['id']: d for d in data}
-  for c in circles:
-    data[c.ex['id']]['x'] = c.x * scale_factor
-    data[c.ex['id']]['y'] = c.y * scale_factor
-  return data
 
 def make_node_spacing_layout(
   xy_dict,
@@ -220,54 +172,6 @@ def make_node_spacing_layout(
     else:
       raise Exception('Unknown grid type: ' + str(grid_type))
   return new_xy_dict
-
-def make_variation_position_layout(
-  data_info,
-  graph,
-  node_type,
-  grid_type,
-  node_size_px_dict = None,
-  x_size_domain = None,
-  y_size_domain = None,
-  x_size_px = None,
-  y_size_px = None,
-):
-  sequence_data = graph.nodes(data=True)
-  if len(sequence_data) == 0:
-    return {}
-  sequence_data = list(dict(sequence_data).items())
-  freq_columns = [
-    x for x in sequence_data[0][1]
-    if x in library_constants.FREQ_COLUMNS[data_info['format']]
-  ]
-  sequence_data = sorted(
-    sequence_data,
-    key = lambda x: np.mean([
-      x[1][col_name] for col_name in freq_columns
-      if col_name in library_constants.FREQ_COLUMNS[data_info['format']]
-    ]),
-  )
-
-  if node_type in ['variation', 'variation_grouped']:
-    xy_dict = {
-      id: [
-        data['variation_pos'],
-        int(data[library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN]),
-      ]
-      for id, data in sequence_data
-    }
-  else:
-    raise Exception('Unknown node type: ' + str(node_type))
-
-  return make_node_spacing_layout(
-    xy_dict,
-    grid_type,
-    node_size_px_dict = node_size_px_dict,
-    x_size_domain = x_size_domain,
-    y_size_domain = y_size_domain,
-    x_size_px = x_size_px,
-    y_size_px = y_size_px,
-  )
 
 def make_radial_layout(data_info, graph):
   node_list = graph.nodes(data=True)
@@ -874,22 +778,6 @@ def make_graph_layout_single(
     layout = nx.multipartite_layout(graph, subset_key='dist_ref')
   elif layout_type == 'multipartite_layout_freq':
     layout = nx.multipartite_layout(graph, subset_key='freq_rank_cat')
-  elif layout_type == 'variation_position_layout_square':
-    layout = make_variation_position_layout(data_info, graph, node_type, 'square')
-  elif layout_type == 'variation_position_layout_vertical':
-    layout = make_variation_position_layout(data_info, graph, node_type, 'vert')
-  elif layout_type == 'variation_position_layout_circle_pack':
-    layout = make_variation_position_layout(
-      data_info,
-      graph,
-      node_type,
-      'circle_pack',
-      node_size_px_dict = node_size_px_dict,
-      x_size_domain = x_size_domain,
-      y_size_domain = y_size_domain,
-      x_size_px = x_size_px,
-      y_size_px = y_size_px,
-    )
   else:
     raise Exception('Unknown layout type: ' + str(layout_type))
 
@@ -1839,25 +1727,6 @@ def make_graph_single_panel(
   graph = graph.subgraph(node_data.index)
 
   ### Make graph layout ###
-  extra_layout_args = {}
-  if graph_layout_type == 'variation_position_layout_circle_pack':
-    extra_layout_args['node_size_px_dict'] = plot_graph_helper.get_node_size(
-      data_info = data_info,
-      node_data = node_data,
-      node_type = node_type,
-      node_size_type = node_size_type,
-      node_size_min_px = node_size_min_px,
-      node_size_max_px = node_size_max_px,
-      node_size_min_freq = node_size_min_freq,
-      node_size_max_freq = node_size_max_freq,
-    ).to_dict()
-
-
-    extra_layout_args['x_size_domain'] = plot_range_x[1] - plot_range_x[0]
-    extra_layout_args['y_size_domain'] = plot_range_y[1] - plot_range_y[0]
-
-    extra_layout_args['x_size_px'] = subplot_width_px
-    extra_layout_args['y_size_px'] = subplot_height_px
 
   graph_layout_separate_components = (
     graph_layout_separate_components and
@@ -1875,7 +1744,6 @@ def make_graph_single_panel(
     precomputed_layout_dir = graph_layout_precomputed_dir,
     separate_components = graph_layout_separate_components,
     reverse_complement = sequence_reverse_complement,
-    **extra_layout_args,
   )
 
   ### Plot edges and nodes ###
@@ -1929,67 +1797,6 @@ def make_graph_single_panel(
       row = row,
       col = col,
     )
-  else:
-    if graph_layout_type in [
-      'variation_position_layout_square',
-      'variation_position_layout_vertical',
-      'variation_position_layout_circle_pack',
-    ]:
-      position_label_type = (
-        'absolute' if data_info['control_type'] == '30bpDown' else 'relative'
-      )
-      x_axis_tick_text = library_constants.get_position_labels(
-        position_label_type,
-        len(data_info['ref_seq_window'])
-      )
-      y_axis_tick_vals = list(range(
-        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
-        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
-      ))
-
-      x_axis_tick_vals = [
-        i for i in range(1, len(x_axis_tick_text) + 1)
-        if (int(x_axis_tick_text[i - 1]) % axis_tick_modulo) == 0
-      ]
-      y_axis_tick_vals = [i for i in y_axis_tick_vals if ((i % axis_tick_modulo) == 0)]
-
-      x_axis_tick_text = [x_axis_tick_text[i - 1] for i in x_axis_tick_vals]
-      y_axis_tick_text = [str(i) for i in y_axis_tick_vals]
-
-      figure.update_xaxes(
-        title = library_constants.POSITION_TITLE[position_label_type],
-        showgrid = True,
-        showline = True,
-        zeroline = True,
-        dtick = 1,
-        linecolor = 'black',
-        linewidth = line_width_scale,
-        title_font_size = library_constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
-        tickfont_size = library_constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
-        ticktext = x_axis_tick_text,
-        tickvals = x_axis_tick_vals,
-        range = plot_range_x,
-        row = row,
-        col = col,
-      )
-      figure.update_yaxes(
-        title = library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_LABEL[
-          library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_COLUMN
-        ],
-        showgrid = True,
-        showline = True,
-        zeroline = True,
-        dtick = 1,
-        linecolor = 'black',
-        linewidth = line_width_scale,
-        title_font_size = library_constants.GRAPH_AXES_TITLE_FONT_SIZE * axis_font_size_scale,
-        tickfont_size = library_constants.GRAPH_AXES_TICK_FONT_SIZE * axis_font_size_scale,
-        ticktext = y_axis_tick_text,
-        tickvals = y_axis_tick_vals,
-        range = plot_range_y,
-        row = row,
-        col = col,
-      )
   
   if plot_range_x is not None:
     figure.update_xaxes(
@@ -2177,22 +1984,7 @@ def make_graph_figure(
       if x not in ['substitution', 'mixed']
     ]
 
-  if graph_layout_type in [
-    'variation_position_layout_square',
-    'variation_position_layout_vertical',
-    'variation_position_layout_circle_pack',
-  ]:
-    if plot_range_x is None:
-      plot_range_x = [
-        library_constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[0] - 1,
-        library_constants.VARIATION_POSITION_LAYOUT_POSITION_RANGE[1] + 1,
-      ]
-    if plot_range_y is None:
-      plot_range_y = [
-        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[0],
-        library_constants.VARIATION_POSITION_LAYOUT_DISTANCE_RANGE[1] + 1,
-      ]
-  elif 'plot_range' in LAYOUT_PROPERTIES[graph_layout_type]:
+  if 'plot_range' in LAYOUT_PROPERTIES[graph_layout_type]:
     if plot_range_x is None:
       plot_range_x = LAYOUT_PROPERTIES[graph_layout_type]['plot_range']['x']
     if plot_range_y is None:
@@ -2218,9 +2010,6 @@ def make_graph_figure(
 
   shared_x_axes = 'all'
   shared_y_axes = 'all'
-  if graph_layout_type == 'variation_position_layout_circle_pack':
-    shared_x_axes = False
-    shared_y_axes = False
 
   if row_heights_px is None:
     row_heights_px = [library_constants.GRAPH_SUBPLOT_HEIGHT_PX] * num_rows_total
