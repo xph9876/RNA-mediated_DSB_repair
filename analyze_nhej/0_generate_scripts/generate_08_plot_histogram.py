@@ -7,13 +7,16 @@ import generate_constants
 import library_constants
 import generate_05_histogram_data
 
-def get_input_dir(name):
-  return generate_05_histogram_data.get_output_dir(name)
+def get_input_dir(name, ext):
+  return generate_05_histogram_data.get_output_dir(name, ext)
 
-def get_output_dir(subst_type):
-  return os.path.join(
-    generate_constants.OUTPUT_DIR['plot_histogram'],
-    subst_type,
+def get_output_dir(subst_type, ext):
+  return generate_constants.join_path(
+    [
+      generate_constants.get_output_dir('plot_histogram', ext),
+      subst_type,
+    ],
+    ext = ext,
   )
 
 if __name__ == '__main__':
@@ -24,8 +27,8 @@ if __name__ == '__main__':
       encoding = generate_constants.OUTPUT_ENCODING[script_ext],
     ) as file_out:
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
-        output_dir = get_output_dir(library_constants.SUBST_WITH)
-        input_dir = get_input_dir(info['name'])
+        output_dir = get_output_dir(library_constants.SUBST_WITH, script_ext)
+        input_dir = get_input_dir(info['name'], script_ext)
 
         arg_reverse_pos = (
           ''
@@ -37,5 +40,5 @@ if __name__ == '__main__':
           if (info['control_type'] == library_constants.CONTROL_30BPDOWN) else
           'relative'
         )
-        file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['plot_histogram']} --input {input_dir} --output {output_dir} {arg_reverse_pos} {arg_label_type}\n")
+        file_out.write(f"python {generate_constants.get_python_script('plot_histogram', script_ext)} --input {input_dir} --output {output_dir} {arg_reverse_pos} {arg_label_type}\n")
       log_utils.log(file_out.name)

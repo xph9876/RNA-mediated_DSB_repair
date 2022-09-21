@@ -42,7 +42,7 @@ To reproduce the NHEJ analyses of the [publication](#citation), the output SAM f
 * *&lt;strand&gt;*: Strand. "R1" for forward and "R2" for reverse.
 * *&lt;construct&gt;*: Plasmid construct. "sense" for Sense, "branch" for BranchΔ, "cmv" for pCMVΔ, "antisense" for "Antisense", "splicing" for 5'-SplicingΔ.
 
-Example: *yjl89_WT_sgCD_R1_antisense.sam*. CONTINUE HERE. Explain that all the SAM files must be present for scripts to run.
+Example: *yjl89_WT_sgCD_R1_antisense.sam*. The scripts such as "run_0
 
 ## Pipeline Stages
 

@@ -6,22 +6,33 @@ import library_constants
 import generate_constants
 import generate_07_plot_graph
 
-def get_output_file(cell_line, dsb_type, version):
+def get_output_file(cell_line, dsb_type, version, ext):
   version_str = (
     ''
     if (version == library_constants.VERSION_NONE) else
     ('_' + version)
   )
-  return os.path.join(
-    generate_constants.OUTPUT_DIR['pptx'],
-    'graph',
-    cell_line + '_' + dsb_type + version_str + os.extsep + 'pptx',
+  return generate_constants.join_path(
+    [
+      generate_constants.get_output_dir('pptx', ext),
+      'graph',
+      cell_line + '_' + dsb_type + version_str + os.extsep + 'pptx',
+    ],
+    ext,
   )
 
-def get_input_file(experiment_name, layout_name, format, ext = 'png'):
-  return os.path.join(
-    generate_07_plot_graph.get_output_dir(layout_name, format, ext),
-    experiment_name + os.path.extsep + ext
+def get_input_file(experiment_name, layout_name, format, file_ext, script_ext):
+  return generate_constants.join_path(
+    [
+      generate_07_plot_graph.get_output_dir(
+        layout_name,
+        format,
+        file_ext = file_ext,
+        script_ext = script_ext,
+      ),
+      experiment_name + os.path.extsep + file_ext,
+    ],
+    script_ext,
   )
 
 TOTAL_WIDTH = {
@@ -54,7 +65,11 @@ if __name__ == '__main__':
           elif dsb_type == library_constants.DSB_TYPE_2anti:
             constructs_individual = library_constants.CONSTRUCTS_INDIVIDUAL_ANTISENSE
             constructs_comparison = library_constants.CONSTRUCTS_COMPARISON_ANTISENSE
-            version_list = [library_constants.VERSION_OLD, library_constants.VERSION_NEW, library_constants.VERSION_MERGED]
+            version_list = [
+              library_constants.VERSION_OLD,
+              library_constants.VERSION_NEW,
+              library_constants.VERSION_MERGED,
+            ]
           else:
             raise Exception('Unknown dsb_type: ' + dsb_type)
           
@@ -100,6 +115,8 @@ if __name__ == '__main__':
                     experiment_name = info['name'],
                     layout_name = generate_constants.USE_LAYOUT,
                     format = format,
+                    file_ext = 'png',
+                    script_ext = ext,
                   ))
                   label_list.append(
                     library_constants.LABELS[info['guide_rna']] +
@@ -118,7 +135,7 @@ if __name__ == '__main__':
             arg_num_rows = '--num_rows ' + ' '.join(str(x) for x in num_rows_list)
             arg_num_cols = '--num_cols ' + ' '.join(str(x) for x in num_cols_list)
             arg_total_width = '--total_width ' + ' '.join(str(x) for x in total_width_list)
-            arg_output = '--output ' + get_output_file(cell_line, dsb_type, info['version'])
-            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_pptx']} {arg_input} {arg_output} {arg_labels} {arg_num_grids} {arg_num_rows} {arg_num_cols} {arg_total_width} {ARG_LEGEND}\n")
+            arg_output = '--output ' + get_output_file(cell_line, dsb_type, info['version'], ext)
+            file_out.write(f"python {generate_constants.get_python_script('get_pptx', ext)} {arg_input} {arg_output} {arg_labels} {arg_num_grids} {arg_num_rows} {arg_num_cols} {arg_total_width} {ARG_LEGEND}\n")
       log_utils.log(file_out.name)
 

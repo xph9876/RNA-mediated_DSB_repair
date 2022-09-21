@@ -7,18 +7,21 @@ import library_constants
 import generate_04_graph_data
 import generate_06_precomputed_layout
 
-def get_input_dir(name):
-  return generate_04_graph_data.get_output_dir(name)
+def get_input_dir(name, ext):
+  return generate_04_graph_data.get_output_dir(name, ext)
 
-def get_layout_dir(layout_name, layout_group):
-  return generate_06_precomputed_layout.get_output_dir(layout_name, layout_group)
+def get_layout_dir(layout_name, layout_group, ext):
+  return generate_06_precomputed_layout.get_output_dir(layout_name, layout_group, ext)
 
-def get_output_dir(layout_name, format, ext):
-  return os.path.join(
-    generate_constants.OUTPUT_DIR['plot_graph'],
-    layout_name,
-    format,
-    ext
+def get_output_dir(layout_name, format, file_ext, script_ext):
+  return generate_constants.join_path(
+    [
+      generate_constants.get_output_dir('plot_graph', script_ext),
+      layout_name,
+      format,
+      file_ext
+    ],
+    script_ext,
   )
 
 if __name__ == '__main__':
@@ -34,8 +37,13 @@ if __name__ == '__main__':
           generate_constants.EXPERIMENT_INFO_COMPARISON.to_dict('records')
         ):
           if info['control_type'] == library_constants.CONTROL_NOT:
-            input_dir = get_input_dir(info['name'])
-            output_dir = get_output_dir(generate_constants.USE_LAYOUT, info['format'], output_ext)
+            input_dir = get_input_dir(info['name'], script_ext)
+            output_dir = get_output_dir(
+              generate_constants.USE_LAYOUT,
+              info['format'],
+              file_ext = output_ext,
+              script_ext = script_ext,
+            )
             if generate_constants.USE_LAYOUT == generate_constants.LAYOUT_UNIVERSAL:
               range_x = {
                 generate_constants.LAYOUT_GROUP_2DSB: [-12, 13],
@@ -61,7 +69,8 @@ if __name__ == '__main__':
                 '--precomputed_layout_dir ' +
                 generate_06_precomputed_layout.get_output_dir(
                   generate_constants.USE_LAYOUT,
-                  info['layout_group']
+                  info['layout_group'],
+                  script_ext,
                 )
               )
             else:
@@ -129,5 +138,5 @@ if __name__ == '__main__':
               arg_universal_layout_max_tick = ''
             arg_ext = '--ext ' + output_ext
 
-            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['plot_graph']} --input {input_dir} --output {output_dir} {arg_precomputed_layout_dir} {arg_ext} {arg_layout} {arg_reverse_complement} {arg_width_height} {arg_range_x} {arg_range_y} {arg_universal_layout_axis_pos} {arg_universal_layout_max_tick}\n")
+            file_out.write(f"python {generate_constants.get_python_script('plot_graph', script_ext)} --input {input_dir} --output {output_dir} {arg_precomputed_layout_dir} {arg_ext} {arg_layout} {arg_reverse_complement} {arg_width_height} {arg_range_x} {arg_range_y} {arg_universal_layout_axis_pos} {arg_universal_layout_max_tick}\n")
         log_utils.log(file_out.name)

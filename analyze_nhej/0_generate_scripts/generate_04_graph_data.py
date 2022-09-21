@@ -7,13 +7,16 @@ import generate_constants
 import library_constants
 import generate_03_get_window
 
-def get_input_dir(name):
-  return generate_03_get_window.get_output_dir(name)
+def get_input_dir(name, ext):
+  return generate_03_get_window.get_output_dir(name, ext)
 
-def get_output_dir(name):
-  return os.path.join(
-    generate_constants.OUTPUT_DIR['graph'],
-    name,
+def get_output_dir(name, ext):
+  return generate_constants.join_path(
+    [
+      generate_constants.get_output_dir('graph', ext),
+      name,
+    ],
+    ext,
   )
 
 if __name__ == '__main__':
@@ -28,7 +31,7 @@ if __name__ == '__main__':
           generate_constants.EXPERIMENT_INFO.to_dict('records') +
           generate_constants.EXPERIMENT_INFO_COMPARISON.to_dict('records')
         ):
-          input_dir = get_input_dir(info['name'])
-          output_dir = get_output_dir(info['name'])
-          file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_graph_data']} --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
+          input_dir = get_input_dir(info['name'], ext)
+          output_dir = get_output_dir(info['name'], ext)
+          file_out.write(f"python {generate_constants.get_python_script('get_graph_data', ext)} --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
       log_utils.log(file_out.name)

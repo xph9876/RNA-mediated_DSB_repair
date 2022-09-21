@@ -46,7 +46,7 @@ TOTAL_READS = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'total
 def get_total_reads(info):
   x = TOTAL_READS.loc[
     (TOTAL_READS['library'] == info['library']),
-    info['strand']
+    info['strand']  
   ]
   if x.shape[0] != 1:
     raise Exception(f'Got {x.shape[0]} values. Expected 1.')
@@ -224,6 +224,14 @@ def get_experiment_info_comparison():
 
 EXPERIMENT_INFO_COMPARISON = get_experiment_info_comparison()
 
+PATH_SEP = {'sh': '/', 'ps1': '\\'}
+
+def join_path(paths, ext):
+  return PATH_SEP[ext].join(paths)
+
+def rejoin_path(path, ext):
+  return join_path(path.split(os.path.sep), ext)
+
 REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {
   'sam': 'data_0_sam',
@@ -237,6 +245,19 @@ OUTPUT_DIR = {
   'plot_histogram': os.path.join('plot', 'histogram'),
   'pptx': 'pptx',
   'library_summary': 'data_7_library_summary',
+}
+
+def get_output_dir(key, ext):
+  return rejoin_path(OUTPUT_DIR[key], ext)
+
+OUTPUT_ENCODING = {
+  'sh': 'utf-8',
+  'ps1': 'utf_8_sig',
+}
+
+ARG_NEWLINE = {
+  'sh': '\\n',
+  'ps1': '`n',
 }
 
 PYTHON_SCRIPTS = {
@@ -253,6 +274,9 @@ PYTHON_SCRIPTS = {
   'plot_histogram': os.path.join('6_plot_histogram', 'plot_histogram.py'),
   'get_pptx': os.path.join('7_get_pptx', 'get_pptx.py'),
 }
+
+def get_python_script(key, ext):
+  return rejoin_path(PYTHON_SCRIPTS[key], ext)
 
 def check_scripts_exits():
   for x in PYTHON_SCRIPTS.values():
@@ -274,12 +298,3 @@ USE_LAYOUT = LAYOUT_UNIVERSAL
 GRAPH_HEIGHT_PX = 1800
 GRAPH_WIDTH_PX = 2400
 
-OUTPUT_ENCODING = {
-  'sh': 'utf-8',
-  'ps1': 'utf_8_sig',
-}
-
-ARG_NEWLINE = {
-  'sh': '\\n',
-  'ps1': '`n',
-}

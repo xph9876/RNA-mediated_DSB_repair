@@ -6,20 +6,27 @@ import library_constants
 import generate_constants
 import generate_08_plot_histogram
 
-def get_output_file(cell_line, intron_type, version):
+def get_output_file(cell_line, intron_type, version, ext):
   version_str = '' if (version == library_constants.VERSION_NONE) else ('_' + version)
-  return os.path.join(
-    generate_constants.OUTPUT_DIR['pptx'],
-    'histogram',
-    cell_line + '_' + intron_type + version_str + os.extsep + 'pptx',
+  return generate_constants.join_path(
+    [
+      generate_constants.get_output_dir('pptx', ext),
+      'histogram',
+      cell_line + '_' + intron_type + version_str + os.extsep + 'pptx',
+    ],
+    ext,
   )
 
-def get_input_file(experiment_name, variation_type, ext = 'png'):
-  return os.path.join(
-    generate_08_plot_histogram.get_output_dir(
-      library_constants.SUBST_WITH
-    ),
-    experiment_name + '_' + variation_type + os.path.extsep + ext
+def get_input_file(experiment_name, variation_type, file_ext, script_ext):
+  return generate_constants.join_path(
+    [
+      generate_08_plot_histogram.get_output_dir(
+        library_constants.SUBST_WITH,
+        ext,
+      ),
+      experiment_name + '_' + variation_type + os.path.extsep + file_ext,
+    ],
+    script_ext,
   )
 
 VARIATION_TYPES = [
@@ -108,14 +115,14 @@ if __name__ == '__main__':
                   library_constants.VARIATION_DELETION,
                   library_constants.VARIATION_SUBSTITUTION,
                 ]:
-                  file_list.append(get_input_file(info['name'], variation_type))
+                  file_list.append(get_input_file(info['name'], variation_type, file_ext='png', script_ext=ext))
             arg_input = '--input ' + ' '.join(file_list)
             arg_top_margin_labels = '--top_margin_labels ' + ' '.join(f'"{x}"' for x in top_labels)
             arg_left_margin_labels = '--left_margin_labels ' + ' '.join(f'"{x}"' for x in left_labels)
             arg_num_grids = '--num_grids 1'
             arg_num_rows = '--num_rows ' + str(num_rows)
             arg_num_cols = '--num_cols ' + str(num_cols)
-            arg_output = '--output ' + get_output_file(cell_line, intron_type, version)
-            file_out.write(f"python {generate_constants.PYTHON_SCRIPTS['get_pptx']} {arg_input} {arg_output} {arg_top_margin_labels} {arg_left_margin_labels} {arg_num_grids} {arg_num_rows} {arg_num_cols}\n")
+            arg_output = '--output ' + get_output_file(cell_line, intron_type, version, ext)
+            file_out.write(f"python {generate_constants.get_python_script('get_pptx', ext)} {arg_input} {arg_output} {arg_top_margin_labels} {arg_left_margin_labels} {arg_num_grids} {arg_num_rows} {arg_num_cols}\n")
       log_utils.log(file_out.name)
 
