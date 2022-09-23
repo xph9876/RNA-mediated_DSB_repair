@@ -28,7 +28,7 @@ Python packages:
 * scipy 1.9.1
 * XlsxWriter 3.0.3
 
-The full output of ```pip freeze``` is given in `python_packages.txt`. Note, for PNG image output from the plotly library, a backend known as [orca](https://github.com/plotly/orca) had to be used due to to problems with the [kaleido](https://github.com/plotly/Kaleido) backend (at least on Windows). Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of orca.
+The full output of ```pip freeze``` is given in `python_packages.txt`. Note, for PNG image output from the [Plotly](https://plotly.com/) library, a backend known as [Orca](https://github.com/plotly/orca) had to be used due to to problems with the [Kaleido](https://github.com/plotly/Kaleido) backend (at least on Windows). Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of Orca.
 
 ## Citation
 
@@ -51,9 +51,9 @@ The raw input for the NHEJ pipeline are the trimmed FASTQ files from the trimmin
 
 Where `<ref_name>` is the name of reference sequence, `<fastq_name>` is the name of the trimmed FASTQ file, and `<sam_name>` is the name of the output SAM file.
 
-For the premade `*.sh` and `*.ps1` scripts to be run successfully, all SAM files produced as described above must be placed in the `data_0_sam` directory. Each SAM file must also be named in the format: `<library>_<cell_line>_<guide_rna>_<construct>.sam` where
+For the pre-made `*.sh` and `*.ps1` scripts to be run successfully, all SAM files produced as described above must be placed in the `data_0_sam` directory. Each SAM file must also be named in the format: `<library>_<cell_line>_<guide_rna>_<construct>.sam` where
 
-* `<library>`: Name of the libary (alphanumeric).
+* `<library>`: Name of the library (alphanumeric).
 * `<cell_line>`: Cell line. `WT` for wild type and `KO` for knock-out.
 * `<guide_rna>`: Guide RNA. Choices: `sgA`, `sgB`, `sgAB`, or `sgCD`.
 * `<strand>`: Strand. `R1` for forward and `R2` for reverse.
@@ -63,11 +63,11 @@ Example: `yjl89_WT_sgCD_R1_antisense.sam`.
 
 Please see `bowtie2_arguments.tsv` for a list of the libraries used in this analysis, their corresponding reference-sequence files, and the proper SAM file names.
 
-### 0_generate_scripts
+### `0_generate_scripts`
 
-Meta-scripts used to generate the `*.sh` and `*.ps1` scripts for running the data processing pipeline on the data sets for the [publication](#citation). These are not required if using any of the pipline stages individually. All `generate_*.py` scripts are run without arguments. 
+Meta-scripts used to generate the `*.sh` and `*.ps1` scripts for running the data processing pipeline on the data sets for the [publication](#citation). These are not required if using any of the pipeline stages individually. All `generate_*.py` scripts are run without arguments. 
 
-### 1_process_nhej
+### `1_process_nhej`
 
 Initial processing of raw SAM files which have been aligned to a reference sequence.
 
@@ -91,7 +91,7 @@ Arguments:
 
 #### `combine_repeat.py`
 
-Combines tables produced with [`filter_nhej.py`](#filternhejpy) representing biological repeats into a single file. The input must be tab-separate file produced with the  script and the ouput.
+Combines tables produced with [`filter_nhej.py`](#filternhejpy) representing biological repeats into a single file. The input must be tab-separate file produced with the  script and the output.
 
 Arguments:
 
@@ -101,9 +101,9 @@ Arguments:
 
 * `--quiet`: If present, do not output extra log messages.
 
-### 2_get_window_data
+### `2_get_window_data`
 
-Scripts for further processing the raw NHEJ data in order to extract window around the DSB, convert raw counts to frequencies, merge experiments which have been sequenced twice, and precompute other data used for downstream visulizations.
+Scripts for further processing the raw NHEJ data in order to extract window around the DSB, convert raw counts to frequencies, merge experiments which have been sequenced twice, and pre-compute other data used for downstream visualizations.
 
 ### `get_window.py`
 
@@ -115,7 +115,7 @@ Arguments:
 
 * `--ref_seq_file`: Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.
 
-* `--output`: Output directory. The output file will be TSV format and named like `window_*.py`, with the suffix after `window_` indicating the characteristics of the file (e.g., with/without subsitutions, mean/count, or filtered). The library metadata is also output in `data_info.tsv`.
+* `--output`: Output directory. The output file will be TSV format and named like `window_*.py`, with the suffix after `window_` indicating the characteristics of the file (e.g., with/without substitutions, mean/count, or filtered). The library metadata is also output in `data_info.tsv`.
 
 * `--dsb_pos`: Position on reference sequence immediately upstream of DSB site (i.e., the DSB is between 1-based position `DSB_POS` and `DSB_POS + 1`.).
 
@@ -125,7 +125,7 @@ Arguments:
 
 * `--anchor_mismatches`: Maximum number of mismatches allowed on the left/right anchor sequences. Reads with more than the allowed number of mismatches on the left/right anchor will be discarded. The mismatches on the left/right are counted separately.
 
-* `--subst_type`: Whether to keep or ignore alignment substitutions. If ignoring aligment substitutions, the corresponding nucleotide on the read is replaced with the reference sequence nucleotide.
+* `--subst_type`: Whether to keep or ignore alignment substitutions. If ignoring alignment substitutions, the corresponding nucleotide on the read is replaced with the reference sequence nucleotide.
 
 * `--construct`: Name of construct (e.g., Sense, Antisense, etc.,). Used only in the library metadata.
 
@@ -155,11 +155,11 @@ Arguments:
 
 * `--subst_type`: Whether to process the files with/without substitutions.
 
-* `--freq_min`: Minimum frequency for output in windows_freq_filter_mean.tsv. Sequences with frequences <= FREQ_MIN are discarded.
+* `--freq_min`: Minimum frequency for output in windows_freq_filter_mean.tsv. Sequences with frequencies <= FREQ_MIN are discarded.
 
 #### `get_merged.py`
 
-Merge together library files from samples that have beem sequenced twice. Operates on the output of [`get_window.py`](#getwindowpy).
+Merge together library files from samples that have been sequenced twice. Operates on the output of [`get_window.py`](#getwindowpy).
 
 Arguments:
 
@@ -185,11 +185,11 @@ Arguments:
 
 * `--subst_type`: Whether to operate on files with/without substitutions.
 
-### 3_get_graph_data
+### `3_get_graph_data`
 
 #### `get_graph_data.py`
 
-Precompute the necessary data for the variation-distance graphs. Uses as input the output of the [2_get_window_data](#2getwindowdata) stage and outputs the following files:
+Pre-compute the necessary data for the variation-distance graphs. Uses as input the output of the [`2_get_window_data`](#2getwindowdata) stage and outputs the following files:
 
 * `sequence_data_&ast.tsv`: Table of the vertex data for the variation distance graphs. Each row represents a single vertex.
 
@@ -201,17 +201,17 @@ Precompute the necessary data for the variation-distance graphs. Uses as input t
 
 Arguments:
 
-* `--input`: Directory with output from [2_get_window_data](#2getwindowdata) stage.
+* `--input`: Directory with output from [`2_get_window_data`](#2getwindowdata) stage.
 
 * `--output`: Output directory.
 
 * `--subst_type`: Whether to process the files with/without substitutions.
 
-### 4_get_histogram_data
+### `4_get_histogram_data`
 
 #### `get_histogram_data.py`
 
-Precomputes the necessary data for the variation-position histgrams. Uses as input the output of the [3_get_graph_data](#3getgraphdata) stage and outputs the following files:
+Pre-computes the necessary data for the variation-position histograms. Uses as input the output of the [`3_get_graph_data`](#3getgraphdata) stage and outputs the following files:
 
 * `variation_*.tsv`: Contains data on individual variations of each sequence window in the `sequence_*.tsv` files. Each row represents a single variation (insertion, deletion, or substitution) in a sequence alignment.
 
@@ -219,31 +219,31 @@ Precomputes the necessary data for the variation-position histgrams. Uses as inp
 
 Arguments:
 
-* `--input`: Directory with output from [3_get_graph_data](#3getgraphdata).
+* `--input`: Directory with output from [`3_get_graph_data`](#3getgraphdata).
 
 * `--output`: Output directory.
 
 * `--subst_type`: Whether to process the files with/without substitutions.
 
-### 5_plot_graph
+### `5_plot_graph`
 
-Code for laying out and plotting variation-distance graphs. Uses output from [3_get_graph_data](#3getgraphdata). For more information about how the vertex sizes, vertex colors, edges, and layouts are computed please see the [publication](#citation).
+Code for laying out and plotting variation-distance graphs. Uses output from [`3_get_graph_data`](#3getgraphdata). For more information about how the vertex sizes, vertex colors, edges, and layouts are computed please see the [publication](#citation).
 
 A brief description of the layouts:
 
-* radial: Arranges vetices in a radial grid around the reference sequence. Insertion (deletion) vertices are placed above (below) the reference sequence. Heuristics are used to improve aesthesics of vertex placement, though this may not easily generalize to new data.
+* `radial`: Arranges vertices in a radial grid around the reference sequence. Insertion (deletion) vertices are placed above (below) the reference sequence. Heuristics are used to improve aesthetics of vertex placement, though this may not easily generalize to new data.
 
-* mds: Uses multi-dimensional scaling (MDS) to embed the pairwise Levenshtein distance matrix into 2D. 
+* `mds`: Uses multi-dimensional scaling (MDS) to embed the pairwise Levenshtein distance matrix into 2D. 
 
-* kamada: Uses the [NetworkX](http://networkx.org) package's implementation of the Kamada-Kawaii algorithm to layout the graph. Reference: T. Kamada and S. Kawai. An algorithm for drawing general undirected graphs. *Inform. Process. Lett.*, 31:7–15, 1989.
+* `kamada`: Uses the [NetworkX](http://networkx.org) package's implementation of the Kamada-Kawaii algorithm to layout the graph. Reference: T. Kamada and S. Kawaii. An algorithm for drawing general undirected graphs. *Inform. Process. Lett.*, 31:7–15, 1989.
 
-* universal: Uses a deterministic layout described in the Methods of the [publication](#citation).
+* `universal`: Uses a deterministic layout described in the Methods of the [publication](#citation).
 
-* fractal: Currently only lays out insertions vertices in a fractal like grid by repeatedly subdividing a square into 4 smaller squares. Each successive nucleotide of the inserted sequence determines which square is selected. `A` goes top-left, `C` goes top-right, `G` goes bottom-left, and `T` goes bottom-right.
+* `fractal`: Currently only lays out insertions vertices in a fractal like grid by repeatedly subdividing a square into 4 smaller squares. Each successive nucleotide of the inserted sequence determines which square is selected. `A` goes top-left, `C` goes top-right, `G` goes bottom-left, and `T` goes bottom-right.
 
 #### `get_precomputed_layout.py`
 
-Precomputes the layout for groups of experiments by taking the union of all sequences in all input experiments and laying them out. This allows experiments with the same reference sequence to have the same coordinates for the same sequence. All experiments should have the same window reference sequence and be individual (not comparison) experiments. 
+Pre-computes the layout for groups of experiments by taking the union of all sequences in all input experiments and laying them out. This allows experiments with the same reference sequence to have the same coordinates for the same sequence. All experiments should have the same window reference sequence and be individual (not comparison) experiments. 
 
 See code of [`plot_graph.py`](#plotgraphpy) for the implementation of each layout.
 
@@ -257,19 +257,19 @@ Arguments:
 
 * `--subst_type`: Whether to process files with/without substitutions.
 
-* `--layout`: One of `radial`, `mds`, `kamada`, or `universal`. See the introduction of [5_plot_graph](#5plotgraph) for a description of each layout.
+* `--layout`: One of `radial`, `mds`, `kamada`, or `universal`. See the introduction of [`5_plot_graph`](#5plotgraph) for a description of each layout.
 
 #### `plot_graph.py`
 
-Does layout and plotting of the processed graph data from [3_get_graph_data](#3getgraphdata).
+Does layout and plotting of the processed graph data from [`3_get_graph_data`](#3getgraphdata).
 
 Arguments:
 
-* `--input`: Directory with the data files produced with [3_get_graph_data](#3getgraphdata).
+* `--input`: Directory with the data files produced with [`3_get_graph_data`](#3getgraphdata).
 
 * `--output`: Output directory. Optional, if not given no output will be written. If given, the output files is named the same as the `INPUT` directory with the appropriate files extension (e.g., `.png` or `.html`).
 
-* `--ext`: File type of output. Choices: `png` or `html`. The library used to produce the output is [Plotly](https://plotly.com/). PNG output is a static image. HTML output is interactive and allows zooming/panning and proide more detail on vertices/edges through hover boxes.
+* `--ext`: File type of output. Choices: `png` or `html`. The library used to produce the output is [Plotly](https://plotly.com/). PNG output is a static image. HTML output is interactive and allows zooming/panning and provide more detail on vertices/edges through hover boxes.
 
 * `--title`: If present, shows a title describing the experiment using the metadata stored in the INPUT directory.
 
@@ -313,7 +313,7 @@ Arguments:
 
 * `--font_size_scale`: How much to scale the font size. Values > 1 increase the font size; values < 1 decrease it.
 
-* `--precomputed_layout_dir`: If present, gives the directory where the precomputed layouts are. This directory must contain the output of [`get_precompued_layout.py`](#getprecomputedlayoutpy). If not present, the layout is computed newly.
+* `--precomputed_layout_dir`: If present, gives the directory where the precomputed layouts are. This directory must contain the output of [`get_precomputed_layout.py`](#getprecomputedlayoutpy). If not present, the layout is computed newly.
 
 * `--reverse_complement`: If present, uses the reverse complement of sequences when determining the node positions, and displaying labels and hover text. This affects the precomputed layout, universal layout, and fractal layout.
 
@@ -329,25 +329,25 @@ Arguments:
 
 * `--legend_color_bar_scale`: How much to scale the legend color bar (for freq ratio coloring). Values > 1 increase the size and values < decrease the size.
 
-* `--separate_components`: If present, separate the connected components of the graph. Currently, this means that the plot is partitioned into a grid with the reference sequence component getting the largest space and other componnets getting smaller spaces along the border.
+* `--separate_components`: If present, separate the connected components of the graph. Currently, this means that the plot is partitioned into a grid with the reference sequence component getting the largest space and other components getting smaller spaces along the border.
 
-### 6_plot_histogram
+### `6_plot_histogram`
 
 #### `plot_histogram.py`
 
-Plots the 3D histograms showing the variation type/position/frequency of the DSB-sequence windows of experiments. Uses the output of [4_get_histogram_data](#4gethistogramdata). Uses [matplotlib](https://matplotlib.org/) for the plotting.
+Plots the 3D histograms showing the variation type/position/frequency of the DSB-sequence windows of experiments. Uses the output of [`4_get_histogram_data`](#4gethistogramdata). Uses [matplotlib](https://matplotlib.org/) for the plotting.
 
 Arguments:
 
-* `--input`: Directory with the data files which are output from [4_get_histogram_data](#4gethistogramdata).
+* `--input`: Directory with the data files which are output from [`4_get_histogram_data`](#4gethistogramdata).
 
 * `--output`: Output directory. Three images are output for each of the 3 variations: insertion, deletion, substitution. The files are named with the name of the INPUT directory and the variations type.
 
-* `--reverse_pos`: If presetnt, reverse the x-axis positions. Useful if the input is from reverse strand data and you want to compare it with forward strand data.
+* `--reverse_pos`: If present, reverse the x-axis positions. Useful if the input is from reverse strand data and you want to compare it with forward strand data.
 
 * `--label_type`: Whether to index the x-axis by `absolute` positions on the reference sequence from `1` to `ref_length`, or `relative` positions from `-ref_length/2` to `ref_length/2` (skipping 0). The relative labeling assumes that the DSB is between `ref_length/2` and `ref_length/2 + 1`. Here `ref_length` refers to the length of windowed reference sequence, which in current analyses is always 20.
 
-### 7_get_pptx
+### `7_get_pptx`
 
 #### `get_pptx.py`
 
