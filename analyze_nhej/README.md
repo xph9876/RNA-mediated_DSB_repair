@@ -8,27 +8,29 @@ This folder contains the processing pipeline for the NHEJ (nonhomologous end joi
 
 Tested OS: Windows 10 Home.
 
-Python version: Python 3.10.6.
+Software:
+* Python 3.10.6
+* Bowtie2 VERSION
 
 Python packages:
-* kaleido (0.2.1)
-* matplotlib (3.5.3)
-* networkx (2.8.6)
-* numpy (1.23.2)
-* pandas (1.4.3)
-* Pillow (9.2.0)
-* plotly (5.10.0)
-* psutil (5.9.1)
-* python-Levenshtein (0.12.2)
-* python-pptx (0.6.21)
-* requests (2.28.1)
-* scikit-learn (1.1.2)
-* scipy (1.9.1)
-* XlsxWriter (3.0.3)
+* kaleido 0.2.1
+* matplotlib 3.5.3
+* networkx 2.8.6
+* numpy 1.23.2
+* pandas 1.4.3
+* Pillow 9.2.0
+* plotly 5.10.0
+* psutil 5.9.1
+* python-Levenshtein 0.12.2
+* python-pptx 0.6.21
+* requests 2.28.1
+* scikit-learn 1.1.2
+* scipy 1.9.1
+* XlsxWriter 3.0.3
 
-The full output of ```pip freeze``` is given in *python_packages.txt*. Note, for PNG image output from the plotly library on Windows, a backend known as [*orca*](https://github.com/plotly/orca) had to be used due to to problems with the [*kaleido*](https://github.com/plotly/Kaleido) backend. Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of orca.
+The full output of ```pip freeze``` is given in *python_packages.txt*. Note, for PNG image output from the plotly library, a backend known as [*orca*](https://github.com/plotly/orca) had to be used due to to problems with the [*kaleido*](https://github.com/plotly/Kaleido) backend (at least on Windows). Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of orca.
 
-## Publication Citation
+## Citation
 
 Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In preparation*.
 
@@ -36,7 +38,20 @@ Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022).
 
 To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form *&ast;.sh* and *&ast;.ps1* (such as *run_01_process_nhej.ps1*/*run_01_process_nhej.sh*) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts *run_all.sh* and *run_all.ps1* run all stages. All scripts must be run with the *analyze_nhej* directory as the current working directory of the terminal.
 
-For the scripts to be run successfully, all SAM files from the trimming and alignment stages of the pipeline must be placed in the *data_0_sam* directory. Each SAM file must be named in the format: *&lt;library&gt;&lowbar;&lt;cell_line&gt;&lowbar;&lt;guide_rna&gt;&lowbar;&lt;construct&gt;.sam* where
+## Pipeline Stages
+
+### Alignment
+
+The raw input for the NHEJ pipeline are the trimmed FASTQ files from the trimming stage (see parent directory). The trimmed FASTQ files must be alignment against the appropriate reference sequence in the directory *ref_seq*. Bowtie2 should be used with the default settings:
+
+```
+  bowtie2-build <ref_name>.fa <ref_name>
+  bowtie2 -x <ref_name> <fastq_name>.fa -S <sam_name>.sam
+```
+
+Where `<ref_name>` is the name of reference sequence, `<fastq_name>` is the name of the trimmed FASTQ file, and `<sam_name>` is the name of the output SAM file.
+
+For the premade *&ast;.sh* and *&ast;.ps1* scripts to be run successfully, all SAM files produced as described above must be placed in the *data_0_sam* directory. Each SAM file must also be named in the format: *&lt;library&gt;&lowbar;&lt;cell_line&gt;&lowbar;&lt;guide_rna&gt;&lowbar;&lt;construct&gt;.sam* where
 
 * *&lt;library&gt;*: Name of the libary (alphanumeric).
 * *&lt;cell_line&gt;*: Cell line. "WT" for wild type and "KO" for knock-out.
@@ -44,9 +59,9 @@ For the scripts to be run successfully, all SAM files from the trimming and alig
 * *&lt;strand&gt;*: Strand. "R1" for forward and "R2" for reverse.
 * *&lt;construct&gt;*: Plasmid construct. "sense" for Sense, "branch" for BranchΔ, "cmv" for pCMVΔ, "antisense" for "Antisense", "splicing" for 5'-SplicingΔ.
 
-Example: *yjl89_WT_sgCD_R1_antisense.sam*. All SAM files used in 
+Example: *yjl89_WT_sgCD_R1_antisense.sam*.
 
-## Pipeline Stages
+Please see *bowtie2_arguments.tsv* for a list of the libraries used in this analysis, their corresponding reference-sequence files, and the proper SAM file names.
 
 ### 0_generate_scripts
 
