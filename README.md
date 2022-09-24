@@ -2,7 +2,7 @@
 
 ## Description
 
-Contains the code for the computational analysis presented in the [publication](#citation).
+Contains the code for the computational analysis presented in the [publication](#citation). Please mee the Methods section of this publication for a more detailed description of the code.
 
 ## Citation
 
@@ -10,7 +10,7 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Files/Directories
 
-* `scripts`: Python scripts for microhomology mediated end joining (MMEJ) analysis, read trimming, and read categorization.
+* `scripts`: Python scripts for microhomology mediated end joining (MMEJ) analysis, read trimming, read categorization, and permutation tests.
 
 * `refseq`: Reference sequences for MMEJ analysis.
 
@@ -57,13 +57,17 @@ The reads are categorized into different repair mechanisms by `scripts/FIXME`. T
 
 2) Run `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`.
 
+### Permutation Tests
+
+THe input frequencies should be the TSV files output from the [MMEJ pipeline](#mmej-pipeline). The output of the [read categorization](#read-categorization) stage can also be used as long they are formatted in a TSV file with the proper columns: `Sample`, `Read`, `Cell_line`, `Genotype`, `Breaks`, `Count`, and, `Frequency`. See source code of `scripts/calc_mh_freq.py` or the output of the [MMEJ pipeline](#mmej-pipeline) for more details.
+
 ### NHEJ Pipeline
 
 1) Align the [trimmed](#trimming) FASTQ files with the appropriate reference sequence using Bowtie2 (see `analyze_nhej/README.md` for examples).
 
 2) Place SAM file output of alignment in the appropriate directory with appropriate name (see `analyze_nhej/README.md`).
 
-3) Run either `analyze_nhej/run_all.ps1` (Windows) or `analyze_nhej/run_all.sh` (Unix). Note, the working directory must be `analyze_nhej` for this to work correctly.
+3) Run either `analyze_nhej/run_all.ps1` (Windows) or `analyze_nhej/run_all.sh` (Unix). Note, the working directory of the terminal must be `analyze_nhej` for this to work correctly.
 
 See `analyze_nhej/README.md` for more details.
 
