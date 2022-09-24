@@ -47,17 +47,17 @@ NHEJ pipeline: please see `analyze_nhej/README.txt`.
 
 The trimming scripts `scripts/trim_F_tag.py` (forward strand file) and `scripts/trim_R_tag.py` (reverse strand files) should be run on the raw Illumina FASTQ files before all other steps.
 
-### Read categorization
+### Read Categorization
 
 The reads are categorized into different repair mechanisms by `scripts/FIXME`. The input should be the trimmed FASTQ files from [trimming](#trimming).
 
-### MMEJ pipeline
+### MMEJ Pipeline
 
 1) Place the [trimmed](#trimming) FASTQ files into the appropriate directory with the appropriate name (see comments in `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`).
 
 2) Run `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`.
 
-### NHEJ pipeline
+### NHEJ Pipeline
 
 1) Align the [trimmed](#trimming) FASTQ files with the appropriate reference sequence using Bowtie2 (see `analyze_nhej/README.md` for examples).
 

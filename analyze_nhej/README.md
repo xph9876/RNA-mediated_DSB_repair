@@ -4,13 +4,13 @@
 
 This folder contains the processing pipeline for the NHEJ (nonhomologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The `run*.sh` and `run*.ps` scripts in the main directory are for reproducing the computations with datasets used in the [publication](#citation). Note `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
 
-## Prerequisties
+## Dependencies
 
 Tested OS: Windows 10 Home.
 
 Software:
 * Python 3.10.6
-* Bowtie2 VERSION
+* Bowtie2 2.4.1
 
 Python packages:
 * kaleido 0.2.1
@@ -81,7 +81,7 @@ Arguments:
 
 * `--sam_file`: Aligned SAM input file. Must be created with [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (specific flags from Bowtie2 are used). Every read must be aligned with exactly the same reference sequence.
 
-* `--output`: Output file. The result is a tab-separated file with columns: `Sequence`: nucleotide sequence of the read; `CIGAR`: CIGAR string for the alignment produced by Bowtie2 (see Bowtie2 documentation); `Count`: number of reads with the same sequence; `Num_Subst`: number of substitutions (AKA mismatches) in the alignment. Note, if multiple reads with identical nucleotide sequences and different CIGARs occur in `SAM_FILE`, then they will be a single row in the output representing the sequence with the `Count` column as the number of such reads and the `CIGAR` column arbitrarily selected from one of the CIGARs.
+* `--output`: Output file. The result is a tab-separated file with columns: `Sequence`: nucleotide sequence of the read; `CIGAR`: CIGAR string for the alignment produced by Bowtie2 (see [Bowtie2 documentation](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)); `Count`: number of reads with the same sequence; `Num_Subst`: number of substitutions (AKA mismatches) in the alignment. Note, if multiple reads with identical nucleotide sequences and different CIGARs occur in `SAM_FILE`, then they will be a single row in the output representing the sequence with the `Count` column as the number of such reads and the `CIGAR` column arbitrarily selected from one of the CIGARs.
 
 * `--min_length`: Minimum length of a read to pass filtering. Reads shorter than this are discarded.
 
