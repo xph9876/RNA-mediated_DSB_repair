@@ -45,7 +45,7 @@ def auto_freq_intron(freq_intron, directory, threshold):
 def main():
 	parser = argparse.ArgumentParser(description='frequency of sequencing reads with intron')
 	parser.add_argument('directory', type=pathlib.Path, help='directory of fastq files')
-	parser.add_argument('--threshold', type=int, default=130, help='length that we can determine the sequences containing intron')
+	parser.add_argument('--threshold', type=int, default=130, help='length that we determine sequences containing intron')
 	parser.add_argument('-o', type=argparse.FileType('w'), default=sys.stdout, help='output tsv file')
 	args = parser.parse_args()
 
