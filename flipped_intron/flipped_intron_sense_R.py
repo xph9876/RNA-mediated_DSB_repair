@@ -44,7 +44,7 @@ def auto_search_seq(search_seq, directory, flipped_intron_seq):
 
 
 def main():
-	parser = argparse.ArgumentParser(description='Calculate frequency of flipped intron from R2 fastq files (reverse strand)')
+	parser = argparse.ArgumentParser(description='Calculate frequency of flipped intron from R2 fastq files (reverse strand) ')
 	parser.add_argument('directory', type=pathlib.Path, help='directory of fastq files')
 	parser.add_argument('-o', type=argparse.FileType('w'), default=sys.stdout, help='output tsv file')
 	args = parser.parse_args()
