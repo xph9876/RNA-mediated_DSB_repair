@@ -7,7 +7,7 @@
 # Parameters
 # Path to GitHub repository
 rep="."
-scripts="${rep}/scripts/"
+scripts="${rep}/MMEJ/"
 refseq="${rep}/refseq/"
 # Path to trimmed reads folder. All the fastq files should be named as {sample name}_{R1/R2}.fq (eg. yjl217_R1.fq)
 reads="/storage/home/hcoda1/0/pxu64/bio-storici/microhomology/trimmed_reads/"
