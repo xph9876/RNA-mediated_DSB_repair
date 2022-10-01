@@ -62,7 +62,7 @@ The  [trimming](#trimming), [frequency of intron](#frequency-of-intron), [freque
 
 ### Trimming
 
-The trimming scripts `trimming/trim_F_tag.py` (forward strand reads) and `trimming/trim_R_tag.py` (reverse strand reads) should be run on the raw DNA-sequencing FASTQ files before all other stages except for [categorization of RNA-seq](#categorization-of-rna-seq).
+Trimming must be performed on all raw reads, DNA-seq and RNA-seq, before the other stages. First, the reads must first be processed with [cutadapt](https://cutadapt.readthedocs.io/en/stable/) and then with the trimming scripts `trimming/trim_F_tag.py` (forward strand reads) and `trimming/trim_R_tag.py` (reverse strand reads). See Methods of the [publication](#citation) for more details.
 
 ### Frequency of intron
 
