@@ -1,4 +1,4 @@
-# Analyze NHEJ
+# NHEJ
 
 ## Description
 
@@ -36,7 +36,7 @@ Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Reproducing Analyses
 
-To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1`/`run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `analyze_nhej` directory as the current working directory of the terminal.
+To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1`/`run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal.
 
 ## Pipeline Stages
 
