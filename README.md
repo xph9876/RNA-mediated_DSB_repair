@@ -62,7 +62,7 @@ The  [trimming](#trimming), [frequency of intron](#frequency-of-intron), [freque
 
 ### Trimming
 
-Trimming must be performed on all raw reads, DNA-seq and RNA-seq, before the other stages. First, the reads must first be processed with [cutadapt](https://cutadapt.readthedocs.io/en/stable/) and then with the trimming scripts `trimming/trim_F_tag.py` (forward strand reads) and `trimming/trim_R_tag.py` (reverse strand reads). See Methods of the [publication](#citation) for more details.
+Trimming must be performed on all raw reads, DNA-seq and RNA-seq, before the other stages. First, the reads must first be processed with [cutadapt](https://cutadapt.readthedocs.io/en/stable/) and then with the trimming scripts `trimming/trim_F_tag.py` (forward strand reads) and `trimming/trim_R_tag.py` (reverse strand reads). See the Methods of the [publication](#citation) for more details.
 
 ### Frequency of intron
 
@@ -78,7 +78,7 @@ The script `RTDR/RTDR_R.py` calculates the frequency of the reads with RNA-templ
 
 ### Categorization of RNA-seq
 
-The scripts `RNA_seq/*.py` categorize RNA-seq reads which have been aligned with the [hisat2](http://daehwankimlab.github.io/hisat2/) software. The input should be the aligned SAM files. There are separate scripts for each of the different constructs, 5'-SplicingΔ, Antisense, BranchΔ, Sense, and pCMVΔ, as indicated by the file names. Note, the raw RNA-seq reads do not require [trimming](#trimming).
+The scripts `RNA_seq/*.py` categorize RNA-seq reads which have been aligned with the [hisat2](http://daehwankimlab.github.io/hisat2/) software. The input should be the aligned SAM files. There are separate scripts for each of the different constructs, 5'-SplicingΔ, Antisense, BranchΔ, Sense, and pCMVΔ, as indicated by the file names.
 
 ### MMEJ pipeline
 
@@ -96,7 +96,7 @@ Performs permutations tests to compare the ratio BranchΔ/Sense of repair in wil
 
 The non-homologous end joining (NHEJ) analysis pipline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms.
 
-1) Align the [trimmed](#trimming) FASTQ files with the appropriate reference sequence using Bowtie2 (see `NHEJ/README.md` for examples).
+1) Align the [trimmed](#trimming) FASTQ files with the appropriate reference sequence using [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (see `NHEJ/README.md` for examples).
 
 2) Place the SAM file output of alignment in the appropriate directory with appropriate name (see `NHEJ/README.md`).
 
