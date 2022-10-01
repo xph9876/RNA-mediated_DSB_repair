@@ -2,7 +2,7 @@
 
 ## Description
 
-Contains the code for the computational analysis presented in the [publication](#citation). Please mee the Methods section of this publication for a more detailed description of the code.
+Contains the code for the computational analysis presented in the [publication](#citation). Please see the Methods section of this publication for a more detailed description of the code.
 
 ## Citation
 
