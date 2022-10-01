@@ -32,7 +32,7 @@ The full output of ```pip freeze``` is given in `python_packages.txt`. Note, for
 
 ## Citation
 
-Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In preparation*.
+Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In submission*.
 
 ## Reproducing Analyses
 
