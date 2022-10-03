@@ -69,7 +69,7 @@ The scripts `flipped_intron/flipped_intron*.py` calculate the frequency of the r
 
 ### Frequency of RTDR
 
-The script `RTDR/RTDR_R.py` calculates the frequency of the reads with RNA-templated DNA repair (RTDR) for reverse strand reads. The input should be the trimmed FASTQ files from [trimming](#trimming).
+The scripts `RTDR/RTDR_*.py` calculate the frequency of the reads with RNA-templated DNA repair (RTDR) for forward (`F`) and reverse (`R`) strand reads. The input should be the trimmed FASTQ files from [trimming](#trimming).
 
 ### Categorization of RNA-seq
 
@@ -89,7 +89,7 @@ Performs permutations tests to compare the ratio BranchΔ/Sense of repair in wil
 
 ### NHEJ pipeline
 
-The non-homologous end joining (NHEJ) analysis pipline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms.
+The non-homologous end joining (NHEJ) analysis pipeline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms.
 
 1) Align the [trimmed](#trimming) FASTQ files with the appropriate reference sequence using [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (see `NHEJ/README.md` for examples).
 
