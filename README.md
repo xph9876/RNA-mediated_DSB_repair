@@ -53,6 +53,12 @@ For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [
 
 For stage [NHEJ pipeline](#nhej-pipeline), please see `NHEJ/README.md`.
 
+## Installation
+After installing all dependencies, just clone the repository to install.
+```bash
+git clone https://github.com/xph9876/RNA-mediated_DSB_repair.git
+```
+
 ## Stages
 
 ### Trimming
