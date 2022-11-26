@@ -70,7 +70,7 @@ def main():
                     continue
                 if min(np.sum(ko_db), np.sum(wt_db), np.sum(ko_wt), np.sum(wt_wt)) == 0:
                     continue
-                ratio = (np.sum(ko_db) / np.sum(ko_wt)) / (np.sum(wt_db) / np.sum(wt_wt))
+                ratio = calc(ko_wt, wt_wt, ko_db, wt_db)
                 # calc permutation
                 res = []
                 if not args.n:
@@ -83,7 +83,10 @@ def main():
                     for _ in range(args.n):
                         sample = permute(wt_wt+ko_wt, wt_db+ko_db)
                         res.append(sample)
-                pvalue = len([x for x in res if x <= ratio]) / len(res)
+                if mmej == 'NHEJ' and cut != '2dsb':
+                    pvalue = len([x for x in res if x >= ratio]) / len(res)
+                else:
+                    pvalue = len([x for x in res if x <= ratio]) / len(res)
                 # write
                 ws.write(row, 0, cut)
                 ws.write(row, 1, rd)
