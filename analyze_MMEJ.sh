@@ -13,6 +13,8 @@ refseq="${rep}/refseq/"
 reads="/storage/home/hcoda1/0/pxu64/bio-storici/microhomology/trimmed_reads/"
 # Path to output folder
 output="./output/"
+# Path to libinfo.tsv, should be 4 columns: Sample_name\tGenotype\tCelltype\tDSB
+libinfo="libinfo.tsv"
 
 # mkdir folder structures
 if ! [ -e $output ]
@@ -63,7 +65,7 @@ echo "MMEJ pairs generated!"
 # Calculate the frequency for each reads, then sum up
 for fq in $(eval ls $reads)
 do
-    eval $scripts/calc_mh_freq.py $output/mh_sites/mmej.tsv libinfo.tsv $reads/$fq -o $output/freqs/${fq}.tsv &
+    eval $scripts/calc_mh_freq.py $output/mh_sites/mmej.tsv $libinfo $reads/$fq -o $output/freqs/${fq}.tsv &
 done
 wait
 # merge
