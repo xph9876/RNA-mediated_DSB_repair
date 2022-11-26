@@ -6,7 +6,7 @@ import library_constants
 import generate_constants
 import generate_07_plot_graph
 
-def get_output_file(cell_line, dsb_type, version, ext):
+def get_output_file(cell_line, dsb_type, version):
   version_str = (
     ''
     if (version == library_constants.VERSION_NONE) else
@@ -14,25 +14,22 @@ def get_output_file(cell_line, dsb_type, version, ext):
   )
   return generate_constants.join_path(
     [
-      generate_constants.get_output_dir('pptx', ext),
+      generate_constants.get_output_dir('pptx'),
       'graph',
       cell_line + '_' + dsb_type + version_str + os.extsep + 'pptx',
-    ],
-    ext,
+    ]
   )
 
-def get_input_file(experiment_name, layout_name, format, file_ext, script_ext):
+def get_input_file(experiment_name, layout_name, format, file_ext):
   return generate_constants.join_path(
     [
       generate_07_plot_graph.get_output_dir(
         layout_name,
         format,
-        file_ext = file_ext,
-        script_ext = script_ext,
+        file_ext = file_ext
       ),
       experiment_name + os.path.extsep + file_ext,
-    ],
-    script_ext,
+    ]
   )
 
 TOTAL_WIDTH = {
@@ -116,7 +113,6 @@ if __name__ == '__main__':
                     layout_name = generate_constants.USE_LAYOUT,
                     format = format,
                     file_ext = 'png',
-                    script_ext = ext,
                   ))
                   label_list.append(
                     library_constants.LABELS[info['guide_rna']] +
@@ -135,7 +131,7 @@ if __name__ == '__main__':
             arg_num_rows = '--num_rows ' + ' '.join(str(x) for x in num_rows_list)
             arg_num_cols = '--num_cols ' + ' '.join(str(x) for x in num_cols_list)
             arg_total_width = '--total_width ' + ' '.join(str(x) for x in total_width_list)
-            arg_output = '--output ' + get_output_file(cell_line, dsb_type, info['version'], ext)
-            file_out.write(f"python {generate_constants.get_python_script('get_pptx', ext)} {arg_input} {arg_output} {arg_labels} {arg_num_grids} {arg_num_rows} {arg_num_cols} {arg_total_width} {ARG_LEGEND}\n")
+            arg_output = '--output ' + get_output_file(cell_line, dsb_type, info['version'])
+            file_out.write(f"python {generate_constants.get_python_script('get_pptx')} {arg_input} {arg_output} {arg_labels} {arg_num_grids} {arg_num_rows} {arg_num_cols} {arg_total_width} {ARG_LEGEND}\n")
       log_utils.log(file_out.name)
 

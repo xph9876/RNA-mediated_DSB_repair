@@ -38,15 +38,16 @@ To reproduce the NHEJ analyses of the [publication](#citation), the scripts with
 ## Demonstration
 
 This is a brief demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows and the Bash script `demo/run.sh`. These scripts also contain examples of running the individual stages of the pipeline. The final output from the different stages should be written to the following directories:
+
 1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`.
-1. (b) Bowtie2 alignments: `demo/data_0_sam`.
+   (b) Bowtie2 alignments: `demo/data_0_sam`.
 2. NHEJ filtered reads: `demo/data_1_filtering`.
 3. Combined repeat libraries: `demo/data_2_combine_repeat`.
 4. Extracted DSB windows: `demo/data_3_window`.
 5. Variation-distance graph data: `demo/data_4_graph`.
 6. Variation-position histogram data: `demo/data_5_histogram`.
-7. Variation-distance graph figures: `demo/plot/graph`.
-8. Variation-position histogram figures: `demo/plot/histogram`.
+7. Variation-distance graph figures: `demo/plot/graph`. There should be 6 output PNG files when the demo script terminates.
+8. Variation-position histogram figures: `demo/plot/histogram`. There should be 18 
 
 ## Pipeline Stages
 
