@@ -37,6 +37,15 @@ Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022).
 
 To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal.
 
+## Demo Script
+
+The file `data_demo_fastq/test.fq` contains an example raw FASTQ file with DNA-sequencing data. We use this file to demonstrate all stages of the pipeline.
+
+1. Use the command
+```
+  bowtie2-
+```
+
 ## Pipeline Stages
 
 ### Alignment
