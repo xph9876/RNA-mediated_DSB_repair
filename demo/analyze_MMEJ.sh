@@ -12,7 +12,7 @@ refseq="${rep}/refseq/"
 # Path to trimmed reads folder. All the fastq files should be named as {sample name}_{R1/R2}.fq (eg. yjl217_R1.fq)
 reads="fastq"
 # Path to output folder
-output="./output/MMEJ"
+output="./demo_output/MMEJ"
 # Path to libinfo.tsv, should be 4 columns: Sample_name\tGenotype\tCelltype\tDSB
 libinfo="libinfo.tsv"
 
