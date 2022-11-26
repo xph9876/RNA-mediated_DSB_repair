@@ -3,7 +3,6 @@
 
 # Data files
 data*
-!data_0_sam
 
 # Plots
 plot/

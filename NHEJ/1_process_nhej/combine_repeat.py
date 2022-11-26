@@ -72,8 +72,9 @@ def main():
     },
     index = data.index,
   )
+  data_combined['Num_Subst'] = data_combined['Num_Subst'].fillna(0).astype(int)
   for i in range(num_repeats):
-    data_combined['Count_' + names[i]] = data['Count_' + names[i]].fillna(0)
+    data_combined['Count_' + names[i]] = data['Count_' + names[i]].fillna(0).astype(int)
 
   if not args.quiet:
     log_utils.log(f"Num sequences combined: {data_combined.shape[0]}\n")

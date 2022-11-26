@@ -48,8 +48,7 @@ def write_plotly(figure, file):
     make_parent_dir(file)
   ext = os.path.splitext(file)[1]
   if ext == '.png':
-    figure.write_image(file, engine='orca') # In case kaleido doesn't work
-    # figure.write_image(file, engine='kaleido')
+    figure.write_image(file, engine='kaleido')
   elif ext == '.html':
     figure.write_html(file)
   else:

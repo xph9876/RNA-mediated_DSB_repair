@@ -8,25 +8,21 @@ This folder contains the processing pipeline for the NHEJ (non-homologous end jo
 
 Tested OS: Windows 11 Home.
 
-FIXME!!! UPDATE THE VERSIONS TO THE LATEST!!!
-
 * Software:
-    * Python 3.10.6
-    * Bowtie2 2.4.1
+    * Python 3.11.0
+    * Bowtie2 2.5.0
 * Python packages:
     * Kaleido 0.1.0.post1 (must be exactly this version)
-    * Matplotlib 3.5.3
-    * NetworkX 2.8.6
-    * Numpy 1.23.2
-    * Pandas 1.4.3
-    * Pillow 9.2.0
-    * Plotly 5.10.0
-    * Psutil 5.9.1
-    * Python-Levenshtein 0.12.2
+    * Matplotlib 3.6.2
+    * NetworkX 2.8.8
+    * Numpy 1.23.5
+    * Pandas 1.5.2
+    * Pillow 9.3.0
+    * Plotly 5.11.0
+    * Python-Levenshtein 0.20.8
     * Python-pptx 0.6.21
-    * Requests 2.28.1
-    * Scikit-Learn 1.1.2
-    * Scipy 1.9.1
+    * Scikit-Learn 1.1.3
+    * Scipy 1.9.3
     * XlsxWriter 3.0.3
 
 The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1, has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
@@ -41,111 +37,17 @@ To reproduce the NHEJ analyses of the [publication](#citation), the scripts with
 
 ## Demonstration
 
-This is a brief tutorial of running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages).
+This is a brief demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows and the Bash script `demo/run.sh`. These scripts also contain examples of running the individual stages of the pipeline. The final output from the different stages should be written to the following directories:
+1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`.
+1. (b) Bowtie2 alignments: `demo/data_0_sam`.
+2. NHEJ filtered reads: `demo/data_1_filtering`.
+3. Combined repeat libraries: `demo/data_2_combine_repeat`.
+4. Extracted DSB windows: `demo/data_3_window`.
+5. Variation-distance graph data: `demo/data_4_graph`.
+6. Variation-position histogram data: `demo/data_5_histogram`.
+7. Variation-distance graph figures: `demo/plot/graph`.
+8. Variation-position histogram figures: `demo/plot/histogram`.
 
-The files `test_1.fq`, `test_2.fq`,`test_3.fq`,`test_4.fq` in `data_demo_fastq/` contain are example raw FASTQ files with DNA-sequencing data (4 files to represent 4 biological repeats). The file `ref_seq/test.fa`, contains an example nucleotide reference sequence. We use these files to demonstrate all stages of the pipeline. The working directory of the terminal must be the directory where this README file is located (`NHEJ`).
-
-1. To make the bowtie2 index and align the reads against the reference sequence, use the commands
-  ```
-  bowtie2-build ref_seq/test.fa test_bowtie
-  bowtie2 -x test_bowtie data_demo_fastq/test_1.fastq -S data_0_sam/test_1.sam
-  bowtie2 -x test_bowtie data_demo_fastq/test_2.fastq -S data_0_sam/test_2.sam
-  bowtie2 -x test_bowtie data_demo_fastq/test_3.fastq -S data_0_sam/test_3.sam
-  bowtie2 -x test_bowtie data_demo_fastq/test_4.fastq -S data_0_sam/test_4.sam
-  ```
-2. To perform the initial NHEJ read filtering, use the command
-  ```
-  python 1_process_nhej\filter_nhej.py --sam_file data_0_sam/test_1.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_1.tsv --min_length 50 --dsb_pos 50 --quiet
-  python 1_process_nhej/filter_nhej.py --sam_file data_0_sam/test_2.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_2.tsv --min_length 50 --dsb_pos 50 --quiet
-  python 1_process_nhej/filter_nhej.py --sam_file data_0_sam/test_3.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_3.tsv --min_length 50 --dsb_pos 50 --quiet
-  python 1_process_nhej/filter_nhej.py --sam_file data_0_sam/test_4.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_4.tsv --min_length 50 --dsb_pos 50 --quiet
-  ```
-3. To combine the 4 repeats into a single file, use the command
-  ```
-  python 1_process_nhej/combine_repeat.py --input data_1_filter_nhej/test_1.tsv data_1_filter_nhej/test_2.tsv data_1_filter_nhej/test_3.tsv data_1_filter_nhej/test_4.tsv --output data_2_combine_repeat/test.tsv --quiet
-  ```
-4. To extract the windows around the cut position, use the commands
-  ```
-  python 2_get_window_data/get_window.py --input data_2_combine_repeat/test.tsv --ref_seq_file ref_seq/test.fa --output data_3_window/test --dsb_pos 50 --dsb_type 2DSB --strand R1 --guide_rna sgTest --cell_line WT --construct Test --subst_type withSubst --control_type notControl --version versionNone
-  python 2_get_window_data/get_window.py --input data_2_combine_repeat/test.tsv --ref_seq_file ref_seq/test.fa --output data_3_window/test --dsb_pos 50 --dsb_type 2DSB --strand R1 --guide_rna sgTest --cell_line WT --construct Test --subst_type withoutSubst --control_type notControl --version versionNone
-  ```
-  The two commands extract the window by retaining or ignoring the alignment substitutions, respectively.
-5. To convert the raw read counts to frequencies, use the commands
-  ```
-  python 2_get_window_data/get_freq.py --input data_3_window/test --output data_3_window/test --subst_type withSubst --total_reads 3000 3000 3000 3000 --freq_min 1e-5
-  python 2_get_window_data/get_freq.py --input data_3_window/test --output data_3_window/test --subst_type withoutSubst --total_reads 3000 3000 3000 3000 --freq_min 1e-5
-  ```
-  The two commands operate on the files that retain or ignore the alignment substitutions, respectively.
-6. To further preprocess the data for plotting the variation-distance graphs, use the commands
-  ```
-  python 3_get_graph_data/get_graph_data.py --input data_3_window/test --output data_4_graph/test --subst_type withSubst
-  python 3_get_graph_data/get_graph_data.py --input data_3_window/test --output data_4_graph/test --subst_type withoutSubst
-  ```
-  The two commands operate on the files that retain or ignore the alignment substitutions, respectively.
-7. To further preprocess the data for plotting the variation-position histograms, use the commands
-  ```
-  python 4_get_histogram_data/get_histogram_data.py --input data_4_graph/test --output data_5_histogram/test --subst_type withSubst
-  python 4_get_histogram_data/get_histogram_data.py --input data_4_graph/test --output data_5_histogram/test --subst_type withoutSubst
-  ```
-  The two commands operate on the files that retain or ignore the alignment substitutions, respectively.
-8. To plot the variation-distance graphs, use the command
-  ```
-  python 5_plot_graph/plot_graph.py --input data_4_graph/test --output plot/demo/html --ext html --layout universal  --width 2400 --height 1800 --range_x -12 13 --range_y -23 20 --universal_layout_y_axis_x_pos 12 --universal_layout_y_axis_y_range -20.5 18.5 --universal_layout_y_axis_insertion_max_tick 6 --universal_layout_y_axis_deletion_max_tick 19
-  python 5_plot_graph/plot_graph.py --input data_4_graph/test --output plot/demo/ --ext png --layout universal  --width 2400 --height 1800 --range_x -12 13 --range_y -23 20 --universal_layout_y_axis_x_pos 12 --universal_layout_y_axis_y_range -20.5 18.5 --universal_layout_y_axis_insertion_max_tick 6 --universal_layout_y_axis_deletion_max_tick 19
-  ```
-  The two commands are for outputting an interactive HTML files and a static PNG file respectively. Only the data with the alignment substitutions ignored is used when plotting the graphs.
-9. To plot the variation-position histograms, use the command
-  ```
-  python 6_plot_histogram\plot_histogram.py --input data_5_histogram\test --output plot\histogram\demo --label_type relative
-  ```
-  Only the data with the alignment substitutions retained is used when plotting the histograms.
-
-In summary, all stages of the pipeline can be run on the test data with the following commands:
-```
-# 1. Alignment.
-bowtie2-build ref_seq/test.fa test_bowtie
-bowtie2 -x test_bowtie data_demo_fastq/test_1.fastq -S data_0_sam/test_1.sam
-bowtie2 -x test_bowtie data_demo_fastq/test_2.fastq -S data_0_sam/test_2.sam
-bowtie2 -x test_bowtie data_demo_fastq/test_3.fastq -S data_0_sam/test_3.sam
-bowtie2 -x test_bowtie data_demo_fastq/test_4.fastq -S data_0_sam/test_4.sam
-
-# 2. NHEJ filtering.
-python 1_process_nhej\filter_nhej.py --sam_file data_0_sam/test_1.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_1.tsv --min_length 50 --dsb_pos 50 --quiet
-python 1_process_nhej/filter_nhej.py --sam_file data_0_sam/test_2.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_2.tsv --min_length 50 --dsb_pos 50 --quiet
-python 1_process_nhej/filter_nhej.py --sam_file data_0_sam/test_3.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_3.tsv --min_length 50 --dsb_pos 50 --quiet
-python 1_process_nhej/filter_nhej.py --sam_file data_0_sam/test_4.sam --ref_seq_file ref_seq/test.fa --output data_1_filter_nhej/test_4.tsv --min_length 50 --dsb_pos 50 --quiet
-
-# 3. Combine repeats.
-python 1_process_nhej/combine_repeat.py --input data_1_filter_nhej/test_1.tsv data_1_filter_nhej/test_2.tsv data_1_filter_nhej/test_3.tsv data_1_filter_nhej/test_4.tsv --output data_2_combine_repeat/test.tsv --quiet
-
-# 4. Extract windows.
-python 2_get_window_data/get_window.py --input data_2_combine_repeat/test.tsv --ref_seq_file ref_seq/test.fa --output data_3_window/test --dsb_pos 50 --dsb_type 2DSB --strand R1 --guide_rna sgTest --cell_line WT --construct Test --subst_type withSubst --control_type notControl --version versionNone
-python 2_get_window_data/get_window.py --input data_2_combine_repeat/test.tsv --ref_seq_file ref_seq/test.fa --output data_3_window/test --dsb_pos 50 --dsb_type 2DSB --strand R1 --guide_rna sgTest --cell_line WT --construct Test --subst_type withoutSubst --control_type notControl --version versionNone
-
-# 5. Get frequencies.
-python 2_get_window_data/get_freq.py --input data_3_window/test --output data_3_window/test --subst_type withSubst --total_reads 3000 3000 3000 3000 --freq_min 1e-5
-python 2_get_window_data/get_freq.py --input data_3_window/test --output data_3_window/test --subst_type withoutSubst --total_reads 3000 3000 3000 3000 --freq_min 1e-5
-
-# 6. Get graph data.
-python 3_get_graph_data/get_graph_data.py --input data_3_window/test --output data_4_graph/test --subst_type withSubst
-python 3_get_graph_data/get_graph_data.py --input data_3_window/test --output data_4_graph/test --subst_type withoutSubst
-
-# 7. Get histogram data.
-python 4_get_histogram_data/get_histogram_data.py --input data_4_graph/test --output data_5_histogram/test --subst_type withSubst
-python 4_get_histogram_data/get_histogram_data.py --input data_4_graph/test --output data_5_histogram/test --subst_type withoutSubst
-
-# 8. Plot variation-distance graphs.
-python 5_plot_graph/plot_graph.py --input data_4_graph/test --output plot/demo/html --ext html --layout universal  --width 2400 --height 1800 --range_x -12 13 --range_y -23 20 --universal_layout_y_axis_x_pos 12 --universal_layout_y_axis_y_range -20.5 18.5 --universal_layout_y_axis_insertion_max_tick 6 --universal_layout_y_axis_deletion_max_tick 19
-python 5_plot_graph/plot_graph.py --input data_4_graph/test --output plot/demo/ --ext png --layout universal  --width 2400 --height 1800 --range_x -12 13 --range_y -23 20 --universal_layout_y_axis_x_pos 12 --universal_layout_y_axis_y_range -20.5 18.5 --universal_layout_y_axis_insertion_max_tick 6 --universal_layout_y_axis_deletion_max_tick 19
-
-# 9. Plot variation-position histograms.
-python 6_plot_histogram\plot_histogram.py --input data_5_histogram\test --output plot\histogram\demo --label_type relative
-```
-
-The expected output from the above commands should be the following files:
-```
-TODO: ADD THE FILES AFTER TESTING THE ABOVE!
-```
 ## Pipeline Stages
 
 ### Alignment
