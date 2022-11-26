@@ -6,13 +6,15 @@ This folder contains the processing pipeline for the NHEJ (non-homologous end jo
 
 ## Dependencies
 
-Tested OS: Windows 10 Home.
+Tested OS: Windows 11 Home.
+
+FIXME!!! UPDATE THE VERSIONS TO THE LATEST!!!
 
 * Software:
     * Python 3.10.6
     * Bowtie2 2.4.1
 * Python packages:
-    * Kaleido 0.2.1
+    * Kaleido 0.1.0.post1 (must be exactly this version)
     * Matplotlib 3.5.3
     * NetworkX 2.8.6
     * Numpy 1.23.2
@@ -27,7 +29,7 @@ Tested OS: Windows 10 Home.
     * Scipy 1.9.1
     * XlsxWriter 3.0.3
 
-The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a backend known as [Orca](https://github.com/plotly/orca) had to be used due to to problems with the [Kaleido](https://github.com/plotly/Kaleido) backend (at least on Windows 10). Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of Orca.
+The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1, has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
 
 ## Citation
 

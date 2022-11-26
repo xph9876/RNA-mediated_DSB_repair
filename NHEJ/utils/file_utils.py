@@ -14,7 +14,7 @@ def write_tsv(data, file, **args):
     na_rep = 'NA',
     quoting = csv.QUOTE_NONNUMERIC,
     index = args.get('index', False),
-    line_terminator = '\n',
+    lineterminator = '\n',
   )
 
 def read_tsv(file):
