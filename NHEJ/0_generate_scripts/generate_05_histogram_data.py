@@ -7,16 +7,15 @@ import generate_constants
 import library_constants
 import generate_04_graph_data
 
-def get_input_dir(name, ext):
-  return generate_04_graph_data.get_output_dir(name, ext)
+def get_input_dir(name):
+  return generate_04_graph_data.get_output_dir(name)
 
-def get_output_dir(name, ext):
+def get_output_dir(name):
   return generate_constants.join_path(
     [
-      generate_constants.get_output_dir('histogram', ext),
+      generate_constants.get_output_dir('histogram'),
       name,
-    ],
-    ext,
+    ]
   )
 
 if __name__ == '__main__':
@@ -28,7 +27,7 @@ if __name__ == '__main__':
     ) as file_out:
       for info in generate_constants.EXPERIMENT_INFO.to_dict('records'):
         for subst_type in library_constants.SUBST_TYPES:
-          input_dir = get_input_dir(info['name'], ext)
-          output_dir = get_output_dir(info['name'], ext)
-          file_out.write(f"python {generate_constants.get_python_script('get_histogram_data', ext)} --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
+          input_dir = get_input_dir(info['name'])
+          output_dir = get_output_dir(info['name'])
+          file_out.write(f"python {generate_constants.get_python_script('get_histogram_data')} --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")
       log_utils.log(file_out.name)

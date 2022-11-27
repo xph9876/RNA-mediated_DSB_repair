@@ -1,15 +1,10 @@
-
 # VS Code files
 .vscode/
 
-# log files
-log*.txt
-
-# SAM files
-*.sam
-
 # Data files
 data*
+!data_bowtie2_build
+!data_fastq
 !data_0_sam
 
 # Plots

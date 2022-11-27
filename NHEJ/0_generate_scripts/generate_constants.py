@@ -27,7 +27,7 @@ def get_ref_seq_file(info):
     os.path.extsep + 'fa'
   )
 
-DSB_POS = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'dsb_pos.tsv'))
+DSB_POS = file_utils.read_tsv(os.path.dirname(__file__) + '/dsb_pos.tsv')
 
 def get_dsb_pos(info):
   dsb_pos = DSB_POS.loc[
@@ -42,7 +42,7 @@ def get_dsb_pos(info):
     dsb_pos += 30
   return dsb_pos
 
-TOTAL_READS = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'total_reads.tsv'))
+TOTAL_READS = file_utils.read_tsv(os.path.dirname(__file__) + '/total_reads.tsv')
 def get_total_reads(info):
   x = TOTAL_READS.loc[
     (TOTAL_READS['library'] == info['library']),
@@ -52,7 +52,7 @@ def get_total_reads(info):
     raise Exception(f'Got {x.shape[0]} values. Expected 1.')
   return x.iloc[0]
 
-MIN_READ_LENGTH = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'min_read_length.tsv'))
+MIN_READ_LENGTH = file_utils.read_tsv(os.path.dirname(__file__) + '/min_read_length.tsv')
 def get_min_read_length(info):
   x = MIN_READ_LENGTH.loc[
     (MIN_READ_LENGTH['dsb_type'] == info['dsb_type']),
@@ -62,7 +62,7 @@ def get_min_read_length(info):
     raise Exception(f'Got {x.shape[0]} values. Expected 1.')
   return x.iloc[0]
 
-LIBRARY_INFO = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'library_info.tsv'))
+LIBRARY_INFO = file_utils.read_tsv(os.path.dirname(__file__) + '/library_info.tsv')
 LIBRARY_INFO['format'] = library_constants.DATA_INDIVIDUAL
 LIBRARY_INFO['name'] = LIBRARY_INFO.apply(get_name_library, axis='columns')
 LIBRARY_INFO['ref_seq_file'] = LIBRARY_INFO.apply(get_ref_seq_file, axis='columns')
@@ -224,16 +224,16 @@ def get_experiment_info_comparison():
 
 EXPERIMENT_INFO_COMPARISON = get_experiment_info_comparison()
 
-PATH_SEP = {'sh': '/', 'ps1': '\\'}
+def join_path(paths):
+  return '/'.join(paths)
 
-def join_path(paths, ext):
-  return PATH_SEP[ext].join(paths)
-
-def rejoin_path(path, ext):
-  return join_path(path.split(os.path.sep), ext)
+def rejoin_path(path):
+  return join_path(path.split(os.path.sep))
 
 REF_SEQ_DIR = 'ref_seq'
 OUTPUT_DIR = {
+  'fastq': 'data_fastq',
+  'bowtie2_build': 'data_bowtie2_build',
   'sam': 'data_0_sam',
   'filter_nhej': 'data_1_filter_nhej',
   'combine_repeat': 'data_2_combine_repeat',
@@ -241,14 +241,14 @@ OUTPUT_DIR = {
   'graph': 'data_4_graph',
   'histogram': 'data_5_histogram',
   'layout': 'data_6_precomputed_layout',
-  'plot_graph': os.path.join('plot', 'graph'),
-  'plot_histogram': os.path.join('plot', 'histogram'),
+  'plot_graph': 'plot/graph',
+  'plot_histogram': 'plot/histogram',
   'pptx': 'pptx',
   'library_summary': 'data_7_library_summary',
 }
 
-def get_output_dir(key, ext):
-  return rejoin_path(OUTPUT_DIR[key], ext)
+def get_output_dir(key):
+  return rejoin_path(OUTPUT_DIR[key])
 
 OUTPUT_ENCODING = {
   'sh': 'utf-8',
@@ -261,22 +261,32 @@ ARG_NEWLINE = {
 }
 
 PYTHON_SCRIPTS = {
-  'filter_nhej': os.path.join('1_process_nhej', 'filter_nhej.py'),
-  'combine_repeat': os.path.join('1_process_nhej', 'combine_repeat.py'),
-  'get_window': os.path.join('2_get_window_data', 'get_window.py'),
-  'get_merged': os.path.join('2_get_window_data', 'get_merged.py'),
-  'get_freq': os.path.join('2_get_window_data', 'get_freq.py'),
-  'get_freq_comparison': os.path.join('2_get_window_data', 'get_freq_comparison.py'),
-  'get_graph_data': os.path.join('3_get_graph_data', 'get_graph_data.py'),
-  'get_histogram_data': os.path.join('4_get_histogram_data', 'get_histogram_data.py'),
-  'get_precomputed_layout': os.path.join('5_plot_graph', 'get_precomputed_layout.py'),
-  'plot_graph': os.path.join('5_plot_graph', 'plot_graph.py'),
-  'plot_histogram': os.path.join('6_plot_histogram', 'plot_histogram.py'),
-  'get_pptx': os.path.join('7_get_pptx', 'get_pptx.py'),
+  'filter_nhej': '1_process_nhej/filter_nhej.py',
+  'combine_repeat': '1_process_nhej/combine_repeat.py',
+  'get_window': '2_get_window_data/get_window.py',
+  'get_merged': '2_get_window_data/get_merged.py',
+  'get_freq': '2_get_window_data/get_freq.py',
+  'get_freq_comparison': '2_get_window_data/get_freq_comparison.py',
+  'get_graph_data': '3_get_graph_data/get_graph_data.py',
+  'get_histogram_data': '4_get_histogram_data/get_histogram_data.py',
+  'get_precomputed_layout': '5_plot_graph/get_precomputed_layout.py',
+  'plot_graph': '5_plot_graph/plot_graph.py',
+  'plot_histogram': '6_plot_histogram/plot_histogram.py',
+  'get_pptx': '7_get_pptx/get_pptx.py',
 }
 
-def get_python_script(key, ext):
-  return rejoin_path(PYTHON_SCRIPTS[key], ext)
+BOWTIE2_BUILD_COMMAND = {
+  'ps1': 'bowtie2-build-s.exe',
+  'sh': 'bowtie2-build',
+}
+
+BOWTIE2_ALIGN_COMMAND = {
+  'ps1': 'bowtie2-align-s.exe',
+  'sh': 'bowtie2',
+}
+
+def get_python_script(key):
+  return rejoin_path(PYTHON_SCRIPTS[key])
 
 def check_scripts_exits():
   for x in PYTHON_SCRIPTS.values():

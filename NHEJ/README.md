@@ -6,28 +6,26 @@ This folder contains the processing pipeline for the NHEJ (non-homologous end jo
 
 ## Dependencies
 
-Tested OS: Windows 10 Home.
+Tested OS: Windows 11 Home.
 
 * Software:
-    * Python 3.10.6
-    * Bowtie2 2.4.1
+    * Python 3.11.0
+    * Bowtie2 2.5.0
 * Python packages:
-    * Kaleido 0.2.1
-    * Matplotlib 3.5.3
-    * NetworkX 2.8.6
-    * Numpy 1.23.2
-    * Pandas 1.4.3
-    * Pillow 9.2.0
-    * Plotly 5.10.0
-    * Psutil 5.9.1
-    * Python-Levenshtein 0.12.2
+    * Kaleido 0.1.0.post1 (must be exactly this version)
+    * Matplotlib 3.6.2
+    * NetworkX 2.8.8
+    * Numpy 1.23.5
+    * Pandas 1.5.2
+    * Pillow 9.3.0
+    * Plotly 5.11.0
+    * Python-Levenshtein 0.20.8
     * Python-pptx 0.6.21
-    * Requests 2.28.1
-    * Scikit-Learn 1.1.2
-    * Scipy 1.9.1
+    * Scikit-Learn 1.1.3
+    * Scipy 1.9.3
     * XlsxWriter 3.0.3
 
-The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a backend known as [Orca](https://github.com/plotly/orca) had to be used due to to problems with the [Kaleido](https://github.com/plotly/Kaleido) backend (at least on Windows 10). Please see [here](https://plotly.com/python/static-image-export/) for details on installation/setup of Orca.
+The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1, has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
 
 ## Citation
 
@@ -35,7 +33,21 @@ Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Reproducing Analyses
 
-To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal.
+To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal. The input files should be the trimmed FASTQ files (as described in the parent directory), and should be placed in the `data_fastq` directory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
+
+## Demonstration
+
+This is a brief demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows and the Bash script `demo/run.sh`. These scripts also contain examples of running the individual stages of the pipeline. The final output from the different stages should be written to the following directories:
+
+1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`.
+   (b) Bowtie2 alignments: `demo/data_0_sam`.
+2. NHEJ filtered reads: `demo/data_1_filtering`.
+3. Combined repeat libraries: `demo/data_2_combine_repeat`.
+4. Extracted DSB windows: `demo/data_3_window`.
+5. Variation-distance graph data: `demo/data_4_graph`.
+6. Variation-position histogram data: `demo/data_5_histogram`.
+7. Variation-distance graph figures: `demo/plot/graph`.
+8. Variation-position histogram figures: `demo/plot/histogram`.
 
 ## Pipeline Stages
 

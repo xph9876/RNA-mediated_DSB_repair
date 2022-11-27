@@ -1,4 +1,4 @@
-# .\run_01_process_nhej.sh
+.\run_01_process_nhej.sh
 .\run_02_combine_repeat.ps1
 .\run_03_get_window.ps1
 .\run_04_graph_data.ps1
