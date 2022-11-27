@@ -36,6 +36,8 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 * `NHEJ`: Python3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
 
+* `demo`: Demonstrations of the various analyses and piplines with example data.
+
 ## Dependencies
 
 For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [permutation test](#permutation-test), [MMEJ pipeline](#mmej-pipeline):
@@ -95,15 +97,7 @@ Performs permutations tests to compare the ratio BranchΔ/Sense of repair in wil
 
 ### NHEJ pipeline
 
-The non-homologous end joining (NHEJ) analysis pipeline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms.
-
-1) Align the [trimmed](#trimming) FASTQ files with the appropriate reference sequence using [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (see `NHEJ/README.md` for examples).
-
-2) Place the SAM file output of alignment in the appropriate directory with appropriate name (see `NHEJ/README.md`).
-
-3) Run either `NHEJ/run_all.ps1` (Windows) or `NHEJ/run_all.sh` (Unix). Note, the working directory of the terminal must be `NHEJ` for this to work correctly.
-
-See `NHEJ/README.md` for more details.
+The non-homologous end joining (NHEJ) analysis pipeline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms. See `NHEJ/README.md` for more details.
 
 ## Contact
 

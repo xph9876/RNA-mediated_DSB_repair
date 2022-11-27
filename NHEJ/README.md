@@ -25,7 +25,7 @@ Tested OS: Windows 11 Home.
     * Scipy 1.9.3
     * XlsxWriter 3.0.3
 
-The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1, has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
+The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1 has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
 
 ## Citation
 
@@ -33,14 +33,13 @@ Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Reproducing Analyses
 
-To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal. The input files should be the trimmed FASTQ files (as described in the parent directory), and should be placed in the `data_fastq` directory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
+To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal. The input files should be the trimmed FASTQ files (as described in the parent directory), and should be placed in the `data_fastq` directory. Bowtie2 (version 2.5, available [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
 
 ## Demonstration
 
-This is a brief demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows and the Bash script `demo/run.sh`. These scripts also contain examples of running the individual stages of the pipeline. The final output from the different stages should be written to the following directories:
+This is a brief demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. Bowtie2 (version 2.5, available [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows and the bash script `demo/run.sh` on Unix. These scripts also contain examples of running the individual stages of the pipeline. The final output from the pipeline will be written to the following directories:
 
-1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`.
-   (b) Bowtie2 alignments: `demo/data_0_sam`.
+1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`. (b) Bowtie2 alignments: `demo/data_0_sam`.
 2. NHEJ filtered reads: `demo/data_1_filtering`.
 3. Combined repeat libraries: `demo/data_2_combine_repeat`.
 4. Extracted DSB windows: `demo/data_3_window`.
@@ -61,18 +60,6 @@ The raw input for the NHEJ pipeline are the trimmed FASTQ files from the trimmin
 ```
 
 Where `<ref_name>` is the name of reference sequence, `<fastq_name>` is the name of the trimmed FASTQ file, and `<sam_name>` is the name of the output SAM file.
-
-For the pre-made `*.sh` and `*.ps1` scripts to be run successfully, all SAM files produced as described above must be placed in the `data_0_sam` directory. Each SAM file must also be named in the format: `<library>_<cell_line>_<guide_rna>_<construct>.sam` where
-
-* `<library>`: Name of the library (alphanumeric).
-* `<cell_line>`: Cell line. `WT` for wild type and `KO` for knock-out.
-* `<guide_rna>`: Guide RNA. Choices: `sgA`, `sgB`, `sgAB`, or `sgCD`.
-* `<strand>`: Strand. `R1` for forward and `R2` for reverse.
-* `<construct>`: Plasmid construct. `sense` for Sense, `branch` for BranchΔ, `cmv` for pCMVΔ, `antisense` for Antisense, `splicing` for 5'-SplicingΔ.
-
-Example: `yjl89_WT_sgCD_R1_antisense.sam`.
-
-Please see `bowtie2_arguments.tsv` for a list of the libraries used in this analysis, their corresponding reference-sequence files, and the proper SAM file names.
 
 ### `0_generate_scripts`
 
