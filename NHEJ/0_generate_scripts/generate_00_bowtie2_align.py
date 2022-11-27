@@ -8,7 +8,7 @@ import generate_constants
 def get_input_file(library, strand):
   return generate_constants.join_path(
     [
-      generate_constants.get_output_dir('sam'),
+      generate_constants.get_output_dir('fastq'),
       library + '_' + strand + os.extsep + 'fastq'
     ]
   )
@@ -38,11 +38,11 @@ if __name__ == '__main__':
       for ref_seq_file in generate_constants.LIBRARY_INFO['ref_seq_file'].unique():
         if ref_seq_file is not None:
           ref_seq_bowtie2_build = get_bowtie2_build_file(ref_seq_file)
-        file_out.write(f"{generate_constants.BOWTIE2_BUILD_COMMAND[ext]} ref_seq/{ref_seq_file} {ref_seq_bowtie2_build}\n")
+          file_out.write(f"{generate_constants.BOWTIE2_BUILD_COMMAND[ext]} ref_seq/{ref_seq_file} {ref_seq_bowtie2_build}\n")
       for info in generate_constants.LIBRARY_INFO.to_dict('records'):
         if info['version'] != library_constants.VERSION_MERGED:
           input_file = get_input_file(info['library'], info['strand'])
           output_file = get_output_file(info['name'])
           ref_seq_bowtie2_build = get_bowtie2_build_file(info['ref_seq_file'])
-          file_out.write(f"{generate_constants.BOWTIE2_ALIGN_COMMAND[ext]} -x  {ref_seq_bowtie2_build} -S {output_file}\n")
+          file_out.write(f"{generate_constants.BOWTIE2_ALIGN_COMMAND[ext]} -x  {ref_seq_bowtie2_build} {input_file} -S {output_file}\n")
       log_utils.log(file_out.name)

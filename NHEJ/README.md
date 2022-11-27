@@ -2,7 +2,7 @@
 
 ## Description
 
-This folder contains the processing pipeline for the NHEJ (non-homologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The `run*.sh` and `run*.ps` scripts in the main directory are for reproducing the computations with data sets used in the [publication](#citation). Note `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
+This folder contains the processing pipeline for the NHEJ (non-homologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The `run*.sh` and `run*.ps` scripts in the main directory are for reproducing the computations with data sets used in the [publication](#citation). Note, `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
 
 ## Dependencies
 
@@ -27,22 +27,24 @@ Tested OS: Windows 11 Home.
 
 The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1 has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
 
+To [reproduce the analyses](#reproducing-analyses) or run the [demo](#demonstration), the software [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) must be installed on the PATH. On Windows, the commands `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available . On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
+
 ## Citation
 
 Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In submission*.
 
 ## Reproducing Analyses
 
-To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal. The input files should be the trimmed FASTQ files (as described in the parent directory), and should be placed in the `data_fastq` directory. Bowtie2 (version 2.5, available [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
+To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with this directory as the current working directory of the terminal. The input for the pipeline are the trimmed DNA-sequencing FASTQ files (as described in the parent directory), and should be placed in the `data_fastq` directory with exactly the file names listed in `fastq/libraries.txt`.
 
 ## Demonstration
 
-This is a brief demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. Bowtie2 (version 2.5, available [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows and the bash script `demo/run.sh` on Unix. These scripts also contain examples of running the individual stages of the pipeline. The final output from the pipeline will be written to the following directories:
+This is a demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows, or the bash script `demo/run.sh` on Unix. These scripts also serve as examples of running the individual stages of the pipeline. The final output from the pipeline will be written to the following directories:
 
 1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`. (b) Bowtie2 alignments: `demo/data_0_sam`.
 2. NHEJ filtered reads: `demo/data_1_filtering`.
-3. Combined repeat libraries: `demo/data_2_combine_repeat`.
-4. Extracted DSB windows: `demo/data_3_window`.
+3. Repeat libraries combined: `demo/data_2_combine_repeat`.
+4. Extracted DSB-sequence windows: `demo/data_3_window`.
 5. Variation-distance graph data: `demo/data_4_graph`.
 6. Variation-position histogram data: `demo/data_5_histogram`.
 7. Variation-distance graph figures: `demo/plot/graph`.
