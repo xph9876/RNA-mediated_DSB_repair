@@ -36,7 +36,7 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 * `NHEJ`: Python3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
 
-* `demo`: Demonstrations of the various analyses and piplines with example data.
+* `demo`: Demonstrations of the various analyses and pipelines with example data.
 
 ## Dependencies
 
