@@ -33,7 +33,7 @@ Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Reproducing Analyses
 
-To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal.
+To reproduce the NHEJ analyses of the [publication](#citation), the scripts with names of the form `*.sh` and `*.ps1` (such as `run_01_process_nhej.ps1` and `run_01_process_nhej.sh`) must be run in the order indicated by their numbering. These scripts also serve as usage examples for the Python scripts. The scripts `run_all.sh` and `run_all.ps1` run all stages. All scripts must be run with the `NHEJ` directory as the current working directory of the terminal. The input files should be the trimmed FASTQ files (as described in the parent directory), and should be placed in the `data_fastq` directory. Bowtie2 (version 2.5, available here [here](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) must be installed on the PATH. On Windows, the executables `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available. On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
 
 ## Demonstration
 
@@ -46,8 +46,8 @@ This is a brief demo on running the NHEJ pipeline stages. For more in-depth desc
 4. Extracted DSB windows: `demo/data_3_window`.
 5. Variation-distance graph data: `demo/data_4_graph`.
 6. Variation-position histogram data: `demo/data_5_histogram`.
-7. Variation-distance graph figures: `demo/plot/graph`. There should be 6 output PNG files when the demo script terminates.
-8. Variation-position histogram figures: `demo/plot/histogram`. There should be 18 
+7. Variation-distance graph figures: `demo/plot/graph`.
+8. Variation-position histogram figures: `demo/plot/histogram`.
 
 ## Pipeline Stages
 
