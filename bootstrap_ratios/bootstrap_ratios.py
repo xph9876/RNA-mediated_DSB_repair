@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 def calc(wt, db):
     return np.sum(db)/np.sum(wt)
 
+
 # draw bootstrap sample
 def resample(wt, db):
     return (np.random.choice(wt, len(wt), replace=True), \
