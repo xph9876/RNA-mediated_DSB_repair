@@ -7,22 +7,22 @@ import xlsxwriter
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def calc_diff(KO_b, KO_s, WT_b, WT_s):
-    KO_diff = np.mean(KO_b) - np.mean(KO_s)
-    WT_diff = np.mean(WT_b) - np.mean(WT_s)
-    return KO_diff - WT_diff
+def calc_diff(WT_s, WT_b, KO_s, KO_b):
+    WT_diff = np.mean(WT_s) - np.mean(WT_b)
+    KO_diff = np.mean(KO_s) - np.mean(KO_b)
+    return WT_diff - KO_diff
 
-def calc_ratio(KO_b, KO_s, WT_b, WT_s):
-    KO_ratio = np.mean(KO_b) / np.mean(KO_s)
-    WT_ratio = np.mean(WT_b) / np.mean(WT_s)
-    return KO_ratio / WT_ratio
+def calc_ratio(WT_s, WT_b, KO_s, KO_b):
+    WT_ratio = np.mean(WT_s) / np.mean(WT_b)
+    KO_ratio = np.mean(KO_s) / np.mean(KO_b)
+    return WT_ratio / KO_ratio
 
 # draw bootstrap sample
-def resample(KO_b, KO_s, WT_b, WT_s):
-    return (np.random.choice(KO_b, len(KO_b), replace=True),
-        np.random.choice(KO_s, len(KO_s), replace=True),
+def resample(WT_s, WT_b, KO_s, KO_b):
+    return (np.random.choice(WT_s, len(WT_s), replace=True),
         np.random.choice(WT_b, len(WT_b), replace=True),
-        np.random.choice(WT_s, len(WT_s), replace=True))
+        np.random.choice(KO_s, len(KO_s), replace=True),
+        np.random.choice(KO_b, len(KO_b), replace=True))
 
 def draw(data, title, output):
     # parameters
@@ -88,22 +88,22 @@ def main():
             for name in names:
                 # select data
                 data = df[(df.Name == name) & (df.Read == rd) & (df.Breaks == cut)]
-                KO_b = data[(data.Cell_line == 'KO') & (data.Genotype == 'db')].Frequency.tolist()
-                KO_s = data[(data.Cell_line == 'KO') & (data.Genotype == 'wt')].Frequency.tolist()
-                WT_b = data[(data.Cell_line == 'WT') & (data.Genotype == 'db')].Frequency.tolist()
                 WT_s = data[(data.Cell_line == 'WT') & (data.Genotype == 'wt')].Frequency.tolist()
-                if (min(len(KO_b), len(KO_s), len(WT_b), len(WT_s)) == 0) or \
-                    (min(np.min(KO_b), np.min(KO_s), np.min(WT_b), np.min(WT_s)) == 0):
+                WT_b = data[(data.Cell_line == 'WT') & (data.Genotype == 'db')].Frequency.tolist()
+                KO_s = data[(data.Cell_line == 'KO') & (data.Genotype == 'wt')].Frequency.tolist()
+                KO_b = data[(data.Cell_line == 'KO') & (data.Genotype == 'db')].Frequency.tolist()
+                if (min(len(WT_s), len(WT_b), len(KO_s), len(KO_b)) == 0) or \
+                    (min(np.min(WT_s), np.min(WT_b), np.min(KO_s), np.min(KO_b)) == 0):
                     continue
 
                 # get the observed difference and ratio
-                diff = calc_diff(KO_b, KO_s, WT_b, WT_s)
-                ratio = calc_ratio(KO_b, KO_s, WT_b, WT_s)
+                diff = calc_diff(WT_s, WT_b, KO_s, KO_b)
+                ratio = calc_ratio(WT_s, WT_b, KO_s, KO_b)
 
                 # calc boostrap
                 res = []
                 for _ in range(args.n):
-                    res.append(calc_diff(*resample(KO_b, KO_s, WT_b, WT_s)))
+                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b)))
                 res = sorted(res)
 
                 # get the basic bootstrap confidence interval
@@ -119,10 +119,10 @@ def main():
                 ws.write(row, 0, cut)
                 ws.write(row, 1, rd)
                 ws.write(row, 2, name)
-                ws.write(row, 3, np.mean(KO_b), value_style)
-                ws.write(row, 4, np.mean(KO_s), value_style)
-                ws.write(row, 5, np.mean(WT_b), value_style)
-                ws.write(row, 6, np.mean(WT_s), value_style)
+                ws.write(row, 3, np.mean(WT_s), value_style)
+                ws.write(row, 4, np.mean(WT_b), value_style)
+                ws.write(row, 5, np.mean(KO_s), value_style)
+                ws.write(row, 6, np.mean(KO_b), value_style)
                 ws.write(row, 7, ratio, value_style)
                 ws.write(row, 8, diff, value_style)
                 ws.write(row, 9, ci[0], value_style)
@@ -134,9 +134,9 @@ def main():
                 draw_output = f'{cut}_{rd}_{name}.png'
                 if pvalue < 0.05:
                     if diff > 0:
-                        sig_str = 'KO_b - KO_s > WT_b - WT_s'
+                        sig_str = 'WT_s - WT_b > KO_s - KO_b'
                     else:
-                        sig_str = 'WT_b - WT_s > KO_b - KO_s'
+                        sig_str = 'KO_s - KO_b > WT_s - WT_b'
                     ws.write(row, 12, sig_str, sig_style)
                     draw_title += '\n' + sig_str
                 else:
@@ -144,8 +144,8 @@ def main():
                     draw_title += '\n(nonsignificant)'
                 row += 1
                 if args.draw is not None:
-                    draw(pd.DataFrame({'Freq': KO_b + KO_s + WT_b + WT_s,
-                                       'Label': ['KO_b'] * 4 + ['KO_s'] * 4 + ['WT_b'] * 4 + ['WT_s'] * 4}),
+                    draw(pd.DataFrame({'Freq': WT_s + WT_b + KO_s + KO_b,
+                                       'Label': ['WT_s'] * 4 + ['WT_b'] * 4 + ['KO_s'] * 4 + ['KO_b'] * 4}),
                         draw_title,
                         args.draw + '/' + draw_output)
     workbook.close()        
