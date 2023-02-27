@@ -46,17 +46,14 @@ def main():
                                      ' For the method, see https://en.wikipedia.org/wiki/Bootstrapping_(statistics) and' +
                                      ' the "basic bootstrap intervals" in "Bootstrap Methods and their Application"' +
                                      ' (Davison and Hinkley, 1997, p194).')
-    # parser.add_argument('freq', type=argparse.FileType('r'), help='MMEJ frequency TSV file')
-    # parser.add_argument('output', help='Output XLSX name')
+    parser.add_argument('freq', type=argparse.FileType('r'), help='MMEJ frequency TSV file')
+    parser.add_argument('output', help='Output XLSX name')
     parser.add_argument('-n', default=999, choices=[999, 9999, 99999], type=int,
                         help='Number of bootstrap samples. We use the form 10^p - 1 for p = 3, 4, 5, so that' +
                         ' the 2.5% and 97.% percentiles can be computed exactly.')
     parser.add_argument('-draw', default=None, help='Output dir for barplots. If not provided the barplots are not drawn.')
     args = parser.parse_args()
 
-    args.freq = open('bootstrap_ratios/mmej.tsv', 'r') # FIXME: Delete after done!
-    args.output = 'bootstrap_ratios/output/mmej_bootstrap.xlsx'
-    # args.draw = 'barplots'
     # read data
     df = pd.read_csv(args.freq, sep='\t')
     names = df.Name.unique()
