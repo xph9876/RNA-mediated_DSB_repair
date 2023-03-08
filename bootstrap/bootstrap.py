@@ -137,8 +137,8 @@ def main():
                     ws.write(row, 12, sig_str, sig_style)
                     draw_title += '\n' + sig_str
                 else:
-                    ws.write(row, 12, '(nonsignificant)', nonsig_style)
-                    draw_title += '\n(nonsignificant)'
+                    ws.write(row, 12, 'NS', nonsig_style)
+                    draw_title += '\nNS'
                 row += 1
                 if args.draw is not None:
                     draw(pd.DataFrame({'Freq': WT_s + WT_b + KO_s + KO_b,
