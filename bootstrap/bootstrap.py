@@ -7,10 +7,12 @@ import xlsxwriter
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# get the difference and relative effect size
 def calc_diff(WT_s, WT_b, KO_s, KO_b):
     WT_diff = np.mean(WT_s) - np.mean(WT_b)
     KO_diff = np.mean(KO_s) - np.mean(KO_b)
-    return WT_diff - KO_diff
+    diff = WT_diff - KO_diff
+    return diff, abs(diff) / max(abs(WT_diff), abs(KO_diff))
 
 def calc_ratio(WT_s, WT_b, KO_s, KO_b):
     WT_ratio = np.mean(WT_s) / np.mean(WT_b)
@@ -77,9 +79,9 @@ def main():
             ws = workbook.add_worksheet(f'{cut}_{rd}')
 
             # header
-            for i, w in enumerate(
-                ['Cut', 'Read', 'Name', 'KO_b', 'KO_s', 'WT_b', 'WT_s',
-                 'Ratio', 'Diff', 'Diff 2.5%', 'Diff 97.5%', 'P', 'Conclusion']):
+            for i, w in enumerate(['Cut', 'Read', 'Name', 'KO_b', 'KO_s', 'WT_b',
+                                   'WT_s', 'Ratio', 'Diff', 'Diff 2.5%', 'Diff 97.5%',
+                                   'P', 'Relative effect size', 'Conclusion']):
                 ws.write(0, i, w, bold)
             row = 1
             for name in names:
@@ -94,13 +96,13 @@ def main():
                     continue
 
                 # get the observed difference and ratio
-                diff = calc_diff(WT_s, WT_b, KO_s, KO_b)
+                diff, effect = calc_diff(WT_s, WT_b, KO_s, KO_b)
                 ratio = calc_ratio(WT_s, WT_b, KO_s, KO_b)
 
                 # calc boostrap
                 res = []
                 for _ in range(args.n):
-                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b)))
+                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b))[0])
                 res = sorted(res)
 
                 # get the basic bootstrap confidence interval
@@ -125,6 +127,7 @@ def main():
                 ws.write(row, 9, ci[0], value_style)
                 ws.write(row, 10, ci[1], value_style)
                 ws.write(row, 11, pvalue, value_style)
+                ws.write(row, 12, effect, value_style)
 
                 # is significant?
                 draw_title = f'{cut} {rd} {name}\nP = {pvalue:.3f}'
@@ -134,10 +137,10 @@ def main():
                         sig_str = 'WT_s - WT_b > KO_s - KO_b'
                     else:
                         sig_str = 'KO_s - KO_b > WT_s - WT_b'
-                    ws.write(row, 12, sig_str, sig_style)
+                    ws.write(row, 13, sig_str, sig_style)
                     draw_title += '\n' + sig_str
                 else:
-                    ws.write(row, 12, 'NS', nonsig_style)
+                    ws.write(row, 13, 'NS', nonsig_style)
                     draw_title += '\nNS'
                 row += 1
                 if args.draw is not None:
