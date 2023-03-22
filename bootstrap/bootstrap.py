@@ -12,7 +12,7 @@ def calc_diff(WT_s, WT_b, KO_s, KO_b):
     WT_diff = np.mean(WT_s) - np.mean(WT_b)
     KO_diff = np.mean(KO_s) - np.mean(KO_b)
     diff = WT_diff - KO_diff
-    return diff, abs(diff) / max(abs(WT_diff), abs(KO_diff))
+    return diff
 
 def calc_ratio(WT_s, WT_b, KO_s, KO_b):
     WT_ratio = np.mean(WT_s) / np.mean(WT_b)
@@ -79,9 +79,8 @@ def main():
             ws = workbook.add_worksheet(f'{cut}_{rd}')
 
             # header
-            for i, w in enumerate(['Cut', 'Read', 'Name', 'KO_b', 'KO_s', 'WT_b',
-                                   'WT_s', 'Ratio', 'Diff', 'Diff 2.5%', 'Diff 97.5%',
-                                   'P', 'Relative effect size', 'Conclusion']):
+            for i, w in enumerate(['Cut', 'Read', 'Name',
+                                   'Diff', 'P', 'Conclusion']):
                 ws.write(0, i, w, bold)
             row = 1
             for name in names:
@@ -96,54 +95,41 @@ def main():
                     continue
 
                 # get the observed difference and ratio
-                diff, effect = calc_diff(WT_s, WT_b, KO_s, KO_b)
-                ratio = calc_ratio(WT_s, WT_b, KO_s, KO_b)
+                diff = calc_diff(WT_s, WT_b, KO_s, KO_b)
 
                 # calc boostrap
                 res = []
                 for _ in range(args.n):
-                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b))[0])
+                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b)))
                 res = sorted(res)
 
-                # get the basic bootstrap confidence interval
-                ci = 2 * diff - np.array([res[int((args.n + 1) * 0.975)],
-                                          res[int((args.n + 1) * 0.025)]])
-
                 # get the 2-sided p-value for the mean diff being 0
-                gt = len([x for x in res if x >= 0])
-                lt = len([x for x in res if x <= 0])
-                pvalue = 2 * (1 + min(gt, lt)) / (args.n + 1)
+                gt = len([x for x in res if x - 2 * diff >= 0])
+                lt = len([x for x in res if x - 2 * diff <= 0])
+                pvalue = min(2 * (1 + min(gt, lt)) / (args.n + 1), 1)
 
                 # write
                 ws.write(row, 0, cut)
                 ws.write(row, 1, rd)
                 ws.write(row, 2, name)
-                ws.write(row, 3, np.mean(WT_s), value_style)
-                ws.write(row, 4, np.mean(WT_b), value_style)
-                ws.write(row, 5, np.mean(KO_s), value_style)
-                ws.write(row, 6, np.mean(KO_b), value_style)
-                ws.write(row, 7, ratio, value_style)
-                ws.write(row, 8, diff, value_style)
-                ws.write(row, 9, ci[0], value_style)
-                ws.write(row, 10, ci[1], value_style)
-                ws.write(row, 11, pvalue, value_style)
-                ws.write(row, 12, effect, value_style)
+                ws.write(row, 3, diff, value_style)
+                ws.write(row, 4, pvalue, value_style)
 
                 # is significant?
-                draw_title = f'{cut} {rd} {name}\nP = {pvalue:.3f}'
-                draw_output = f'{cut}_{rd}_{name}.png'
                 if pvalue < 0.05:
                     if diff > 0:
-                        sig_str = 'WT_s - WT_b > KO_s - KO_b'
+                        sig_str = 'WT'
                     else:
-                        sig_str = 'KO_s - KO_b > WT_s - WT_b'
-                    ws.write(row, 13, sig_str, sig_style)
+                        sig_str = 'KO'
+                    ws.write(row, 5, sig_str, sig_style)
                     draw_title += '\n' + sig_str
                 else:
-                    ws.write(row, 13, 'NS', nonsig_style)
+                    ws.write(row, 5, 'NS', nonsig_style)
                     draw_title += '\nNS'
                 row += 1
                 if args.draw is not None:
+                    draw_title = f'{cut} {rd} {name}\nP = {pvalue:.3f}\n{sig_str}'
+                    draw_output = f'{cut}_{rd}_{name}.png'
                     draw(pd.DataFrame({'Freq': WT_s + WT_b + KO_s + KO_b,
                                        'Label': ['WT_s'] * 4 + ['WT_b'] * 4 + ['KO_s'] * 4 + ['KO_b'] * 4}),
                         draw_title,
