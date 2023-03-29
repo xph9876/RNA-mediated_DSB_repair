@@ -40,18 +40,14 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Dependencies
 
-For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [permutation test](#permutation-test), [MMEJ pipeline](#mmej-pipeline):
+For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [permutation test](#permutation-test), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
 
-* Software:
-    * Python 3.8.13
-* Python packages:
-    * Numpy 1.22.3
-    * Matplotlib 3.4.3
-    * Pandas 1.4.2
-    * Seaborn 0.11.2
-    * Xlsxwriter 3.0.3
-    * Scipy 1.7.3
-    * Statannotations 0.4.3
+```bash
+# After conda installation, run in repository folder
+conda env create -f MMEJ/mmej_environment.yml
+# Before each use, activate conda environment
+conda activate microhomology
+```
 
 For stage [NHEJ pipeline](#nhej-pipeline), please see `NHEJ/README.md`.
 

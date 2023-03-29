@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 def draw(data, output):
     color = '#CF191B'
-    label = {'WT':'E-E_WT', 'KO':'E-E_KO'}
+    label = {'WT':'E-E_WT', 'KO':'E-E_KO', 'OX':'E-E_OX'}
     data['label'] = data.Cell_line.map(label)
     data = data.sort_values('label', ascending=False)
     fig, ax = plt.subplots(figsize=(8,4))
@@ -60,7 +60,7 @@ def main():
     sns.set(style='ticks', font_scale=1.5)
     for rd in reads:
         data = df[(df.Read == rd) & (df.Breaks == '2dsb')].copy()
-        draw(data, f'{args.o}_WT_vs_KO_{rd}.png')
+        draw(data, f'{args.o}_compare_genotype_{rd}.png')
     
     
     print('Done!')

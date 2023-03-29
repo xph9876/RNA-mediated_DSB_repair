@@ -105,7 +105,7 @@ echo "Barplots for MMEJ generated!"
 eval $scripts/draw_ee_ei_ratio.py $output/mmej_freqs.tsv -o $output/plots/boxplots_ee_ei_ratio/MMEJ &
 eval $scripts/draw_ee_ei_ratio.py $output/mmej_freqs.tsv -o $output/plots/boxplots_ee_ei_ratio_annot/MMEJ --annot &
 eval $scripts/draw_wt_db_ratio.py $output/mmej_freqs.tsv -o $output/plots/boxplots_wt_db_ratio/MMEJ &
-eval $scripts/draw_wt_db_ratio_KO_WT.py $output/mmej_freqs.tsv -o $output/plots/boxplots_wt_db_ratio/MMEJ &
+eval $scripts/draw_wt_db_ratio_compare_genotypes.py $output/mmej_freqs.tsv -o $output/plots/boxplots_wt_db_ratio/MMEJ &
 wait
 echo "Boxplots for cell type comparison generated!"
 
