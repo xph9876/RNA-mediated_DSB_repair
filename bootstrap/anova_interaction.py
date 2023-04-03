@@ -40,9 +40,9 @@ def draw(data, title, sig_str, output):
     
     # Maybe add significance bracket
     if sig_str is not None:
-        annotator = Annotator(ax, [('WT_s - WT_b', 'KO_s - KO_b')],\
+        annotator = Annotator(ax, [('WT_S - WT_B', 'KO_S - KO_B')],\
                               data=data, x='Label', y='Freq',\
-                              order=['WT_s - WT_b', 'KO_s - KO_b'])
+                              order=['WT_S - WT_B', 'KO_S - KO_B'])
         annotator.verbose = False
         annotator.perform_stat_test = False
         annotator.annotate_custom_annotations([sig_str])
@@ -50,7 +50,7 @@ def draw(data, title, sig_str, output):
     sns.despine()
     ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0),\
         useOffset=False, useMathText=True)
-    plt.xticks(rotation=12)
+    # plt.xticks(rotation=12)
     low, high = plt.ylim()
     bound = max(abs(low), abs(high))
     plt.ylim(-bound, bound)
@@ -62,7 +62,7 @@ def draw(data, title, sig_str, output):
     plt.close()
 
 def main():
-    parser = argparse.ArgumentParser(description='Perform bootstrap to compare WT - DB difference of each class of' +
+    parser = argparse.ArgumentParser(description='Perform bootstrap to compare Sense - BranchΔ difference of each class of' +
                                      ' frequencies of RNaseH2 WT and KO.' +
                                      ' For the method, see https://en.wikipedia.org/wiki/Bootstrapping_(statistics) and' +
                                      ' the "basic bootstrap intervals" in "Bootstrap Methods and their Application"' +
@@ -116,36 +116,35 @@ def main():
                 if (min(len(WT_s), len(WT_b), len(KO_s), len(KO_b)) == 0) or \
                     (min(np.min(WT_s), np.min(WT_b), np.min(KO_s), np.min(KO_b)) == 0):
                     continue
-
-                # get the observed difference and ratio
-                diff = calc_diff(WT_s, WT_b, KO_s, KO_b)
-
-                # calc boostrap
-                res = []
-                for _ in range(args.n):
-                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b)))
-                res = sorted(res)
-
-                # get the 2-sided p-value for the mean diff being 0
-                gt = len([x for x in res if x - 2 * diff >= 0])
-                lt = len([x for x in res if x - 2 * diff <= 0])
-                pvalue = min(2 * (1 + min(gt, lt)) / (args.n + 1), 1)
-
+              
                 # temp t-test
                 # sd = np.sqrt((np.std(WT_s, ddof=1)**2 + np.std(WT_b, ddof=1)**2 + np.std(KO_s, ddof=1)**2 + np.std(KO_b, ddof=1)**2) / 4)
                 # pvalue_ttest = 2 * (1-scipy.stats.t.cdf(abs(diff / sd), df=12))
                 # print('t-test: ' + str(pvalue_ttest))
                 # print('boottest: ' + str(pvalue))
                 model = ols(
-                    'Freq ~ C(Cell) * C(Construct)',
-                    data=pd.DataFrame({'Freq': WT_s + WT_b + KO_s + KO_b,
+                  "Freq ~ C(Cell, Treatment('KO')) * C(Construct, Treatment('B'))", # baselines are KO and BranchD
+                  data=pd.DataFrame({
+                    'Freq': WT_s + WT_b + KO_s + KO_b,
                     'Cell': ['WT'] * 8 + ['KO'] * 8,
-                    'Construct': ['S'] * 4 + ['B'] * 4 + ['S'] * 4 + ['B'] * 4})).fit()
-                model.params
-                diff_KO = model.params[2]
-                diff_WT = model.params[2] + model.params[3]
+                    'Construct': ['S'] * 4 + ['B'] * 4 + ['S'] * 4 + ['B'] * 4
+                  })
+                ).fit()
+                diff_KO = model.params[2] # KO_S - KO_B
+                diff_WT = model.params[2] + model.params[3] # WT_S - WT_B
                 diff_interaction = model.params[3] # interaction estimate
                 pvalue = model.pvalues[3] # interaction p-value
+                sd = np.sqrt(model.mse_resid)
+                # print(str(diff_KO) + ' ' + str(np.mean(KO_s) - np.mean(KO_b)))
+                # print(str(diff_WT) + ' ' + str(np.mean(WT_s) - np.mean(WT_b)))
+                # print(str(diff_interaction) + ' ' + str(np.mean(WT_s) - np.mean(WT_b) - (np.mean(KO_s) - np.mean(KO_b))))
+                # print(str(sd) + ' ' + str(np.sqrt(model.mse_resid)))
+                # print(str(model.pvalues[3]) + ' ' + str(pvalue_ttest))
+                # assert np.isclose((diff_KO), (np.mean(KO_s) - np.mean(KO_b)))
+                # assert np.isclose((diff_WT), (np.mean(WT_s) - np.mean(WT_b)))
+                # assert np.isclose((diff_interaction), (np.mean(WT_s) - np.mean(WT_b) - (np.mean(KO_s) - np.mean(KO_b))))
+                # assert np.isclose((sd), (np.sqrt(model.mse_resid)))
+                # assert np.isclose((model.pvalues[3]), (pvalue_ttest))
                 # anova_table = sm.stats.anova_lm(model, type=2)
                 # print(anova_table)
                 # print('')
@@ -154,12 +153,12 @@ def main():
                 ws.write(row, 0, cut)
                 ws.write(row, 1, rd)
                 ws.write(row, 2, name)
-                ws.write(row, 3, diff, value_style)
+                ws.write(row, 3, diff_interaction, value_style)
                 ws.write(row, 4, pvalue, value_style)
 
                 # is significant?
                 if pvalue < 0.05:
-                    if diff > 0:
+                    if diff_interaction > 0:
                         sig_str = '* WT'
                     else:
                         sig_str = '* KO'
@@ -177,9 +176,15 @@ def main():
                     #     draw_title,
                     #     args.draw + '/' + draw_output)
                     # print([WT_s, WT_b, KO_s, KO_b])
-                    draw(pd.DataFrame({'Freq': [np.mean(WT_s) - np.mean(WT_b), np.mean(KO_s) - np.mean(KO_b)],
-                                       'Err': [np.sqrt(np.std(WT_s)**2 + np.std(WT_b)**2), np.sqrt(np.std(KO_s)**2 + np.std(KO_b)**2)],
-                                       'Label': ['WT_s - WT_b', 'KO_s - KO_b']}),
+                    # draw(pd.DataFrame({'Freq': [np.mean(WT_s) - np.mean(WT_b), np.mean(KO_s) - np.mean(KO_b)],
+                    #                    'Err': [np.sqrt(np.std(WT_s)**2 + np.std(WT_b)**2), np.sqrt(np.std(KO_s)**2 + np.std(KO_b)**2)],
+                    #                    'Label': ['WT_s - WT_b', 'KO_s - KO_b']}),
+                    #     draw_title if args.title else None,
+                    #     sig_str,
+                    #     args.draw + '/' + draw_output)
+                    draw(pd.DataFrame({'Freq': [diff_WT, diff_KO],
+                                       'Err': [np.sqrt(2) * sd, np.sqrt(2) * sd],
+                                       'Label': ['WT_S - WT_B', 'KO_S - KO_B']}),
                         draw_title if args.title else None,
                         sig_str,
                         args.draw + '/' + draw_output)
