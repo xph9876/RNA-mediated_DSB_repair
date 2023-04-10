@@ -7,53 +7,54 @@ import xlsxwriter
 import seaborn as sns
 import matplotlib.pyplot as plt
 from statannotations.Annotator import Annotator
-import scipy.stats
-import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
 # get the difference and relative effect size
-def calc_diff(WT_s, WT_b, KO_s, KO_b):
-    WT_diff = np.mean(WT_s) - np.mean(WT_b)
-    KO_diff = np.mean(KO_s) - np.mean(KO_b)
-    diff = WT_diff - KO_diff
-    return diff
+def calc_diff(ca_na, ca_nb, cb_na, cb_nb):
+    ca_diff = np.mean(ca_na) - np.mean(ca_nb)
+    cb_diff = np.mean(cb_na) - np.mean(cb_nb)
+    diff = ca_diff - cb_diff
+    return ca_diff, cb_diff, diff
 
-def calc_ratio(WT_s, WT_b, KO_s, KO_b):
-    WT_ratio = np.mean(WT_s) / np.mean(WT_b)
-    KO_ratio = np.mean(KO_s) / np.mean(KO_b)
-    return WT_ratio / KO_ratio
+def calc_ratio(ca_na, ca_nb, cb_na, cb_nb):
+    ca_ratio = np.mean(ca_na) / np.mean(ca_nb)
+    cb_ratio = np.mean(cb_na) / np.mean(cb_nb)
+    ratio = ca_ratio / cb_ratio
+    return ca_ratio, cb_ratio, ratio
 
 # draw bootstrap sample
-def resample(WT_s, WT_b, KO_s, KO_b):
-    return (np.random.choice(WT_s, len(WT_s), replace=True),
-        np.random.choice(WT_b, len(WT_b), replace=True),
-        np.random.choice(KO_s, len(KO_s), replace=True),
-        np.random.choice(KO_b, len(KO_b), replace=True))
+def resample(ca_na, ca_nb, cb_na, cb_nb):
+    return (np.random.choice(ca_na, len(ca_na), replace=True),
+        np.random.choice(ca_nb, len(ca_nb), replace=True),
+        np.random.choice(cb_na, len(cb_na), replace=True),
+        np.random.choice(cb_nb, len(cb_nb), replace=True))
 
-def draw(data, title, sig_str, output):
+def draw(data, title, output, diff=True, ca='WT', cb='KO', annotate=False):
     # parameters
     fig, ax = plt.subplots(figsize=(6,6))
     plt.subplots_adjust(left=0.15, top=0.8, bottom=0.2, right=.9)
     sns.barplot(x='Label', y='Freq', data=data, edgecolor='k', ax=ax)
     plt.errorbar(x=data['Label'], y=data['Freq'],
             yerr=data['Err'], fmt='none', c='black', capsize=10)
-    
+
     # Maybe add significance bracket
-    if sig_str is not None:
-        annotator = Annotator(ax, [('WT_s - WT_b', 'KO_s - KO_b')],\
+    if annotate:
+        annotator = Annotator(ax, [(ca, cb)],\
                               data=data, x='Label', y='Freq',\
-                              order=['WT_s - WT_b', 'KO_s - KO_b'])
+                              order=[ca, cb])
         annotator.verbose = False
         annotator.perform_stat_test = False
-        annotator.annotate_custom_annotations([sig_str])
+        annotator.annotate_custom_annotations(['*'])
 
     sns.despine()
     ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0),\
         useOffset=False, useMathText=True)
-    plt.xticks(rotation=12)
     low, high = plt.ylim()
     bound = max(abs(low), abs(high))
-    plt.ylim(-bound, bound)
+    if diff:
+        plt.ylim(-bound, bound)
+    else:
+        plt.ylim(0, bound)
     plt.xlabel('')
     plt.ylabel('')
     if title is not None:
@@ -74,6 +75,11 @@ def main():
                         ' the 2.5% and 97.% percentiles can be computed exactly.')
     parser.add_argument('-draw', default=None, help='Output dir for barplots. If not provided the barplots are not drawn.')
     parser.add_argument('-title', action='store_true', help='If present, put a title on plots.')
+    parser.add_argument('-ca', default='WT', help='Cell line A.')
+    parser.add_argument('-cb', default='KO', help='Cell line B.')
+    parser.add_argument('-na', default='Sense', help='Construct A (numerator).')
+    parser.add_argument('-stat', default='diff', choices=['diff', 'ratio'], help='Which test statistic to use: differences or ratios.')
+    parser.add_argument('-nb', default='BranchD', help='Construct B (denominator).')
     args = parser.parse_args()
 
     # read data
@@ -97,93 +103,93 @@ def main():
 
     # process data
     for rd in reads:
-        for cut in breaks:
+        for brk in breaks:
             # create worksheet
-            ws = workbook.add_worksheet(f'{cut}_{rd}')
+            ws = workbook.add_worksheet(f'{brk}_{rd}')
 
             # header
             for i, w in enumerate(['Cut', 'Read', 'Name',
-                                   'Diff', 'P', 'Conclusion', 'P (t-test)']):
+                                   args.stat.capitalize(), 'P', 'Conclusion', 'P (t-test)']):
                 ws.write(0, i, w, bold)
             row = 1
             for name in names:
                 # select data
-                data = df[(df.Name == name) & (df.Read == rd) & (df.Breaks == cut)]
-                WT_s = data[(data.Cell_line == 'WT') & (data.Genotype == 'wt')].Frequency.tolist()
-                WT_b = data[(data.Cell_line == 'WT') & (data.Genotype == 'db')].Frequency.tolist()
-                KO_s = data[(data.Cell_line == 'KO') & (data.Genotype == 'wt')].Frequency.tolist()
-                KO_b = data[(data.Cell_line == 'KO') & (data.Genotype == 'db')].Frequency.tolist()
-                if (min(len(WT_s), len(WT_b), len(KO_s), len(KO_b)) == 0) or \
-                    (min(np.min(WT_s), np.min(WT_b), np.min(KO_s), np.min(KO_b)) == 0):
+                data = df.loc[(df.Name == name) & (df.Read == rd) & (df.Breaks == brk)]
+                ca_na = data.loc[(data.Cell_line == args.ca) & (data.Construct == args.na)].sort_values('Sample').Frequency.to_numpy()
+                ca_nb = data.loc[(data.Cell_line == args.ca) & (data.Construct == args.nb)].sort_values('Sample').Frequency.to_numpy()
+                cb_na = data.loc[(data.Cell_line == args.cb) & (data.Construct == args.na)].sort_values('Sample').Frequency.to_numpy()
+                cb_nb = data.loc[(data.Cell_line == args.cb) & (data.Construct == args.nb)].sort_values('Sample').Frequency.to_numpy()
+                if (min(len(ca_na), len(ca_nb), len(cb_na), len(cb_nb)) == 0) or \
+                    (min(np.min(ca_na), np.min(ca_nb), np.min(cb_na), np.min(cb_nb)) == 0):
                     continue
 
                 # get the observed difference and ratio
-                diff = calc_diff(WT_s, WT_b, KO_s, KO_b)
+                if args.stat == "diff":
+                    stat_ca, stat_cb, stat = calc_diff(ca_na, ca_nb, ca_na, cb_nb)
+                else: #ratio
+                    stat_ca, stat_cb, stat = calc_ratio(ca_na, ca_nb, ca_na, cb_nb)
 
                 # calc boostrap
-                res = []
+                boot_ca = []
+                boot_cb = []
+                boot = []
                 for _ in range(args.n):
-                    res.append(calc_diff(*resample(WT_s, WT_b, KO_s, KO_b)))
-                res = sorted(res)
+                    if args.stat == "diff":
+                        bstat_ca, bstat_cb, bstat = calc_diff(*resample(ca_na, ca_nb, cb_na, cb_nb))
+                    else: #ratio
+                        bstat_ca, bstat_cb, bstat = calc_ratio(*resample(ca_na, ca_nb, ca_na, cb_nb))
+                    boot_ca.append(bstat_ca)
+                    boot_cb.append(bstat_cb)
+                    boot.append(bstat)
+                boot = sorted(boot)
 
-                # get the 2-sided p-value for the mean diff being 0
-                gt = len([x for x in res if x - 2 * diff >= 0])
-                lt = len([x for x in res if x - 2 * diff <= 0])
+                # get the 2-sided p-value for the mean stat being 0
+                gt = len([x for x in boot if x - 2 * stat >= 0])
+                lt = len([x for x in boot if x - 2 * stat <= 0])
                 pvalue = min(2 * (1 + min(gt, lt)) / (args.n + 1), 1)
 
-                # temp t-test
-                # sd = np.sqrt((np.std(WT_s, ddof=1)**2 + np.std(WT_b, ddof=1)**2 + np.std(KO_s, ddof=1)**2 + np.std(KO_b, ddof=1)**2) / 4)
-                # pvalue_ttest = 2 * (1-scipy.stats.t.cdf(abs(diff / sd), df=12))
-                # print('t-test: ' + str(pvalue_ttest))
-                # print('boottest: ' + str(pvalue))
-                model = ols(
-                    'Freq ~ C(Cell) * C(Construct)',
-                    data=pd.DataFrame({'Freq': WT_s + WT_b + KO_s + KO_b,
-                    'Cell': ['WT'] * 8 + ['KO'] * 8,
-                    'Construct': ['S'] * 4 + ['B'] * 4 + ['S'] * 4 + ['B'] * 4})).fit()
-                model.params
-                diff_KO = model.params[2]
-                diff_WT = model.params[2] + model.params[3]
-                diff_interaction = model.params[3] # interaction estimate
-                pvalue = model.pvalues[3] # interaction p-value
-                # anova_table = sm.stats.anova_lm(model, type=2)
-                # print(anova_table)
-                # print('')
-
                 # write
-                ws.write(row, 0, cut)
+                ws.write(row, 0, brk)
                 ws.write(row, 1, rd)
                 ws.write(row, 2, name)
-                ws.write(row, 3, diff, value_style)
+                ws.write(row, 3, stat, value_style)
                 ws.write(row, 4, pvalue, value_style)
 
                 # is significant?
                 if pvalue < 0.05:
-                    if diff > 0:
-                        sig_str = '* WT'
-                    else:
-                        sig_str = '* KO'
+                    if args.stat == "diff":
+                        if stat > 0:
+                            conclusion = args.ca
+                        else:
+                            conclusion = args.cb
+                    else: # ratio
+                        if stat > 1:
+                            conclusion = args.ca
+                        else:
+                            conclusion = args.cb
                     style = sig_style
                 else:
-                    sig_str = 'NS'
+                    conclusion = 'NS'
                     style = nonsig_style
-                ws.write(row, 5, sig_str, style)
+                ws.write(row, 5, conclusion, style)
                 row += 1
                 if args.draw is not None:
-                    draw_title = f'{cut} {rd} {name}\nP = {pvalue:.3f}\n{sig_str}'
-                    draw_output = f'{cut}_{rd}_{name}.png'
-                    # draw(pd.DataFrame({'Freq': WT_s + WT_b + KO_s + KO_b,
-                    #                    'Label': ['WT_s'] * 4 + ['WT_b'] * 4 + ['KO_s'] * 4 + ['KO_b'] * 4}),
-                    #     draw_title,
-                    #     args.draw + '/' + draw_output)
-                    # print([WT_s, WT_b, KO_s, KO_b])
-                    draw(pd.DataFrame({'Freq': [np.mean(WT_s) - np.mean(WT_b), np.mean(KO_s) - np.mean(KO_b)],
-                                       'Err': [np.sqrt(np.std(WT_s)**2 + np.std(WT_b)**2), np.sqrt(np.std(KO_s)**2 + np.std(KO_b)**2)],
-                                       'Label': ['WT_s - WT_b', 'KO_s - KO_b']}),
+                    draw_title = f'{brk} {rd} {name}\nP = {pvalue:.3f} ({conclusion})'
+                    draw_output = f'{brk}_{rd}_{name}.png'
+                    if args.stat == 'diff':
+                        ylab = 'Frequency difference [Sense - BranchΔ]'
+                    else:
+                        ylab = 'Frequency ratio [Sense/BranchΔ]'
+                    draw(pd.DataFrame({'Freq': [stat_ca, stat_cb],
+                                       'Err': [np.std(boot_ca), np.std(boot_cb)],
+                                       'Label': [args.ca, args.cb]}),
                         draw_title if args.title else None,
-                        sig_str,
-                        args.draw + '/' + draw_output)
-    workbook.close()        
+                        args.draw + '/' + draw_output,
+                        diff = args.stat == "diff",
+                        ca = args.ca,
+                        cb = args.cb,
+                        annotate = pvalue < 0.05)
+    workbook.close()
 
 if __name__ == '__main__':
     main()
