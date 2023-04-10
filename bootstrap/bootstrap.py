@@ -31,7 +31,7 @@ def resample(ca_na, ca_nb, cb_na, cb_nb):
 
 def draw(data, title, output, diff=True, ca='WT', cb='KO', annotate=False):
     # parameters
-    fig, ax = plt.subplots(figsize=(6,6))
+    fig, ax = plt.subplots(figsize=(3,3))
     plt.subplots_adjust(left=0.15, top=0.8, bottom=0.2, right=.9)
     sns.barplot(x='Label', y='Freq', data=data, edgecolor='k', ax=ax)
     plt.errorbar(x=data['Label'], y=data['Freq'],
@@ -109,7 +109,7 @@ def main():
 
             # header
             for i, w in enumerate(['Cut', 'Read', 'Name',
-                                   args.stat.capitalize(), 'P', 'Conclusion', 'P (t-test)']):
+                                   args.stat.capitalize(), 'P', 'Conclusion']):
                 ws.write(0, i, w, bold)
             row = 1
             for name in names:
@@ -125,9 +125,9 @@ def main():
 
                 # get the observed difference and ratio
                 if args.stat == "diff":
-                    stat_ca, stat_cb, stat = calc_diff(ca_na, ca_nb, ca_na, cb_nb)
+                    stat_ca, stat_cb, stat = calc_diff(ca_na, ca_nb, cb_na, cb_nb)
                 else: #ratio
-                    stat_ca, stat_cb, stat = calc_ratio(ca_na, ca_nb, ca_na, cb_nb)
+                    stat_ca, stat_cb, stat = calc_ratio(ca_na, ca_nb, cb_na, cb_nb)
 
                 # calc boostrap
                 boot_ca = []
@@ -137,15 +137,17 @@ def main():
                     if args.stat == "diff":
                         bstat_ca, bstat_cb, bstat = calc_diff(*resample(ca_na, ca_nb, cb_na, cb_nb))
                     else: #ratio
-                        bstat_ca, bstat_cb, bstat = calc_ratio(*resample(ca_na, ca_nb, ca_na, cb_nb))
+                        bstat_ca, bstat_cb, bstat = calc_ratio(*resample(ca_na, ca_nb, cb_na, cb_nb))
                     boot_ca.append(bstat_ca)
                     boot_cb.append(bstat_cb)
                     boot.append(bstat)
                 boot = sorted(boot)
 
-                # get the 2-sided p-value for the mean stat being 0
-                gt = len([x for x in boot if x - 2 * stat >= 0])
-                lt = len([x for x in boot if x - 2 * stat <= 0])
+                # get the 2-sided p-value for the mean stat being the null hypothesis val:
+                # 0 for difference, 1 for ratio
+                null_val = 0 if args.stat == "diff" else 1
+                gt = len([x for x in boot if 2 * stat - x >= null_val])
+                lt = len([x for x in boot if 2 * stat - x <= null_val])
                 pvalue = min(2 * (1 + min(gt, lt)) / (args.n + 1), 1)
 
                 # write
@@ -153,7 +155,6 @@ def main():
                 ws.write(row, 1, rd)
                 ws.write(row, 2, name)
                 ws.write(row, 3, stat, value_style)
-                ws.write(row, 4, pvalue, value_style)
 
                 # is significant?
                 if pvalue < 0.05:
@@ -167,19 +168,16 @@ def main():
                             conclusion = args.ca
                         else:
                             conclusion = args.cb
-                    style = sig_style
+                    ws.write(row, 4, pvalue, sig_style)
+                    ws.write(row, 5, conclusion, sig_style)
                 else:
                     conclusion = 'NS'
-                    style = nonsig_style
-                ws.write(row, 5, conclusion, style)
+                    ws.write(row, 4, pvalue, nonsig_style)
+                    ws.write(row, 5, conclusion, nonsig_style)
                 row += 1
                 if args.draw is not None:
                     draw_title = f'{brk} {rd} {name}\nP = {pvalue:.3f} ({conclusion})'
                     draw_output = f'{brk}_{rd}_{name}.png'
-                    if args.stat == 'diff':
-                        ylab = 'Frequency difference [Sense - BranchΔ]'
-                    else:
-                        ylab = 'Frequency ratio [Sense/BranchΔ]'
                     draw(pd.DataFrame({'Freq': [stat_ca, stat_cb],
                                        'Err': [np.std(boot_ca), np.std(boot_cb)],
                                        'Label': [args.ca, args.cb]}),
