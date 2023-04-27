@@ -32,7 +32,7 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 * `libinfo_antisense.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
 
-* `permutation_test`: Python3 scripts for the [permutation test](#permutation-test) stage.
+* `test_ratios`: Python3 scripts for the [test ratios](#test-ratios) stage.
 
 * `NHEJ`: Python3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
 
@@ -91,9 +91,11 @@ Pipeline for the microhomology-mediated end joining (MMEJ) analysis. Computes mi
 
 2) Run `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`.
 
-### Permutation test
+### Test ratios
 
-Performs permutations tests to compare the ratio BranchΔ/Sense of repair in wild-type vs. KO cells. The input frequencies should be the TSV files output from the [MMEJ pipeline](#mmej-pipeline). The output of the [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), and [frequency of RTDR](#frequency-of-rtdr) stages can also be used as long they are formatted in a TSV file with the proper columns: `Sample`, `Read`, `Cell_line`, `Genotype`, `Breaks`, `Count`, and, `Frequency`. See source code of `MMEJ/calc_mh_freq.py` or the output of the [MMEJ pipeline](#mmej-pipeline) for more details.
+Performs Mann-Whitney U tests to compare the ratio Sense/BranchΔ (or other constructs) of repair in wild-type and RNase H2A (or other) cells. The input frequencies should be the TSV files output from the [MMEJ pipeline](#mmej-pipeline). The output of the [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), and [frequency of RTDR](#frequency-of-rtdr) stages can also be used as long they are formatted in a TSV file with the proper columns: `Sample`, `Read`, `Cell_line`, `Genotype`, `Breaks`, `Count`, and, `Frequency`. See source code of `MMEJ/calc_mh_freq.py` or the output of the [MMEJ pipeline](#mmej-pipeline) for more details.
+
+The input frequencies used in the publication are included in the `test_ratios/input` subdirectory. To run the analysis use the `test_ratios/run.sh` script.
 
 ### NHEJ pipeline
 

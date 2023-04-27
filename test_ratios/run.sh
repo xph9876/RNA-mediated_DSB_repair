@@ -1,3 +1,9 @@
+mkdir -p output/flipped_intron
+mkdir -p output/mmej
+mkdir -p output/NHEJ
+mkdir -p output/R-TDR
+mkdir -p output/OX_WT
+mkdir -p output/yeast
 python test_ratios.py input/flipped_intron.tsv output/flipped_intron.xlsx -draw output/flipped_intron -ca WT -cb KO -na Sense -nb BranchD
 python test_ratios.py input/mmej.tsv output/mmej.xlsx -draw output/mmej -ca WT -cb KO -na Sense -nb BranchD
 python test_ratios.py input/NHEJ.tsv output/NHEJ.xlsx -draw output/NHEJ -ca WT -cb KO -na Sense -nb BranchD
