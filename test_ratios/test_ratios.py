@@ -81,10 +81,14 @@ def main():
             for name in names:
                 # select data
                 data = df.loc[(df.Name == name) & (df.Read == rd) & (df.Breaks == brk)]
-                ca_na = data.loc[(data.Cell_line == args.ca) & (data.Construct == args.na)].sort_values('Sample').Frequency.to_numpy()
-                ca_nb = data.loc[(data.Cell_line == args.ca) & (data.Construct == args.nb)].sort_values('Sample').Frequency.to_numpy()
-                cb_na = data.loc[(data.Cell_line == args.cb) & (data.Construct == args.na)].sort_values('Sample').Frequency.to_numpy()
-                cb_nb = data.loc[(data.Cell_line == args.cb) & (data.Construct == args.nb)].sort_values('Sample').Frequency.to_numpy()
+                ca_na = data.loc[(data.Cell_line == args.ca) & (data.Construct == args.na)]\
+                    .sort_values('Sample').Frequency.to_numpy()
+                ca_nb = data.loc[(data.Cell_line == args.ca) & (data.Construct == args.nb)]\
+                    .sort_values('Sample').Frequency.to_numpy()
+                cb_na = data.loc[(data.Cell_line == args.cb) & (data.Construct == args.na)]\
+                    .sort_values('Sample').Frequency.to_numpy()
+                cb_nb = data.loc[(data.Cell_line == args.cb) & (data.Construct == args.nb)]\
+                    .sort_values('Sample').Frequency.to_numpy()
                 if (min(len(ca_na), len(ca_nb), len(cb_na), len(cb_nb)) == 0) or \
                     (min(np.min(ca_na), np.min(ca_nb), np.min(cb_na), np.min(cb_nb)) == 0):
                     continue
