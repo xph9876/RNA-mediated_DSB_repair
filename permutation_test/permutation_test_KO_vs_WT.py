@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
 import pandas as pd
 import numpy as np
 import xlsxwriter
 import itertools as it
-
 
 # calc ratio
 def calc(wt1, wt2, db1, db2):
     r1 = np.sum(db1)/np.sum(wt1)
     r2 = np.sum(db2)/np.sum(wt2)
     return r1/r2
-    
 
 # each permutation
 def permute(wt, db):
@@ -33,7 +30,6 @@ def main():
     df = pd.read_csv(args.freq, sep='\t')
     mmejs = df.Name.unique()
     reads = df.Read.unique()
-    celllines = df.Cell_line.unique()
     breaks = df.Breaks.unique()
 
     # create xlsx writer
@@ -57,7 +53,7 @@ def main():
             # create worksheet
             ws = workbook.add_worksheet(f'{cut}_{rd}')
             # header
-            for i, w in enumerate(['Cut','Read','MMEJ', 'Ratio', 'P-value']):
+            for i, w in enumerate(['Cut','Read','MMEJ', 'Ratio', 'P-value', 'Conclusion']):
                 ws.write(0, i, w, bold)
             # data
             row = 1
@@ -66,9 +62,9 @@ def main():
                 wt_db = db[(db.Name == mmej) & (db.Cell_line == 'WT')].Frequency.tolist()
                 ko_wt = wt[(wt.Name == mmej) & (wt.Cell_line == 'KO')].Frequency.tolist()
                 ko_db = db[(db.Name == mmej) & (db.Cell_line == 'KO')].Frequency.tolist()
-                if len(wt_wt) == 0:
+                if min(len(wt_wt), len(wt_db), len(ko_wt), len(ko_db)) == 0:
                     continue
-                if min(np.sum(ko_db), np.sum(wt_db), np.sum(ko_wt), np.sum(wt_wt)) == 0:
+                if min(np.min(ko_db), np.min(wt_db), np.min(ko_wt), np.min(wt_wt)) == 0:
                     continue
                 ratio = calc(ko_wt, wt_wt, ko_db, wt_db)
                 # calc permutation
@@ -83,10 +79,11 @@ def main():
                     for _ in range(args.n):
                         sample = permute(wt_wt+ko_wt, wt_db+ko_db)
                         res.append(sample)
-                if mmej == 'NHEJ' and cut != '2dsb':
-                    pvalue = len([x for x in res if x >= ratio]) / len(res)
-                else:
-                    pvalue = len([x for x in res if x <= ratio]) / len(res)
+                pvalue = min(
+                    2 * len([x for x in res if x >= ratio]) / len(res),
+                    2 * len([x for x in res if x <= ratio]) / len(res),
+                    1
+                )
                 # write
                 ws.write(row, 0, cut)
                 ws.write(row, 1, rd)
@@ -94,15 +91,17 @@ def main():
                 ws.write(row, 3, ratio, value_style)
                 if pvalue < args.p:
                     ws.write(row, 4, pvalue, sig_style)
+                    if ratio <= 1:
+                        ws.write(row, 5, 'KO')
+                    else:
+                        ws.write(row, 5, 'WT')
                 else:
                     ws.write(row, 4, pvalue, nonsig_style)
+                    ws.write(row, 5, 'NS')
                 row += 1
     workbook.close()        
-    
 
-   
     print('Done!')
-
 
 if __name__ == '__main__':
     main()
