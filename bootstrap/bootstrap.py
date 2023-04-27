@@ -7,7 +7,6 @@ import xlsxwriter
 import seaborn as sns
 import matplotlib.pyplot as plt
 from statannotations.Annotator import Annotator
-from statsmodels.formula.api import ols
 
 # get the difference and relative effect size
 def calc_diff(ca_na, ca_nb, cb_na, cb_nb):
