@@ -30,9 +30,9 @@ if __name__ == '__main__':
         input_dir = get_input_dir(info['name'])
 
         arg_reverse_pos = (
-          ''
-          if (info['strand'] == library_constants.STRAND_R2) else
           '--reverse_pos'
+          if (info['strand'] == library_constants.STRAND_R2) else
+          ''
         )
         arg_label_type = '--label_type ' + (
           'absolute'
