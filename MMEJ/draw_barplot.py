@@ -29,15 +29,15 @@ def draw(data, output, annotated=False):
         if len(data.Label.unique()) == 3:
             annotator = Annotator(ax, [('Sense', 'BranchΔ'), ('BranchΔ', 'pCMVΔ'), ('Sense', 'pCMVΔ')],\
                 data=data, x='Label', y='Frequency', order=['Sense', 'BranchΔ', 'pCMVΔ'])
-            annotator.configure(test='Mann-Whitney', text_format='star')
-            annotator.verbose = False
-            annotator.apply_and_annotate()
         elif '5\'-SplicingΔ' in data.Label.unique():
             annotator = Annotator(ax, [('Antisense', '5\'-SplicingΔ')],\
                 data=data, x='Label', y='Frequency', order=['Antisense', '5\'-SplicingΔ'])
-            annotator.configure(test='Mann-Whitney', text_format='star')
-            annotator.verbose = False
-            annotator.apply_and_annotate()
+        elif len(data.Label.unique()) == 2 and 'pCMVΔ' not in data.Label.unique():
+            annotator = Annotator(ax, [('Sense', 'BranchΔ')], 
+                data=data, x='Label', y='Frequency', order=['Sense', 'BranchΔ'])
+        annotator.configure(test='Mann-Whitney', text_format='star')
+        annotator.verbose = False
+        annotator.apply_and_annotate()
     plt.xlabel('')
     plt.ylabel('')
     fig.savefig(output)
