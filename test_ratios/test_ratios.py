@@ -10,7 +10,7 @@ from statannotations.Annotator import Annotator
 import scipy.stats
 import itertools
 
-def draw(data, title, output, ca='WT', cb='KO', annotated=False):
+def draw(data, title, output, ca='WT', cb='KO', annotated=False, color=None):
     # skip mmejs which has 0 frequency in any library
     if data.Frequency.min() == 0:
         return
@@ -18,7 +18,8 @@ def draw(data, title, output, ca='WT', cb='KO', annotated=False):
     fig, ax = plt.subplots(figsize=(3,3))
     plt.subplots_adjust(left=0.15, top=0.9, bottom=0.2, right=1)
     sns.barplot(x='Label', y='Frequency', data=data, \
-        errwidth=2, capsize=0.2, errorbar='sd', edgecolor='k', ax=ax)
+        errwidth=2, capsize=0.2, errorbar='sd', edgecolor='k', ax=ax, \
+        color=color)
     sns.swarmplot(x='Label', y='Frequency', color='k', data=data, ax=ax)
     sns.despine()
     ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0),\
@@ -137,8 +138,12 @@ def main():
                         args.draw + '/' + draw_output,
                         ca=args.ca,
                         cb=args.cb,
-                        annotated = pvalue < 0.05)
-    workbook.close()        
+                        annotated = pvalue < 0.05,
+                        color = {
+                            'with_AI': '#70AD47',
+                            'without_AI': '#4472C4',
+                        }.get(name, None))
+    workbook.close()
 
 if __name__ == '__main__':
     main()
