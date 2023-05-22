@@ -140,7 +140,7 @@ def main():
                         cb=args.cb,
                         annotated = pvalue < 0.05,
                         color = {
-                            'with_AI': '#70AD47',
+                            'with_AI': '#34B050',
                             'without_AI': '#4472C4',
                         }.get(name, None))
     workbook.close()
