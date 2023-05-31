@@ -311,6 +311,22 @@ def make_fractal_layout(data_info, graph, reverse_complement=False):
           raise Exception('Impossible.')
   return xy_dict
 
+# Determines how the rows are laid out in the insertion side
+# of the universal layout.
+def get_universal_layout_insertion_row_spec(dist_ref):
+  if dist_ref in library_constants.GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC:
+    # This part was manually determined by looking at the layout
+    return library_constants.GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC[dist_ref]
+  else:
+    rows = 2 ** ((dist_ref - 1) // 2)
+    cols = 4 ** dist_ref // rows
+    row_space = 2 / rows
+    return {
+      'rows': rows,
+      'cols': cols,
+      'row_space': row_space,
+    }
+
 def get_pos_universal_layout(
   ref_align,
   read_align,
@@ -329,17 +345,17 @@ def get_pos_universal_layout(
       read_align,
     ))
     
-    row_spec = library_constants.GRAPH_UNIVERSAL_LAYOUT_INSERTION_ROW_SPEC
-    num_rows = row_spec[dist_ref]['rows']
-    num_cols = row_spec[dist_ref]['cols']
+    row_spec = get_universal_layout_insertion_row_spec(dist_ref)
+    num_rows = row_spec['rows']
+    num_cols = row_spec['cols']
     row = kmer_index % num_rows
     col = kmer_index // num_rows
-    prev_rows_offset = sum(
-      1 + row_spec[i]['rows'] * row_spec[i]['row_space']
-      for i in row_spec
-      if i < dist_ref
-    )
-    curr_row_offset = row * row_spec[dist_ref]['row_space']
+    prev_rows_offset = 0
+    for i in range(1, dist_ref):
+      row_spec_prev = get_universal_layout_insertion_row_spec(i)
+      prev_rows_offset += 1 + row_spec_prev['rows'] * row_spec_prev['row_space']
+
+    curr_row_offset = row * row_spec['row_space']
     y = 1 + prev_rows_offset + curr_row_offset
     x = ((col / num_cols) - 0.5 * (1 - 1 / num_cols))
     return (x * 22, y + 1)
