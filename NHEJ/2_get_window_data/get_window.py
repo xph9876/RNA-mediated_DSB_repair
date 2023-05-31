@@ -131,7 +131,7 @@ def parse_args():
   parser.add_argument(
     '--cell_line',
     type = str,
-    choices = [library_constants.CELL_LINE_WT, library_constants.CELL_LINE_KO],
+    choices = library_constants.CELL_LINES,
     help = 'Cell in this library.',
     required = True,
   )

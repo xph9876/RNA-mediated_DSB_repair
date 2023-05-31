@@ -113,8 +113,19 @@ LIBRARY_INFO = pd.concat(
   axis = 'index'
 ).reset_index(drop=True)
 LIBRARY_INFO['name_experiment'] = LIBRARY_INFO.apply(
-  get_name_experiment, axis = 'columns'
+  get_name_experiment,
+  axis = 'columns'
 )
+LIBRARY_INFO = LIBRARY_INFO.sort_values([
+  'dsb_type',
+  'guide_rna',
+  'cell_line',
+  'construct',
+  'control_type',
+  'version',
+  'library',
+  'strand'
+]).reset_index(drop=True)
 
 EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   'cell_line',
@@ -139,11 +150,13 @@ LAYOUT_GROUP_2DSB = '2DSB'
 LAYOUT_GROUP_1DSB_A = '1DSB_A'
 LAYOUT_GROUP_1DSB_B = '1DSB_B'
 LAYOUT_GROUP_2DSBanti = '2DSBanti'
+LAYOUT_GROUP_2DSByeast = '2DSByeast'
 LAYOUT_GROUPS = [
   LAYOUT_GROUP_2DSB,
   LAYOUT_GROUP_1DSB_A,
   LAYOUT_GROUP_1DSB_B,
   LAYOUT_GROUP_2DSBanti,
+  LAYOUT_GROUP_2DSByeast,
 ]
 
 EXPERIMENT_INFO['layout_group'] = None
@@ -169,7 +182,20 @@ EXPERIMENT_INFO.loc[
   EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_2anti,
   'layout_group'
 ] = LAYOUT_GROUP_2DSBanti
+EXPERIMENT_INFO.loc[
+  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_2yeast,
+  'layout_group'
+] = LAYOUT_GROUP_2DSByeast
 EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
+EXPERIMENT_INFO = EXPERIMENT_INFO.sort_values([
+  'dsb_type',
+  'guide_rna',
+  'cell_line',
+  'construct',
+  'control_type',
+  'version',
+  'strand'
+]).reset_index(drop=True)
 
 def get_experiment_info(**args):
   info = EXPERIMENT_INFO
@@ -198,6 +224,9 @@ def get_experiment_info_comparison():
       if key_dict['dsb_type'] == library_constants.DSB_TYPE_2anti:
         construct_1_list = [library_constants.CONSTRUCT_ANTISENSE]
         construct_2_list = [library_constants.CONSTRUCT_SPLICING]
+      elif key_dict['dsb_type'] == library_constants.DSB_TYPE_2yeast:
+        construct_1_list = [library_constants.CONSTRUCT_ANTISENSE]
+        construct_2_list = [library_constants.CONSTRUCT_BRANCH]
       else:
         construct_1_list = [library_constants.CONSTRUCT_SENSE]
         construct_2_list = [library_constants.CONSTRUCT_BRANCH, library_constants.CONSTRUCT_CMV]
@@ -226,6 +255,16 @@ def get_experiment_info_comparison():
   return pd.DataFrame.from_records(experiments_comparison)
 
 EXPERIMENT_INFO_COMPARISON = get_experiment_info_comparison()
+EXPERIMENT_INFO_COMPARISON = EXPERIMENT_INFO_COMPARISON.sort_values([
+  'dsb_type',
+  'guide_rna',
+  'cell_line',
+  'construct_1',
+  'construct_2',
+  'control_type',
+  'version',
+  'strand'
+]).reset_index(drop=True)
 
 def join_path(paths):
   return '/'.join(paths)

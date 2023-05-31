@@ -44,6 +44,12 @@ if __name__ == '__main__':
           intron_type_list = ['sense', 'antisense']
         elif cell_line == library_constants.CELL_LINE_KO:
           intron_type_list = ['sense']
+        elif cell_line in [
+          library_constants.CELL_LINE_YWT,
+          library_constants.CELL_LINE_YWTS3,
+          library_constants.CELL_LINE_YRNS3,
+        ]:
+          intron_type_list = ['antisense']
         else:
           raise Exception('Unknown cell line: ' + str(cell_line))
         for intron_type in intron_type_list:
@@ -61,12 +67,26 @@ if __name__ == '__main__':
               {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_30BPDOWN, 'guide_rna': library_constants.GUIDE_RNA_B},
             ]
           elif intron_type == 'antisense':
-            construct_list = library_constants.CONSTRUCTS_INDIVIDUAL_ANTISENSE
-            version_list = [library_constants.VERSION_OLD, library_constants.VERSION_NEW, library_constants.VERSION_MERGED]
-            row_spec_list = [
-              {'strand': library_constants.STRAND_R1, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_CD},
-              {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_CD},
-            ]
+            if cell_line == library_constants.CELL_LINE_WT:
+              construct_list = library_constants.CONSTRUCTS_INDIVIDUAL_ANTISENSE
+              version_list = [library_constants.VERSION_OLD, library_constants.VERSION_NEW, library_constants.VERSION_MERGED]
+              row_spec_list = [
+                {'strand': library_constants.STRAND_R1, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_CD},
+                {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_CD},
+              ]
+            elif cell_line in [
+              library_constants.CELL_LINE_YWT,
+              library_constants.CELL_LINE_YWTS3,
+              library_constants.CELL_LINE_YRNS3,
+            ]:
+              construct_list = library_constants.CONSTRUCTS_INDIVIDUAL_YEAST
+              version_list = [library_constants.VERSION_NONE]
+              row_spec_list = [
+                {'strand': library_constants.STRAND_R1, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_YCD},
+                {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_NOT, 'guide_rna': library_constants.GUIDE_RNA_YCD},
+                {'strand': library_constants.STRAND_R1, 'control_type': library_constants.CONTROL_NODSB, 'guide_rna': library_constants.GUIDE_RNA_YCD},
+                {'strand': library_constants.STRAND_R2, 'control_type': library_constants.CONTROL_NODSB, 'guide_rna': library_constants.GUIDE_RNA_YCD},
+              ]
           else:
             raise Exception('Impossible.')
           num_rows = len(row_spec_list)
@@ -86,7 +106,12 @@ if __name__ == '__main__':
           left_labels = []
           for row_spec in row_spec_list:
             labels = [library_constants.LABELS[row_spec['guide_rna']]]
-            if row_spec['guide_rna'] in [library_constants.GUIDE_RNA_AB, library_constants.GUIDE_RNA_CD]:
+            if row_spec['guide_rna'] in [
+              library_constants.GUIDE_RNA_AB,
+              library_constants.GUIDE_RNA_CD,
+              library_constants.GUIDE_RNA_YCD,
+            ]:
+              # 2 DSB graphs show the strand label also
               labels.append(library_constants.LABELS[row_spec['strand']])
             if row_spec['control_type'] != library_constants.CONTROL_NOT:
               labels.append(library_constants.LABELS[row_spec['control_type']])
