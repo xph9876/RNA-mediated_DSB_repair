@@ -45,8 +45,11 @@ def get_dsb_pos(info):
 TOTAL_READS = file_utils.read_tsv(os.path.dirname(__file__) + '/total_reads.tsv')
 def get_total_reads(info):
   x = TOTAL_READS.loc[
-    (TOTAL_READS['library'] == info['library']),
-    info['strand']  
+    (
+      (TOTAL_READS['library'] == info['library']) &
+      (TOTAL_READS['strand'] == info['strand'])
+    ),
+    'total_reads'
   ]
   if x.shape[0] != 1:
     raise Exception(f'Got {x.shape[0]} values. Expected 1.')
@@ -80,14 +83,14 @@ def get_library_info(**args):
   return library_info.iloc[0].to_dict()
 
 ANTISENSE_MERGED_PAIRS = {
-  ('yjl89', 'yjl349'): 'yjl89n349',
-  ('yjl90', 'yjl350'): 'yjl90n350',
-  ('yjl91', 'yjl351'): 'yjl91n351',
-  ('yjl92', 'yjl352'): 'yjl92n352',
-  ('yjl93', 'yjl353'): 'yjl93n353',
-  ('yjl94', 'yjl354'): 'yjl94n354',
-  ('yjl95', 'yjl355'): 'yjl95n355',
-  ('yjl96', 'yjl356'): 'yjl96n356',
+  ('yjl089', 'yjl349'): 'yjl089n349',
+  ('yjl090', 'yjl350'): 'yjl090n350',
+  ('yjl091', 'yjl351'): 'yjl091n351',
+  ('yjl092', 'yjl352'): 'yjl092n352',
+  ('yjl093', 'yjl353'): 'yjl093n353',
+  ('yjl094', 'yjl354'): 'yjl094n354',
+  ('yjl095', 'yjl355'): 'yjl095n355',
+  ('yjl096', 'yjl356'): 'yjl096n356',
 }
 def get_library_info_antisense_merged():
   info_list = []
