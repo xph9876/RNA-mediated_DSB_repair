@@ -131,7 +131,7 @@ if __name__ == '__main__':
                     generate_constants.ARG_NEWLINE[ext] +
                     library_constants.LABELS[construct]
                   )
-            if dsb_type == library_constants.DSB_TYPE_2anti:
+            if dsb_type in [library_constants.DSB_TYPE_2anti, library_constants.DSB_TYPE_2yeast]:
               # transpose the 2'nd grid and make full width
               num_rows_list[-1], num_cols_list[-1] = num_cols_list[-1], num_rows_list[-1]
               total_width_list[-1] = 1
