@@ -7,3 +7,5 @@ dsb_type	strand	version	dsb_pos
 2DSBanti	R2	old	47
 2DSBanti	R1	new	66
 2DSBanti	R2	new	47
+2DSByeast	R1	versionNone	105
+2DSByeast	R2	versionNone	85

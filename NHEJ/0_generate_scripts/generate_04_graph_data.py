@@ -25,11 +25,11 @@ if __name__ == '__main__':
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[ext],
     ) as file_out:
-      for subst_type in library_constants.SUBST_TYPES:
-        for info in (
-          generate_constants.EXPERIMENT_INFO.to_dict('records') +
-          generate_constants.EXPERIMENT_INFO_COMPARISON.to_dict('records')
-        ):
+      for info in (
+        generate_constants.EXPERIMENT_INFO.to_dict('records') +
+        generate_constants.EXPERIMENT_INFO_COMPARISON.to_dict('records')
+      ):
+        for subst_type in library_constants.SUBST_TYPES:
           input_dir = get_input_dir(info['name'])
           output_dir = get_output_dir(info['name'])
           file_out.write(f"python {generate_constants.get_python_script('get_graph_data')} --input {input_dir} --output {output_dir} --subst_type {subst_type}\n")

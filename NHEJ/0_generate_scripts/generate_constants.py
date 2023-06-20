@@ -45,8 +45,11 @@ def get_dsb_pos(info):
 TOTAL_READS = file_utils.read_tsv(os.path.dirname(__file__) + '/total_reads.tsv')
 def get_total_reads(info):
   x = TOTAL_READS.loc[
-    (TOTAL_READS['library'] == info['library']),
-    info['strand']  
+    (
+      (TOTAL_READS['library'] == info['library']) &
+      (TOTAL_READS['strand'] == info['strand'])
+    ),
+    'total_reads'
   ]
   if x.shape[0] != 1:
     raise Exception(f'Got {x.shape[0]} values. Expected 1.')
@@ -80,14 +83,14 @@ def get_library_info(**args):
   return library_info.iloc[0].to_dict()
 
 ANTISENSE_MERGED_PAIRS = {
-  ('yjl89', 'yjl349'): 'yjl89n349',
-  ('yjl90', 'yjl350'): 'yjl90n350',
-  ('yjl91', 'yjl351'): 'yjl91n351',
-  ('yjl92', 'yjl352'): 'yjl92n352',
-  ('yjl93', 'yjl353'): 'yjl93n353',
-  ('yjl94', 'yjl354'): 'yjl94n354',
-  ('yjl95', 'yjl355'): 'yjl95n355',
-  ('yjl96', 'yjl356'): 'yjl96n356',
+  ('yjl089', 'yjl349'): 'yjl089n349',
+  ('yjl090', 'yjl350'): 'yjl090n350',
+  ('yjl091', 'yjl351'): 'yjl091n351',
+  ('yjl092', 'yjl352'): 'yjl092n352',
+  ('yjl093', 'yjl353'): 'yjl093n353',
+  ('yjl094', 'yjl354'): 'yjl094n354',
+  ('yjl095', 'yjl355'): 'yjl095n355',
+  ('yjl096', 'yjl356'): 'yjl096n356',
 }
 def get_library_info_antisense_merged():
   info_list = []
@@ -110,8 +113,19 @@ LIBRARY_INFO = pd.concat(
   axis = 'index'
 ).reset_index(drop=True)
 LIBRARY_INFO['name_experiment'] = LIBRARY_INFO.apply(
-  get_name_experiment, axis = 'columns'
+  get_name_experiment,
+  axis = 'columns'
 )
+LIBRARY_INFO = LIBRARY_INFO.sort_values([
+  'dsb_type',
+  'guide_rna',
+  'cell_line',
+  'construct',
+  'control_type',
+  'version',
+  'library',
+  'strand'
+]).reset_index(drop=True)
 
 EXPERIMENT_INFO = LIBRARY_INFO.groupby([
   'cell_line',
@@ -136,11 +150,13 @@ LAYOUT_GROUP_2DSB = '2DSB'
 LAYOUT_GROUP_1DSB_A = '1DSB_A'
 LAYOUT_GROUP_1DSB_B = '1DSB_B'
 LAYOUT_GROUP_2DSBanti = '2DSBanti'
+LAYOUT_GROUP_2DSByeast = '2DSByeast'
 LAYOUT_GROUPS = [
   LAYOUT_GROUP_2DSB,
   LAYOUT_GROUP_1DSB_A,
   LAYOUT_GROUP_1DSB_B,
   LAYOUT_GROUP_2DSBanti,
+  LAYOUT_GROUP_2DSByeast,
 ]
 
 EXPERIMENT_INFO['layout_group'] = None
@@ -166,7 +182,20 @@ EXPERIMENT_INFO.loc[
   EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_2anti,
   'layout_group'
 ] = LAYOUT_GROUP_2DSBanti
+EXPERIMENT_INFO.loc[
+  EXPERIMENT_INFO['dsb_type'] == library_constants.DSB_TYPE_2yeast,
+  'layout_group'
+] = LAYOUT_GROUP_2DSByeast
 EXPERIMENT_INFO['format'] = library_constants.DATA_INDIVIDUAL
+EXPERIMENT_INFO = EXPERIMENT_INFO.sort_values([
+  'dsb_type',
+  'guide_rna',
+  'cell_line',
+  'construct',
+  'control_type',
+  'version',
+  'strand'
+]).reset_index(drop=True)
 
 def get_experiment_info(**args):
   info = EXPERIMENT_INFO
@@ -195,6 +224,9 @@ def get_experiment_info_comparison():
       if key_dict['dsb_type'] == library_constants.DSB_TYPE_2anti:
         construct_1_list = [library_constants.CONSTRUCT_ANTISENSE]
         construct_2_list = [library_constants.CONSTRUCT_SPLICING]
+      elif key_dict['dsb_type'] == library_constants.DSB_TYPE_2yeast:
+        construct_1_list = [library_constants.CONSTRUCT_ANTISENSE]
+        construct_2_list = [library_constants.CONSTRUCT_BRANCH]
       else:
         construct_1_list = [library_constants.CONSTRUCT_SENSE]
         construct_2_list = [library_constants.CONSTRUCT_BRANCH, library_constants.CONSTRUCT_CMV]
@@ -223,6 +255,16 @@ def get_experiment_info_comparison():
   return pd.DataFrame.from_records(experiments_comparison)
 
 EXPERIMENT_INFO_COMPARISON = get_experiment_info_comparison()
+EXPERIMENT_INFO_COMPARISON = EXPERIMENT_INFO_COMPARISON.sort_values([
+  'dsb_type',
+  'guide_rna',
+  'cell_line',
+  'construct_1',
+  'construct_2',
+  'control_type',
+  'version',
+  'strand'
+]).reset_index(drop=True)
 
 def join_path(paths):
   return '/'.join(paths)

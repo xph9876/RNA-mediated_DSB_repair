@@ -48,8 +48,14 @@ if __name__ == '__main__':
       for dsb_type in library_constants.DSB_TYPES:
         if dsb_type == library_constants.DSB_TYPE_2anti:
           cell_line_list = [library_constants.CELL_LINE_WT]
-        else:
-          cell_line_list = library_constants.CELL_LINES
+        elif dsb_type in [library_constants.DSB_TYPE_2, library_constants.DSB_TYPE_1]:
+          cell_line_list = [library_constants.CELL_LINE_WT, library_constants.CELL_LINE_KO]
+        elif dsb_type == library_constants.DSB_TYPE_2yeast:
+          cell_line_list = [
+            library_constants.CELL_LINE_YWT,
+            library_constants.CELL_LINE_YWTS3,
+            library_constants.CELL_LINE_YRNS3,
+          ]
         for cell_line in cell_line_list:
           if dsb_type == library_constants.DSB_TYPE_1:
             constructs_individual = library_constants.CONSTRUCTS_INDIVIDUAL_SENSE
@@ -67,6 +73,10 @@ if __name__ == '__main__':
               library_constants.VERSION_NEW,
               library_constants.VERSION_MERGED,
             ]
+          elif dsb_type == library_constants.DSB_TYPE_2yeast:
+            constructs_individual = library_constants.CONSTRUCTS_INDIVIDUAL_YEAST
+            constructs_comparison = library_constants.CONSTRUCTS_COMPARISON_YEAST
+            version_list = [library_constants.VERSION_NONE]
           else:
             raise Exception('Unknown dsb_type: ' + dsb_type)
           
@@ -121,7 +131,7 @@ if __name__ == '__main__':
                     generate_constants.ARG_NEWLINE[ext] +
                     library_constants.LABELS[construct]
                   )
-            if dsb_type == library_constants.DSB_TYPE_2anti:
+            if dsb_type in [library_constants.DSB_TYPE_2anti, library_constants.DSB_TYPE_2yeast]:
               # transpose the 2'nd grid and make full width
               num_rows_list[-1], num_cols_list[-1] = num_cols_list[-1], num_rows_list[-1]
               total_width_list[-1] = 1

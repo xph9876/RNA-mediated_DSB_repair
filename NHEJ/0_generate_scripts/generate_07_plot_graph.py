@@ -48,12 +48,14 @@ if __name__ == '__main__':
                 generate_constants.LAYOUT_GROUP_1DSB_A: [-12, 13],
                 generate_constants.LAYOUT_GROUP_1DSB_B: [-12, 13],
                 generate_constants.LAYOUT_GROUP_2DSBanti: [-12, 13],
+                generate_constants.LAYOUT_GROUP_2DSByeast: [-12, 13],
               }[info['layout_group']]
               range_y = {
                 generate_constants.LAYOUT_GROUP_2DSB: [-22, 22],
                 generate_constants.LAYOUT_GROUP_1DSB_A: [-23, 20],
                 generate_constants.LAYOUT_GROUP_1DSB_B: [-22, 16],
                 generate_constants.LAYOUT_GROUP_2DSBanti: [-22, 27],
+                generate_constants.LAYOUT_GROUP_2DSByeast: [-22, 35],
               }[info['layout_group']]
               arg_range_x = '--range_x ' + ' '.join(str(x) for x in range_x)
               arg_range_y = '--range_y ' + ' '.join(str(y) for y in range_y)
@@ -118,12 +120,14 @@ if __name__ == '__main__':
                 generate_constants.LAYOUT_GROUP_1DSB_A: 6,
                 generate_constants.LAYOUT_GROUP_1DSB_B: 5,
                 generate_constants.LAYOUT_GROUP_2DSBanti: 8,
+                generate_constants.LAYOUT_GROUP_2DSByeast: 11,
               }[info['layout_group']]
               arg_universal_layout_max_tick_deletion = {
                 generate_constants.LAYOUT_GROUP_2DSB: 17,
                 generate_constants.LAYOUT_GROUP_1DSB_A: 19,
                 generate_constants.LAYOUT_GROUP_1DSB_B: 18,
                 generate_constants.LAYOUT_GROUP_2DSBanti: 17,
+                generate_constants.LAYOUT_GROUP_2DSByeast: 17,
               }[info['layout_group']]
               arg_universal_layout_max_tick = (
                 '--universal_layout_y_axis_insertion_max_tick ' +
