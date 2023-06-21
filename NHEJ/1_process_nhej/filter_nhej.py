@@ -251,19 +251,19 @@ def main():
 
     total_reads += 1
 
+    fields = line.rstrip().split('\t')
+    mandatory, optional = sam_utils.parse_sam_fields(fields)
     read_seq = mandatory['SEQ']
+    cigar = mandatory['CIGAR']
 
     if read_seq in read_counts:
-      read_counts[read_seq] += 1
+      read_counts[read_seq, cigar] += 1
       accepted_repeat += 1
       continue
     elif read_seq in read_counts_rejected:
       read_counts_rejected[read_seq] += 1
       rejected_repeat += 1
       continue
-
-    fields = line.rstrip().split('\t')
-    mandatory, optional = sam_utils.parse_sam_fields(fields)
 
     if int(mandatory['FLAG']) & 4: # the read did not align at all
       rejected_no_alignment += 1
@@ -275,18 +275,17 @@ def main():
       read_counts_rejected[read_seq] += 1
       continue
 
+    if len(read_seq) < args.min_length:
+      rejected_too_short += 1
+      read_counts_rejected[read_seq] += 1
+      continue
+
     # XG is the number of gap-extends (aka in/dels). 
     # XM if number of mismatches.
     # Both should always be present for aligned reads.
     num_indel_sam = int(optional['XG']['VALUE'])
     num_subst_sam = int(optional['XM']['VALUE'])
 
-    if len(read_seq) < args.min_length:
-      rejected_too_short += 1
-      read_counts_rejected[read_seq] += 1
-      continue
-
-    cigar = mandatory['CIGAR']
     ref_align, read_align = alignment_utils.get_alignment(ref_seq, read_seq, 1, cigar)
 
     ins_pos, del_pos, subst_pos = alignment_utils.get_variation_pos(ref_align, read_align)
@@ -298,10 +297,10 @@ def main():
     if num_subst_sam != num_subst:
         raise Exception('Incorrect count of substitutions')
 
+    insertion_special = False
+    deletion_special = False
     if num_ins + num_del > 0:
       dsb_touches = check_dsb_touches_indel(args.dsb_pos, ins_pos, del_pos)
-      insertion_special = False
-      deletion_special = False
       if not dsb_touches:
         if num_ins > 0:
           # insertions special case
@@ -363,18 +362,28 @@ def main():
   if len(read_counts) == 0:
     raise Exception('No sequences captured')
 
-  for output_file, rc in [
-    (args.output, read_counts),
-    (args.output_rejected, read_counts_rejected)
-  ]:
-    read_seq_and_cigars = sorted(rc.keys(), key = lambda x: -rc[x])
-    output_file.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
-    for read_seq, cigar in read_seq_and_cigars:
-      count = read_counts[read_seq, cigar]
-      num_subst = read_num_subst[read_seq, cigar]
-      output_file.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
-    log_utils.log('------>')
-    log_utils.log(args.output.name)
+  read_seq_and_cigars = sorted(
+    read_counts.keys(),
+    key = lambda x: -read_counts[x]
+  )
+  args.output.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
+  for read_seq, cigar in read_seq_and_cigars:
+    count = read_counts[read_seq, cigar]
+    num_subst = read_num_subst[read_seq, cigar]
+    args.output.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
+
+  read_seq = sorted(
+    read_counts_rejected.keys(),
+    key = lambda x: -read_counts_rejected[x]
+  )
+  args.output_rejected.write('Sequence\tCount\n')
+  for read_seq in read_seq:
+    count = read_counts_rejected[read_seq]
+    args.output_rejected.write(f'{read_seq}\t{count}\n')
+  
+  log_utils.log('------>')
+  log_utils.log(args.output.name)
+  log_utils.log(args.output_rejected.name)
 
   total_accepted = (
     accepted_repeat +
