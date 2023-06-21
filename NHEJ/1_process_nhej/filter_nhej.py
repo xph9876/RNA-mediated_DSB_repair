@@ -184,6 +184,12 @@ def main():
     help = 'Output file.'
   )
   parser.add_argument(
+    '--output_rejected',
+    type = common_utils.check_file_output,
+    required = True,
+    help = 'Output file for rejected reads.'
+  )
+  parser.add_argument(
     '--min_length',
     type = int,
     required = True,
@@ -217,18 +223,23 @@ def main():
   
   # For logging
   rejected_header = 0
+  rejected_repeat = 0
   rejected_no_alignment = 0
   rejected_pos_not_1 = 0
   rejected_not_consecutive = 0
   rejected_too_short = 0
   rejected_dsb_not_touch = 0
+  accepted_repeat = 0
+  accepted_other = 0
   accepted_deletion_special = 0
   accepted_insertion_special = 0
 
   # categorize
   read_counts = collections.defaultdict(int)
+  read_counts_rejected = collections.defaultdict(int)
   read_num_subst = {}
   total_lines = file_utils.count_lines(args.sam_file.name)
+  total_reads = 0
   for line_num, line in enumerate(args.sam_file):
     if (line_num % 100000) == 0:
       if not args.quiet:
@@ -238,18 +249,32 @@ def main():
       rejected_header += 1
       continue
 
+    total_reads += 1
+
+    read_seq = mandatory['SEQ']
+
+    if read_seq in read_counts:
+      read_counts[read_seq] += 1
+      accepted_repeat += 1
+      continue
+    elif read_seq in read_counts_rejected:
+      read_counts_rejected[read_seq] += 1
+      rejected_repeat += 1
+      continue
+
     fields = line.rstrip().split('\t')
     mandatory, optional = sam_utils.parse_sam_fields(fields)
 
     if int(mandatory['FLAG']) & 4: # the read did not align at all
       rejected_no_alignment += 1
+      read_counts_rejected[read_seq] += 1
       continue
 
     if int(mandatory['POS']) != 1:
       rejected_pos_not_1 += 1
+      read_counts_rejected[read_seq] += 1
       continue
 
-    read_seq = mandatory['SEQ']
     # XG is the number of gap-extends (aka in/dels). 
     # XM if number of mismatches.
     # Both should always be present for aligned reads.
@@ -258,6 +283,7 @@ def main():
 
     if len(read_seq) < args.min_length:
       rejected_too_short += 1
+      read_counts_rejected[read_seq] += 1
       continue
 
     cigar = mandatory['CIGAR']
@@ -274,6 +300,8 @@ def main():
 
     if num_ins + num_del > 0:
       dsb_touches = check_dsb_touches_indel(args.dsb_pos, ins_pos, del_pos)
+      insertion_special = False
+      deletion_special = False
       if not dsb_touches:
         if num_ins > 0:
           # insertions special case
@@ -292,7 +320,7 @@ def main():
             num_del = len(del_pos)
             num_subst = len(subst_pos)
             dsb_touches = True
-            accepted_insertion_special += 1
+            insertion_special = True
         elif num_del > 0:
           # deletions and no insertions special case
           new_read_align = check_deletion_special_case(
@@ -310,57 +338,96 @@ def main():
             num_del = len(del_pos)
             num_subst = len(subst_pos)
             dsb_touches = True
-            accepted_deletion_special += 1
+            deletion_special = True
 
       # If still DSB does not touch after special case check, reject
       if not dsb_touches:
         rejected_dsb_not_touch += 1
+        read_counts_rejected[read_seq] += 1
         continue
     
     if not is_consecutive(ins_pos, del_pos):
       rejected_not_consecutive += 1
+      read_counts_rejected[read_seq] += 1
       continue
 
+    if insertion_special:
+      accepted_insertion_special += 1
+    elif deletion_special:
+      accepted_deletion_special += 1
+    else:
+      accepted_other += 1
     read_counts[read_seq, cigar] += 1
     read_num_subst[read_seq, cigar] = num_subst
 
   if len(read_counts) == 0:
     raise Exception('No sequences captured')
 
-  output_file = args.output
-  read_seq_and_cigars = sorted(read_counts.keys(), key = lambda x: -read_counts[x])
-  output_file.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
-  for read_seq, cigar in read_seq_and_cigars:
-    count = read_counts[read_seq, cigar]
-    num_subst = read_num_subst[read_seq, cigar]
-    output_file.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
-  log_utils.log('------>')
-  log_utils.log(args.output.name)
+  for output_file, rc in [
+    (args.output, read_counts),
+    (args.output_rejected, read_counts_rejected)
+  ]:
+    read_seq_and_cigars = sorted(rc.keys(), key = lambda x: -rc[x])
+    output_file.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
+    for read_seq, cigar in read_seq_and_cigars:
+      count = read_counts[read_seq, cigar]
+      num_subst = read_num_subst[read_seq, cigar]
+      output_file.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
+    log_utils.log('------>')
+    log_utils.log(args.output.name)
 
-  total_accepted = sum(read_counts.values())
+  total_accepted = (
+    accepted_repeat +
+    accepted_insertion_special +
+    accepted_deletion_special +
+    accepted_other
+  )
   total_rejected = (
-    rejected_header +
+    rejected_repeat +
     rejected_no_alignment + 
     rejected_pos_not_1 +
     rejected_too_short +
     rejected_dsb_not_touch +
     rejected_not_consecutive
   )
-  if total_rejected != (total_lines - total_accepted):
-    raise Exception("Line counts of accepted + rejected != total lines")
+  if (total_rejected  + total_accepted) != total_reads:
+    raise Exception("accepted + rejected != total")
+
+  if total_accepted != sum(read_counts.values()):
+    raise Exception("Total accepted not summing")
+  
+  if total_rejected != sum(read_counts_rejected.values()):
+    raise Exception("Total rejected not summing")
 
   if not args.quiet:
-    log_utils.log(f'Total lines: {total_lines}')
+    accepted_new = (
+      accepted_insertion_special +
+      accepted_deletion_special +
+      accepted_other
+    )
+    rejected_new = (
+      rejected_no_alignment +
+      rejected_pos_not_1 +
+      rejected_too_short +
+      rejected_dsb_not_touch +
+      rejected_not_consecutive
+    )
+    log_utils.log(f'Header lines: {rejected_header}')
+    log_utils.log(f'Total reads: {total_reads}')
     log_utils.log(f'    Accepted: {total_accepted}')
-    log_utils.log(f'        Insertion special case: {accepted_insertion_special}')
-    log_utils.log(f'        Deletion special case: {accepted_deletion_special}')
+    log_utils.log(f'        Repeat: {accepted_repeat}')
+    log_utils.log(f'        New: {accepted_new}')
+    log_utils.log(f'            Insertion special case: {accepted_other}')
+    log_utils.log(f'            Insertion special case: {accepted_insertion_special}')
+    log_utils.log(f'            Deletion special case: {accepted_deletion_special}')
     log_utils.log(f'    Rejected: {total_rejected}')
-    log_utils.log(f'        Header: {rejected_header}')
-    log_utils.log(f'        No alignment: {rejected_no_alignment}')
-    log_utils.log(f'        POS != 1: {rejected_pos_not_1}')
-    log_utils.log(f'        Too short: {rejected_too_short}')
-    log_utils.log(f'        DSB not touch: {rejected_dsb_not_touch}')
-    log_utils.log(f'        Not consecutive: {rejected_not_consecutive}')
+    log_utils.log(f'        Repeat: {rejected_repeat}')
+    log_utils.log(f'        New: {rejected_new}')
+    log_utils.log(f'            No alignment: {rejected_no_alignment}')
+    log_utils.log(f'            POS != 1: {rejected_pos_not_1}')
+    log_utils.log(f'            Too short: {rejected_too_short}')
+    log_utils.log(f'            DSB not touch: {rejected_dsb_not_touch}')
+    log_utils.log(f'            Not consecutive: {rejected_not_consecutive}')
   log_utils.new_line()
 
 if __name__ == '__main__':
