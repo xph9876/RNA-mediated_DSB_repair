@@ -9,7 +9,7 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   count_list = defaultdict(int)
-  with open(input, 'r') as input:
+  with open(args.i, 'r') as input:
     while True:
       line_1 = input.readline() # ignore header
       if len(line_1) == 0:

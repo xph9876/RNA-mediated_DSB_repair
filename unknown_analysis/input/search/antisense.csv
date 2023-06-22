@@ -1,0 +1,9 @@
+Category,Name,Construct,Breaks,Strand,Sequence
+anti_x,6_nt_signature,Sense,sgA,R1,TAGGGA
+anti_x,6_nt_signature,Sense,sgA,R2,ATTACC
+anti_x,6_nt_signature,BranchD,sgA,R1,TAGGGA
+anti_x,6_nt_signature,BranchD,sgA,R2,ATTACC
+anti_x,6_nt_signature,Sense,sgB,R1,TAGGGA
+anti_x,6_nt_signature,Sense,sgB,R2,ATTACC
+anti_x,6_nt_signature,BranchD,sgB,R1,TAGGGA
+anti_x,6_nt_signature,BranchD,sgB,R2,ATTACC
