@@ -11,6 +11,9 @@ root_dir = os.path.dirname(__file__)
 
 dsb_pos = pd.read_csv(os.path.join(root_dir, 'dsb_pos.tsv'), sep='\t')
 library_info = pd.read_csv(os.path.join(root_dir, 'library_info.tsv'), sep='\t')
+total_reads = pd.read_csv(os.path.join(root_dir, 'total_reads.tsv'), sep='\t')
+library_info = library_info.merge(dsb_pos, on=['dsb_type', 'strand', 'version'])
+library_info = library_info.merge(total_reads, on=['library', 'strand'])
 library_info = library_info.loc[
   (library_info['dsb_type'] == '1DSB') &
   (library_info['control_type'].isin(['noDSB', 'notControl']))
@@ -34,10 +37,10 @@ library_info = library_info.loc[
 
 library_info = library_info.sort_values(by=['library', 'strand'])
 library_info = library_info.to_dict('records')
-total_reads = pd.read_csv(os.path.join(root_dir, 'total_reads.tsv'), sep='\t')
 
-collected_dir = os.path.join(root_dir, 'output', 'collected')
-ranks_dir = os.path.join(root_dir, 'output', 'ranks')
+fastq_dir = args.f
+filter_nhej_dir = args.n
+alignment_dir = os.path.join(root_dir, 'output', 'alignment')
 
 def join_path(sep, *path):
   path = sep.join(path)
@@ -55,34 +58,30 @@ def get_lib_name_long(info):
     ('_' + info['control_type'] if info['control_type'] != 'notControl' else '')
   )
 
-# Make the collect_fastq script
-for ext in ['.sh', '.ps1']:
-  sep = '\\' if ext == '.ps1' else '/'
-  with open('run_collect_fastq' + ext, 'w') as out:
-    for info in library_info:
-      i = join_path(sep, args.f, get_lib_name(info) + '.fastq')
-      o = join_path(sep, collected_dir, get_lib_name(info) + '.tsv')
-      out.write(f'python collect_fastq.py -i {i} -o {o}\n')
-# yjl090_WT_sgCD_R1_antisense.tsv
-
-# Make the get_ranks script
-for ext in ['.sh', '.ps1']:
-  sep = '\\' if ext == '.ps1' else '/'
-  with open('run_get_ranks' + ext, 'w') as out:
-    for info in library_info:
-      i = join_path(sep, args.n, get_lib_name_long(info) + '.tsv')
-      r = join_path(sep, collected_dir, get_lib_name(info) + '.tsv')
-      o = join_path(sep, ranks_dir, get_lib_name(info) + '_ranks.tsv')
-      out.write(f'python get_ranks.py -i {i} -r {r} -o {o}\n')
-    #     python .\get_ranks.py -i .\output\$t\filter_nhej_rejected.tsv `
-    # -r .\input\fasta\2_collected\${t}.tsv `
-    # -o .\output\$t\filter_nhej_rejected_ranks.tsv
-
 # Make the analyze alignments script
-# for ext in ['.sh', '.ps1']:
-#   sep = '\\' if ext == '.ps1' else '/'
-#   with open('run_analyze_alignments' + ext, 'w') as out:
-#     for info in library_info:
-#       i = join_path(sep, collected_dir, info['library'] + '_' + info['strand'] + '.tsv')
-#       o = join_path(sep, collected_dir, info['library'] + '_' + info['strand'] + '_alignments.tsv')
-#       out.write(f'python analyze_alignments.py -i {i} -o {o}\n')
+for ext in ['.sh', '.ps1']:
+  sep = '\\' if ext == '.ps1' else '/'
+  with open('run_analyze_alignments' + ext, 'w') as out:
+    for info in library_info:
+      i = join_path(sep, filter_nhej_dir, get_lib_name_long(info) + '_rejected.tsv')
+      o = join_path(sep, alignment_dir, get_lib_name_long(info) + '.tsv')
+      d = info['dsb_pos']
+      c = info['construct']
+      b = info['guide_rna']
+      s = info['strand']
+      t = info['total_reads']
+      r = join_path(sep, 'input', 'ref_seq', f'{info["dsb_type"]}_{s}_{c}.fa')
+      out.write(f'python analyze_alignments.py -i {i} -o {o} -d {d} -c {c} -b {b} -r {r} -m 0\n')
+
+# $d = $dsb_pos[$name]
+# $r = $ref_seq[$name]
+# $c = If ($name -match "Sense") {"S"} Else {"B"}
+# $b = If ($name -match "sgA") {"sgA"} Else {"sgB"}
+# $s = If ($name -match "sgA") {"R1"} Else {"R2"}
+# $t = $total_reads[$name]
+# Write-Output "Alignment analysis: $name"
+# python .\analyze_alignments.py `
+#   -i .\output\$name\filter_nhej_rejected_ranks.tsv `
+#   -o .\output\$name\alignment.csv `
+#   -d $d -r .\input\ref_seq\$r `
+#   -b $b -s $s -c $c -t $t -m 0
