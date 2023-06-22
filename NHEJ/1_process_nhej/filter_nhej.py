@@ -241,8 +241,8 @@ def main():
   read_cigar = {}
   total_lines = file_utils.count_lines(args.sam_file.name)
   total_reads = 0
-  for line_num, line in enumerate(args.sam_file):
-    if (line_num % 100000) == 0:
+  for line_num, line in enumerate(args.sam_file, 1):
+    if (line_num % 100000) == 1:
       if not args.quiet:
         log_utils.log(f"Progress: {line_num} / {total_lines}")
 
@@ -368,28 +368,35 @@ def main():
   if len(read_count_accepted) == 0:
     raise Exception('No sequences captured')
 
+  read_count = read_count_accepted.copy()
+  read_count.update(read_count_rejected)
+  read_count = sorted(read_count.items(), key=lambda x: x[1], reverse=True) # tuples (read_seq, count)
+  read_rank = {read_seq : rank for rank, (read_seq, _) in enumerate(read_count, 1)} 
+
   read_seq_list = sorted(
     read_count_accepted.keys(),
     key = lambda x: read_count_accepted[x],
     reverse = True
   )
-  args.output.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
+  args.output.write('Rank\tCount\tNum_Subst\tCIGAR\tSequence\n')
   for read_seq in read_seq_list:
+    rank = read_rank[read_seq]
     cigar = read_cigar[read_seq]
     count = read_count_accepted[read_seq]
     num_subst = read_num_subst[read_seq]
-    args.output.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
+    args.output.write(f'{rank}\t{count}\t{num_subst}\t{cigar}\t{read_seq}\n')
 
   read_seq_list = sorted(
     read_count_rejected.keys(),
     key = lambda x: read_count_rejected[x],
     reverse = True
   )
-  args.output_rejected.write('Sequence\tCount\tAligned\n')
+  args.output_rejected.write('Rank\tCount\tAligned\tSequence\n')
   for read_seq in read_seq_list:
+    rank = read_rank[read_seq]
     count = read_count_rejected[read_seq]
     aligned = int(read_aligned[read_seq])
-    args.output_rejected.write(f'{read_seq}\t{count}\t{aligned}\n')
+    args.output_rejected.write(f'{rank}\t{count}\t{aligned}\t{read_seq}\n')
   
   log_utils.log('------>')
   log_utils.log(args.output.name)
