@@ -4,7 +4,6 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../utils/'))) # allow importing the utils dir
 
-import collections
 import file_utils
 import common_utils
 import sam_utils
@@ -235,9 +234,11 @@ def main():
   accepted_insertion_special = 0
 
   # categorize
-  read_counts = collections.defaultdict(int)
-  read_counts_rejected = collections.defaultdict(int)
+  read_count_accepted = {}
+  read_count_rejected = {}
   read_num_subst = {}
+  read_aligned = {}
+  read_cigar = {}
   total_lines = file_utils.count_lines(args.sam_file.name)
   total_reads = 0
   for line_num, line in enumerate(args.sam_file):
@@ -256,28 +257,33 @@ def main():
     read_seq = mandatory['SEQ']
     cigar = mandatory['CIGAR']
 
-    if read_seq in read_counts:
-      read_counts[read_seq, cigar] += 1
+    if read_seq in read_count_accepted:
+      read_count_accepted[read_seq] += 1
       accepted_repeat += 1
       continue
-    elif read_seq in read_counts_rejected:
-      read_counts_rejected[read_seq] += 1
+    elif read_seq in read_count_rejected:
+      read_count_rejected[read_seq] += 1
       rejected_repeat += 1
       continue
 
+    read_cigar[read_seq] = cigar
+
     if int(mandatory['FLAG']) & 4: # the read did not align at all
       rejected_no_alignment += 1
-      read_counts_rejected[read_seq] += 1
+      read_count_rejected[read_seq] = 1
+      read_aligned[read_seq] = False
       continue
+    else:
+      read_aligned[read_seq] = True
 
     if int(mandatory['POS']) != 1:
       rejected_pos_not_1 += 1
-      read_counts_rejected[read_seq] += 1
+      read_count_rejected[read_seq] = 1
       continue
 
     if len(read_seq) < args.min_length:
       rejected_too_short += 1
-      read_counts_rejected[read_seq] += 1
+      read_count_rejected[read_seq] = 1
       continue
 
     # XG is the number of gap-extends (aka in/dels). 
@@ -342,12 +348,12 @@ def main():
       # If still DSB does not touch after special case check, reject
       if not dsb_touches:
         rejected_dsb_not_touch += 1
-        read_counts_rejected[read_seq] += 1
+        read_count_rejected[read_seq] = 1
         continue
     
     if not is_consecutive(ins_pos, del_pos):
       rejected_not_consecutive += 1
-      read_counts_rejected[read_seq] += 1
+      read_count_rejected[read_seq] = 1
       continue
 
     if insertion_special:
@@ -356,30 +362,34 @@ def main():
       accepted_deletion_special += 1
     else:
       accepted_other += 1
-    read_counts[read_seq, cigar] += 1
-    read_num_subst[read_seq, cigar] = num_subst
+    read_count_accepted[read_seq] = 1
+    read_num_subst[read_seq] = num_subst
 
-  if len(read_counts) == 0:
+  if len(read_count_accepted) == 0:
     raise Exception('No sequences captured')
 
-  read_seq_and_cigars = sorted(
-    read_counts.keys(),
-    key = lambda x: -read_counts[x]
+  read_seq_list = sorted(
+    read_count_accepted.keys(),
+    key = lambda x: read_count_accepted[x],
+    reverse = True
   )
   args.output.write('Sequence\tCIGAR\tCount\tNum_Subst\n')
-  for read_seq, cigar in read_seq_and_cigars:
-    count = read_counts[read_seq, cigar]
-    num_subst = read_num_subst[read_seq, cigar]
+  for read_seq in read_seq_list:
+    cigar = read_cigar[read_seq]
+    count = read_count_accepted[read_seq]
+    num_subst = read_num_subst[read_seq]
     args.output.write(f'{read_seq}\t{cigar}\t{count}\t{num_subst}\n')
 
-  read_seq = sorted(
-    read_counts_rejected.keys(),
-    key = lambda x: -read_counts_rejected[x]
+  read_seq_list = sorted(
+    read_count_rejected.keys(),
+    key = lambda x: read_count_rejected[x],
+    reverse = True
   )
-  args.output_rejected.write('Sequence\tCount\n')
-  for read_seq in read_seq:
-    count = read_counts_rejected[read_seq]
-    args.output_rejected.write(f'{read_seq}\t{count}\n')
+  args.output_rejected.write('Sequence\tCount\tAligned\n')
+  for read_seq in read_seq_list:
+    count = read_count_rejected[read_seq]
+    aligned = int(read_aligned[read_seq])
+    args.output_rejected.write(f'{read_seq}\t{count}\t{aligned}\n')
   
   log_utils.log('------>')
   log_utils.log(args.output.name)
@@ -402,10 +412,10 @@ def main():
   if (total_rejected  + total_accepted) != total_reads:
     raise Exception("accepted + rejected != total")
 
-  if total_accepted != sum(read_counts.values()):
+  if total_accepted != sum(read_count_accepted.values()):
     raise Exception("Total accepted not summing")
   
-  if total_rejected != sum(read_counts_rejected.values()):
+  if total_rejected != sum(read_count_rejected.values()):
     raise Exception("Total rejected not summing")
 
   if not args.quiet:
