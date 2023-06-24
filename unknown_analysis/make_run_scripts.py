@@ -41,6 +41,7 @@ library_info = library_info.to_dict('records')
 fastq_dir = args.f
 filter_nhej_dir = args.n
 alignment_dir = os.path.join(root_dir, 'output', 'alignment')
+alignment_full_dir = os.path.join(root_dir, 'output', 'alignment_full')
 nhej_mmej_dir = os.path.join(root_dir, 'output', 'nhej_mmej')
 
 def join_path(sep, *path):
@@ -65,7 +66,7 @@ for ext in ['.sh', '.ps1']:
   with open('run_analyze_alignments' + ext, 'w') as out:
     for info in library_info:
       i = join_path(sep, filter_nhej_dir, get_lib_name_long(info) + '_rejected.tsv')
-      o = join_path(sep, alignment_dir, get_lib_name_long(info) + '.tsv')
+      o = join_path(sep, alignment_dir, get_lib_name_long(info) + '.csv')
       d = info['dsb_pos']
       c = info['construct']
       b = info['guide_rna']
@@ -80,9 +81,18 @@ for ext in ['.sh', '.ps1']:
   with open('run_nhej_mmej' + ext, 'w') as out:
     for info in library_info:
       i = join_path(sep, filter_nhej_dir, get_lib_name_long(info) + '.tsv')
-      o = join_path(sep, nhej_mmej_dir, get_lib_name_long(info) + '.tsv')
+      o = join_path(sep, nhej_mmej_dir, get_lib_name_long(info) + '.csv')
       c = info['construct']
       b = info['guide_rna']
       s = info['strand']
       t = info['total_reads']
       out.write(f'python detect_mmej.py -i {i} -o {o} -c {c} -b {b} -s {s} -t {t}\n')
+
+# Make the full alignment output script
+for ext in ['.sh', '.ps1']:
+  sep = '\\' if ext == '.ps1' else '/'
+  with open('run_alignment_full' + ext, 'w') as out:
+    for info in library_info:
+      i = join_path(sep, alignment_dir, get_lib_name_long(info) + '.csv')
+      o = join_path(sep, alignment_full_dir, get_lib_name_long(info))
+      out.write(f'python make_full_output.py -i {i} -o {o}\n')

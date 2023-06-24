@@ -314,6 +314,8 @@ def alignment_analyze(
     raise Exception('No sequences found')
   
   df = pd.DataFrame.from_records(data_list_out)
+  if os.path.dirname(output) != '':
+    os.makedirs(os.path.dirname(output), exist_ok=True)
   df.to_csv(output, index=False)
 
 if __name__ == '__main__':

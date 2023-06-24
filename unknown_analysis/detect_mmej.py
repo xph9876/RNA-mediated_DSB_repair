@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import argparse
 
@@ -40,4 +41,6 @@ if __name__ == '__main__':
         'read': rec['Sequence'],
       })
   data_out = pd.DataFrame.from_records(data_out)
+  if os.path.dirname(args.o) != '':
+    os.makedirs(os.path.dirname(args.o), exist_ok=True)
   data_out.to_csv(args.o, index=False)
