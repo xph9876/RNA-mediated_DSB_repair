@@ -41,6 +41,7 @@ library_info = library_info.to_dict('records')
 fastq_dir = args.f
 filter_nhej_dir = args.n
 alignment_dir = os.path.join(root_dir, 'output', 'alignment')
+nhej_mmej_dir = os.path.join(root_dir, 'output', 'nhej_mmej')
 
 def join_path(sep, *path):
   path = sep.join(path)
@@ -71,17 +72,17 @@ for ext in ['.sh', '.ps1']:
       s = info['strand']
       t = info['total_reads']
       r = join_path(sep, 'input', 'ref_seq', f'{info["dsb_type"]}_{s}_{c}.fa')
-      out.write(f'python analyze_alignments.py -i {i} -o {o} -d {d} -c {c} -b {b} -r {r} -m 0\n')
+      out.write(f'python analyze_alignments.py -i {i} -o {o} -d {d} -c {c} -b {b} -s {s} -t {t} -r {r} -m 0\n')
 
-# $d = $dsb_pos[$name]
-# $r = $ref_seq[$name]
-# $c = If ($name -match "Sense") {"S"} Else {"B"}
-# $b = If ($name -match "sgA") {"sgA"} Else {"sgB"}
-# $s = If ($name -match "sgA") {"R1"} Else {"R2"}
-# $t = $total_reads[$name]
-# Write-Output "Alignment analysis: $name"
-# python .\analyze_alignments.py `
-#   -i .\output\$name\filter_nhej_rejected_ranks.tsv `
-#   -o .\output\$name\alignment.csv `
-#   -d $d -r .\input\ref_seq\$r `
-#   -b $b -s $s -c $c -t $t -m 0
+# Make the detect NHEJ and MMEJ overlap script
+for ext in ['.sh', '.ps1']:
+  sep = '\\' if ext == '.ps1' else '/'
+  with open('run_nhej_mmej' + ext, 'w') as out:
+    for info in library_info:
+      i = join_path(sep, filter_nhej_dir, get_lib_name_long(info) + '.tsv')
+      o = join_path(sep, nhej_mmej_dir, get_lib_name_long(info) + '.tsv')
+      c = info['construct']
+      b = info['guide_rna']
+      s = info['strand']
+      t = info['total_reads']
+      out.write(f'python detect_mmej.py -i {i} -o {o} -c {c} -b {b} -s {s} -t {t}\n')

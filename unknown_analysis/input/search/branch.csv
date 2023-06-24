@@ -1,5 +1,0 @@
-Category,Name,Construct,Breaks,Strand,Sequence
-branch_x,S_in_B,BranchD,sgA,R1,TCGACTCTAGACGCGTAGGA
-branch_x,B_in_S,Sense,sgA,R1,TCGACTCTAGTTATCCACAG
-branch_x,S_in_B,BranchD,sgA,R2,TCCTACGCGTCTAGAGTCGA
-branch_x,B_in_S,Sense,sgA,R2,CTGTGGATAACTAGAGTCGA

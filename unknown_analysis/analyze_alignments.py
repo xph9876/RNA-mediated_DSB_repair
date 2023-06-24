@@ -3,14 +3,21 @@ import pandas as pd
 import os
 import argparse
 
-def load_search_data(breaks, strand, construct):
-  search = []
-  for file in [
+def load_search_data(
+  breaks,
+  strand,
+  construct,
+  file_list = [
     'microhomologies.csv',
-    'branch.csv',
-    'antisense.csv',
-    'antisense_2.csv'
-  ]:
+    'branch_x.csv',
+    'antisense_x.csv',
+    'antisense_x_2.csv'
+  ]
+):
+  search = []
+  if construct == 'cmv':
+    construct = 'sense' # sense and cmv have the same search sequences
+  for file in file_list:
     df = pd.read_csv(os.path.join('input/search', file))
     df = df.loc[(df.Breaks == breaks) & (df.Strand == strand) & (df.Construct == construct)]
     df = df.to_dict('records')
@@ -19,8 +26,8 @@ def load_search_data(breaks, strand, construct):
     search += df
   return search
 
-def search_seq(search, read):
-  for x in search:
+def search_seq(search_data, read):
+  for x in search_data:
     if x['Sequence'] in read:
       return x
   return None
@@ -317,7 +324,8 @@ if __name__ == '__main__':
   parser.add_argument('-d', required=True, type=int, help='DSB position.')
   parser.add_argument('-b', required=True, choices=['sgA', 'sgB'], help='Breaks')
   parser.add_argument('-s', required=True, choices=['R1', 'R2'], help='Read strand.')
-  parser.add_argument('-c', choices=['S', 'B'], default='S', help='Whether this is Sense or BranchΔ')
+  parser.add_argument('-c', required=True, choices=['sense', 'branch', 'cmv'],
+                      help='Whether this is Sense, BranchΔ, or pCMVΔ')
   parser.add_argument('-t', required=True, type=int, help='Total reads')
   parser.add_argument('-m', required=True, type=int, default=0,
                       help='Max number of reads to process (0 to process all).')
@@ -337,7 +345,7 @@ if __name__ == '__main__':
     ref = ref,
     breaks = args.b,
     strand = args.s,
-    construct = {'S': 'Sense', 'B': 'BranchD'}[args.c],
+    construct = args.c,
     total_reads = args.t,
     max_reads = args.m,
     output = args.o
