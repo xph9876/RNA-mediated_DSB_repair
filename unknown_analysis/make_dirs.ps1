@@ -15,3 +15,7 @@ if (!(Test-Path output/alignment_full/yjl271_WT_sgB_R2_branch)) {
 }
 
 python .\make_full_output.py -i .\output\alignment\yjl271_WT_sgB_R2_branch.csv -o .\output\alignment_full\yjl271_WT_sgB_R2_branch
+
+python .\make_summary_output.py -i .\output\alignment_full\yjl271_WT_sgB_R2_branch\unknown.csv -o .\output\summary\yjl271_WT_sgB_R2_branch -m unknown
+python .\make_summary_output.py -i .\output\alignment_full\yjl271_WT_sgB_R2_branch\mmej.csv -o .\output\summary\yjl271_WT_sgB_R2_branch -m mmej
+python .\make_summary_output.py -i .\output\nhej_mmej\yjl271_WT_sgB_R2_branch.csv -o .\output\summary\yjl271_WT_sgB_R2_branch -m nhej_mmej

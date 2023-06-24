@@ -40,7 +40,19 @@ if __name__ == '__main__':
         'search': search['Sequence'],
         'read': rec['Sequence'],
       })
-  data_out = pd.DataFrame.from_records(data_out)
+  data_out = pd.DataFrame.from_records(
+    data_out,
+    columns = [
+      'rank',
+      'count',
+      'freq',
+      'match_len',
+      'match',
+      'name',
+      'search',
+      'read',
+    ]
+  )
   if os.path.dirname(args.o) != '':
     os.makedirs(os.path.dirname(args.o), exist_ok=True)
   data_out.to_csv(args.o, index=False)

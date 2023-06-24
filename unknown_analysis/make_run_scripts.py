@@ -43,6 +43,7 @@ filter_nhej_dir = args.n
 alignment_dir = os.path.join(root_dir, 'output', 'alignment')
 alignment_full_dir = os.path.join(root_dir, 'output', 'alignment_full')
 nhej_mmej_dir = os.path.join(root_dir, 'output', 'nhej_mmej')
+summary_dir = os.path.join(root_dir, 'output', 'summary')
 
 def join_path(sep, *path):
   path = sep.join(path)
@@ -96,3 +97,16 @@ for ext in ['.sh', '.ps1']:
       i = join_path(sep, alignment_dir, get_lib_name_long(info) + '.csv')
       o = join_path(sep, alignment_full_dir, get_lib_name_long(info))
       out.write(f'python make_full_output.py -i {i} -o {o}\n')
+
+# Make the summary alignment output script
+for ext in ['.sh', '.ps1']:
+  sep = '\\' if ext == '.ps1' else '/'
+  with open('run_summary' + ext, 'w') as out:
+    for info in library_info:
+      for mode in ['mmej', 'unknown', 'nhej_mmej']:
+        if mode == 'nhej_mmej':
+          i = join_path(sep, nhej_mmej_dir, get_lib_name_long(info) + '.csv')
+        else:
+          i = join_path(sep, alignment_full_dir, get_lib_name_long(info), mode + '.csv')
+        o = join_path(sep, summary_dir, get_lib_name_long(info))
+        out.write(f'python make_summary_output.py -i {i} -o {o} -m {mode}\n')
