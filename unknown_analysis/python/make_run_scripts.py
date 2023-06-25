@@ -39,22 +39,22 @@ if __name__ == '__main__':
     (library_info['dsb_type'] == '1DSB') &
     (library_info['control_type'].isin(['noDSB', 'notControl']))
   ]
-  # FIXME: Remove this temporary line
-  library_info = library_info.loc[
-    (library_info['library'] + '_' + library_info['strand']).isin(
-      [
-        'yjl244_R1',
-        'yjl244_R2',
-        'yjl245_R1',
-        'yjl245_R2',
-        'yjl255_R1',
-        'yjl259_R1',
-        'yjl267_R2',
-        'yjl271_R2',
-      ]
-    )
-  ]
-  # End temporary line
+  # Temporary code for testing
+  # library_info = library_info.loc[
+  #   (library_info['library'] + '_' + library_info['strand']).isin(
+  #     [
+  #       'yjl244_R1',
+  #       'yjl244_R2',
+  #       'yjl245_R1',
+  #       'yjl245_R2',
+  #       'yjl255_R1',
+  #       'yjl259_R1',
+  #       'yjl267_R2',
+  #       'yjl271_R2',
+  #     ]
+  #   )
+  # ]
+  # End temporary code for testing
   library_info['cell_line'] = pd.Categorical(library_info['cell_line'], categories=['WT', 'KO'], ordered=True)
   library_info['guide_rna'] = pd.Categorical(library_info['guide_rna'], categories=['sgA', 'sgB'], ordered=True)
   library_info['construct'] = pd.Categorical(library_info['construct'], categories=['sense', 'branch', 'cmv'], ordered=True)
@@ -75,12 +75,14 @@ if __name__ == '__main__':
     nhej_mmej_dir = join_path(sep, args.o, 'nhej_mmej')
     summary_dir = join_path(sep, args.o, 'summary')
     compare_dir = join_path(sep, args.o, 'compare')
+    mean_dir = join_path(sep, args.o, 'mean')
 
     analyze_alignments_py = join_path(sep, args.p, 'analyze_alignments.py')
     detect_mmej_py = join_path(sep, args.p, 'detect_mmej.py')
-    compare_libraries_py = join_path(sep, args.p, 'compare_libraries.py')
     full_output_py = join_path(sep, args.p, 'full_output.py')
     summary_output_py = join_path(sep, args.p, 'summary_output.py')
+    compare_libraries_py = join_path(sep, args.p, 'compare_libraries.py')
+    mean_tables_py = join_path(sep, args.p, 'mean_tables.py')
 
     # Make analyze alignments script
     with open(os.path.join(args.r, 'run_analyze_alignments' + ext), 'w') as out:
@@ -139,4 +141,11 @@ if __name__ == '__main__':
         tables = ' '.join([get_lib_name_long(info) for info in library_info])
         out.write(
           f'python {compare_libraries_py} -i {i} -o {o} -t {tables} -k freq -m {mode}\n'
+        )
+
+    # Make the mean tables script
+    with open(os.path.join(args.r, 'run_mean_tables' + ext), 'w') as out:
+      for mode in ['mmej', 'unknown', 'nhej_mmej']:
+        out.write(
+          f'python {mean_tables_py} -i {compare_dir} -o {mean_dir} -m {mode}\n'
         )
