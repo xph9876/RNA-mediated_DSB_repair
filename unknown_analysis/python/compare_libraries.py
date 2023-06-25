@@ -5,7 +5,7 @@ import argparse
 from summary_output import GROUP_COLUMNS
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
+  parser = argparse.ArgumentParser('Combine summary tables from multiple libraries')
   parser.add_argument('-i', type=str, required=True, nargs='+', help='Input directories')
   parser.add_argument('-o', type=str, required=True, help='Output directory')
   parser.add_argument('-t', type=str, required=True, nargs='+', help='Table names')
@@ -26,8 +26,7 @@ if __name__ == '__main__':
     raise Exception('No input files specified')
   if len(inputs) != len(tables):
     raise Exception('Number of input files and table names must match')
-  if os.path.dirname(output) != '':
-    os.makedirs(os.path.dirname(output), exist_ok=True)
+  os.makedirs(output, exist_ok=True)
 
   for col_info in GROUP_COLUMNS[mode]:
     fn = mode + '_' + '_'.join(col_info['cols'])

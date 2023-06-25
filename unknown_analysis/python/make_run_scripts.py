@@ -19,7 +19,8 @@ def get_lib_name_long(info):
   )
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
+  parser = argparse.ArgumentParser(
+    description='Make .ps1/.sh run scripts for unknown analysis')
   parser.add_argument('-i', type=str, required=True,
                       help='Input info directory (with library_info.tsv, dsb_pos.tsv, and total_reads.tsv)')
   parser.add_argument('-o', type=str, required=True, help='Output directory for Python scripts')
@@ -106,14 +107,14 @@ if __name__ == '__main__':
         out.write(f'python {detect_mmej_py} -i {i} -o {o} -c {c} -b {b} -s {s} -t {t}\n')
 
     # Make the full alignment output script
-    with open(os.path.join(args.r, 'run_full' + ext), 'w') as out:
+    with open(os.path.join(args.r, 'run_full_output' + ext), 'w') as out:
       for info in library_info:
         i = join_path(sep, alignment_dir, get_lib_name_long(info) + '.csv')
         o = join_path(sep, full_dir, get_lib_name_long(info))
         out.write(f'python {full_output_py} -i {i} -o {o}\n')
 
     # Make the summary alignment output script
-    with open(os.path.join(args.r, 'run_summary' + ext), 'w') as out:
+    with open(os.path.join(args.r, 'run_summary_output' + ext), 'w') as out:
       for info in library_info:
         for mode in ['mmej', 'unknown', 'nhej_mmej']:
           if mode == 'nhej_mmej':
@@ -124,7 +125,7 @@ if __name__ == '__main__':
           out.write(f'python {summary_output_py} -i {i} -o {o} -m {mode}\n')
 
     # Make the compare output script
-    with open(os.path.join(args.r, 'run_compare' + ext), 'w') as out:
+    with open(os.path.join(args.r, 'run_compare_libraries' + ext), 'w') as out:
       for mode in ['mmej', 'unknown', 'nhej_mmej']:
         i = ' '.join([
           join_path(

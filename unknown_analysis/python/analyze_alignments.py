@@ -280,7 +280,7 @@ def alignment_analyze(
       'rank': rank,
       'count': count,
       'freq': freq,
-      'bt2_aligned': aligned,
+      'bt2': aligned,
       'len': read_length,
       'read': read,
       'read_no_sub': read_no_sub,
@@ -319,10 +319,12 @@ def alignment_analyze(
   df.to_csv(output, index=False)
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
+  parser = argparse.ArgumentParser(
+    description='Analyze rejected NHEJ reads to determine "unknown" categories.')
   parser.add_argument('-i', required=True, help='Input CSV file.')
   parser.add_argument('-o', required=True, help='Ouput CSV file.')
-  parser.add_argument('-r', required=True, help='Reference sequence file with a single DNA sequence in FASTA format.')
+  parser.add_argument('-r', required=True,
+                      help='Reference sequence file with a single DNA sequence in FASTA format.')
   parser.add_argument('-d', required=True, type=int, help='DSB position.')
   parser.add_argument('-b', required=True, choices=['sgA', 'sgB'], help='Breaks')
   parser.add_argument('-s', required=True, choices=['R1', 'R2'], help='Read strand.')

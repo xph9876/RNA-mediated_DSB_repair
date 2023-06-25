@@ -12,26 +12,29 @@ def reverse_complement(s):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
-    description='Make search strings for detecting Antisense and 5\'-SplicingD intron contamination.')
+    description='Make search strings for detecting Antisense/5\'-SplicingΔ intron' +
+    ' or BranchΔ in Sense (or vice versa) contamination.')
   parser.add_argument('-l', type=int, default=20, help='Substring length.')
   parser.add_argument('-o', type=str, required=True, help='Output directory.')
-  parser.add_argument('-r', type=str, required=True, nargs=2,
-                      help='Paths to the Sense and BranchΔ (respectively) R1 reference sequences.')
+  parser.add_argument('-rs', type=str, required=True, help='Path to the Sense R1 reference sequence.')
+  parser.add_argument('-rb', type=str, required=True, help='Path to the BranchΔ R1 reference sequence.')
+  parser.add_argument('-b', type=int, required=True, nargs=2,
+                      help='Branch site R1 start and end position (1-based, inclusive) on Sense.')
   args = parser.parse_args()
   sub_len = args.l
-  subs = []
-  for src_con, ref_file in zip(['sense', 'branch'], args.r):
+  search_data = []
+  for src_con, ref_file in [('sense', args.rs), ('branch', args.rb)]:
     with open(ref_file) as input:
-      x = input.read().splitlines()
-    x = x[1] # should have just 2 lines with 2nd line being the sequence
-    for i in range(len(x) - sub_len + 1):
+      ref_seq = input.read().splitlines()
+    ref_seq = ref_seq[1] # should have just 2 lines with 2nd line being the sequence
+    for i in range(len(ref_seq) - sub_len + 1):
       for con in ['sense', 'branch']:
         for strand in ['R1', 'R2']:
           for breaks in ['sgA', 'sgB']:
-            s = x[i : i + sub_len]
+            s = ref_seq[i : i + sub_len]
             if strand == 'R1':
               s = reverse_complement(s)
-            subs.append({
+            search_data.append({
               'Category': 'anti_x',
               'Name': f'RC_{src_con}_{strand}_{i + 1}_{i + sub_len}',
               'Construct': con,
@@ -39,6 +42,36 @@ if __name__ == '__main__':
               'Strand': strand,
               'Sequence': s
             })
-  subs = pd.DataFrame.from_records(subs)
-  subs = subs.loc[~subs.duplicated(['Construct', 'Breaks', 'Strand', 'Sequence'])]
-  pd.DataFrame(subs).to_csv(os.path.join(args.o, 'antisense_x_2.csv'), index=False)
+  search_data = pd.DataFrame.from_records(search_data)
+  search_data = search_data.loc[~search_data.duplicated(['Construct', 'Breaks', 'Strand', 'Sequence'])]
+  search_data.to_csv(os.path.join(args.o, 'antisense_x_2.csv'), index=False)
+  
+  # Make the BranchΔ in Sense (and vice versa) tables
+  with open(os.path.join(args.o, 'branch_x.csv'), 'w') as output:
+    search_data = []
+    for src_con, ref_file in [('sense', args.rs), ('branch', args.rb)]:
+      with open(ref_file) as input:
+        ref_seq = input.read().splitlines()
+      ref_seq = ref_seq[1] # should have just 2 lines with 2nd line being the sequence
+      dst_con = 'branch' if (src_con == 'sense') else 'sense'
+      if src_con == 'sense':
+        idx = range(args.b[0] - 1, args.b[1] + 1)
+      else:
+        idx = range(args.b[0] - 1, args.b[0])
+      for i in idx:
+        window = ref_seq[i - (sub_len // 2) : i + (sub_len // 2)]
+        for breaks in ['sgA', 'sgB']:
+          for strand in ['R1', 'R2']:
+            s = window
+            if strand == 'R2':
+              s = reverse_complement(s)
+            search_data.append({
+              'Category': 'branch_x',
+              'Name': f'{src_con[0]}_in_{dst_con[0]}',
+              'Construct': dst_con,
+              'Breaks': breaks,
+              'Strand': strand,
+              'Sequence': s,
+            })
+    search_data = pd.DataFrame.from_records(search_data)
+    search_data.to_csv(os.path.join(args.o, 'branch_x.csv'), index=False)

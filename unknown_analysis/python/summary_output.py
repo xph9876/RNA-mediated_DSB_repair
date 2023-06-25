@@ -28,7 +28,7 @@ GROUP_COLUMNS = {
     {'cols': ['len'], 'sort': False},
   ],
   'nhej_mmej': [
-    {'cols': ['name', 'match'], 'sort': True},
+    {'cols': ['name'], 'sort': True},
     {'cols': ['match_len'], 'sort': False},
     {'cols': ['total'], 'sort': False},
   ],
