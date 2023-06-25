@@ -44,5 +44,5 @@ if __name__ == '__main__':
           input_file = get_input_file(info['library'], info['strand'])
           output_file = get_output_file(info['name'])
           ref_seq_bowtie2_build = get_bowtie2_build_file(info['ref_seq_file'])
-          file_out.write(f"{generate_constants.BOWTIE2_ALIGN_COMMAND[ext]} -x {generate_constants.BOWTIE2_ALIGN_ARGS} {ref_seq_bowtie2_build} {input_file} -S {output_file}\n")
+          file_out.write(f"{generate_constants.BOWTIE2_ALIGN_COMMAND[ext]} {generate_constants.BOWTIE2_ALIGN_ARGS} -x {ref_seq_bowtie2_build} {input_file} -S {output_file}\n")
       log_utils.log(file_out.name)
