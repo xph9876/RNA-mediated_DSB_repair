@@ -125,37 +125,17 @@ if __name__ == '__main__':
 
     # Make the compare output script
     with open(os.path.join(args.r, 'run_compare' + ext), 'w') as out:
-      for col_info in [
-        {'join': ['cat'], 'keep': ['freq'], 'reorder': True},
-        {'join': ['cat_2'], 'keep': ['freq'], 'reorder': True},
-        {'join': ['total'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['name', 'match'], 'keep': ['freq'], 'reorder': True},
-        {'join': ['match_len'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['bt2'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['num_var'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['num_ins'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['num_del'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['num_sub'], 'keep': ['freq'], 'reorder': False},
-        {'join': ['len'], 'keep': ['freq'], 'reorder': False},
-      ]:
-        join_cols = col_info['join']
-        keep_cols = col_info['keep']
-        reorder = int(col_info['reorder'])
-        fn = 'unknown_' + '_'.join(col_info['join']) + '.csv'
+      for mode in ['mmej', 'unknown', 'nhej_mmej']:
         i = ' '.join([
           join_path(
             sep,
             summary_dir,
-            get_lib_name_long(info),
-            fn
+            get_lib_name_long(info)
           )
           for info in library_info
         ])
-        o = join_path(sep, compare_dir, fn)
+        o = join_path(sep, compare_dir)
         tables = ' '.join([get_lib_name_long(info) for info in library_info])
-        join_cols = ' '.join(join_cols)
-        keep_cols = ' '.join(keep_cols)
         out.write(
-          f'python {compare_libraries_py} -i {i} -o {o} -t {tables} -j' +
-          f' {join_cols} -k {keep_cols} -r {reorder}\n'
+          f'python {compare_libraries_py} -i {i} -o {o} -t {tables} -k freq -m {mode}\n'
         )

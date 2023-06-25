@@ -5,7 +5,7 @@ import pandas as pd
 GROUP_COLUMNS = {
   'mmej': [
     {'cols': ['total'], 'sort': False},
-    {'cols': ['name', 'match'], 'sort': True},
+    {'cols': ['name'], 'sort': True},
     {'cols': ['match_len'], 'sort': False},
     {'cols': ['bt2'], 'sort': False},
     {'cols': ['num_var'], 'sort': False},
@@ -18,7 +18,7 @@ GROUP_COLUMNS = {
     {'cols': ['cat'], 'sort': True},
     {'cols': ['cat_2'], 'sort': True},
     {'cols': ['total'], 'sort': False},
-    {'cols': ['name', 'match'], 'sort': True},
+    {'cols': ['name'], 'sort': True},
     {'cols': ['match_len'], 'sort': False},
     {'cols': ['bt2'], 'sort': False},
     {'cols': ['num_var'], 'sort': False},
@@ -50,7 +50,7 @@ def get_cat_2(cat):
     'branch_x': 'other',
   }[cat]
 
-if __name__:
+if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('-i', type=str, required=True, help='Input CSV file.')
   parser.add_argument('-o', type=str, required=True, help='Output directory.')
