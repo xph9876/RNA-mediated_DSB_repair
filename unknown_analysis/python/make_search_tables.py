@@ -55,7 +55,7 @@ if __name__ == '__main__':
               s = reverse_complement(s)
             search_data.append({
               'Category': 'anti_x',
-              'Name': f'RC_{src_con}_{strand}_{i + 1}_{i + sub_len}',
+              'Name': f'RC_{src_con[0].upper()}_{strand}_{i + 1}_{i + sub_len}',
               'Construct': con,
               'Breaks': breaks,
               'Strand': strand,
