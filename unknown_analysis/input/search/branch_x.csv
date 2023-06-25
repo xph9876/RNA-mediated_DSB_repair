@@ -1,5 +1,5 @@
 Category,Name,Construct,Breaks,Strand,Sequence
-branch_x,S_in_B,branch,sgA,R1,TCGACTCTAGACGCGTAGGA
-branch_x,B_in_S,sense,sgA,R1,TCGACTCTAGTTATCCACAG
-branch_x,S_in_B,branch,sgA,R2,TCCTACGCGTCTAGAGTCGA
-branch_x,B_in_S,sense,sgA,R2,CTGTGGATAACTAGAGTCGA
+branch_x,s_in_b,branch,sgA,R1,TCGACTCTAGACGCGTAGGA
+branch_x,b_in_s,sense,sgA,R1,TCGACTCTAGTTATCCACAG
+branch_x,s_in_b,branch,sgA,R2,TCCTACGCGTCTAGAGTCGA
+branch_x,b_in_s,sense,sgA,R2,CTGTGGATAACTAGAGTCGA

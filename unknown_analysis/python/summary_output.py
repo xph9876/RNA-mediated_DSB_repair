@@ -72,7 +72,7 @@ if __name__:
     if total:
       df2 = df.groupby([1] * df.shape[0])
     else:
-      df2 = df.groupby(group['cols'])
+      df2 = df.groupby(group['cols'], dropna=False)
     df2 = df2[cols]
     df2 = df2.sum().reset_index(drop=total)
     if total and (df2.shape[0] == 0):
