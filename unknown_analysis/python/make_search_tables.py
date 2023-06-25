@@ -59,15 +59,17 @@ if __name__ == '__main__':
       else:
         idx = range(args.b[0] - 1, args.b[0])
       for i in idx:
-        window = ref_seq[i - (sub_len // 2) : i + (sub_len // 2)]
-        for breaks in ['sgA', 'sgB']:
-          for strand in ['R1', 'R2']:
+        start = i - (sub_len // 2)
+        end = i + (sub_len // 2)
+        window = ref_seq[start : end]
+        for strand in ['R1', 'R2']:
+          for breaks in ['sgA', 'sgB']:
             s = window
             if strand == 'R2':
               s = reverse_complement(s)
             search_data.append({
               'Category': 'branch_x',
-              'Name': f'{src_con[0]}_in_{dst_con[0]}',
+              'Name': f'{src_con[0].upper()}i{dst_con[0].upper()}_{strand}_{start + 1}_{end}',
               'Construct': dst_con,
               'Breaks': breaks,
               'Strand': strand,
