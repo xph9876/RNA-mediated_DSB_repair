@@ -22,6 +22,25 @@ if __name__ == '__main__':
                       help='Branch site R1 start and end position (1-based, inclusive) on Sense.')
   args = parser.parse_args()
   sub_len = args.l
+
+  # Make the 6 nt Antisense/5'-splicingΔ contamination tables
+  six_nt_sig = {'R1': 'TAGGGA', 'R2': 'ATTACC'}
+  search_data = []
+  for con in ['sense', 'branch']:
+    for strand in ['R1', 'R2']:
+      for breaks in ['sgA', 'sgB']:
+        search_data.append({
+          'Category': 'anti_x',
+          'Name': '6_nt_sig',
+          'Construct': con,
+          'Breaks': breaks,
+          'Strand': strand,
+          'Sequence': six_nt_sig[strand],
+        })
+  search_data = pd.DataFrame.from_records(search_data)
+  search_data.to_csv(os.path.join(args.o, 'antisense_x.csv'), index=False)
+
+  # Make the Antisense/5'-SplicingΔ contamination tables
   search_data = []
   for src_con, ref_file in [('sense', args.rs), ('branch', args.rb)]:
     with open(ref_file) as input:
