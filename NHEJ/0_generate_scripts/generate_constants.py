@@ -65,7 +65,7 @@ def get_min_read_length(info):
     raise Exception(f'Got {x.shape[0]} values. Expected 1.')
   return x.iloc[0]
 
-LIBRARY_INFO = file_utils.read_tsv(os.path.dirname(__file__) + '/library_info.tsv')
+LIBRARY_INFO = file_utils.read_tsv(os.path.join(os.path.dirname(__file__), 'library_info.tsv'))
 LIBRARY_INFO['format'] = library_constants.DATA_INDIVIDUAL
 LIBRARY_INFO['name'] = LIBRARY_INFO.apply(get_name_library, axis='columns')
 LIBRARY_INFO['ref_seq_file'] = LIBRARY_INFO.apply(get_ref_seq_file, axis='columns')
@@ -351,3 +351,10 @@ USE_LAYOUT = LAYOUT_UNIVERSAL
 
 GRAPH_HEIGHT_PX = 1800
 GRAPH_WIDTH_PX = 2400
+
+# Temporary code to limit analysis to 1DSB
+LIBRARY_INFO = LIBRARY_INFO.loc[
+  (LIBRARY_INFO['dsb_type'] == '1DSB') &
+  (LIBRARY_INFO['control_type'].isin(['notControl', 'noDSB']))
+].reset_index(drop=True)
+# End temporary code
