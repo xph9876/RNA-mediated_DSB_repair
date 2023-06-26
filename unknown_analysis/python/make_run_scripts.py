@@ -73,7 +73,7 @@ if __name__ == '__main__':
     nhej_mmej_dir = join_path(sep, args.o, 'nhej_mmej')
     summary_dir = join_path(sep, args.o, 'summary')
     compare_dir = join_path(sep, args.o, 'compare')
-    mean_dir = join_path(sep, args.o, 'mean')
+    mean_dir = join_path(sep, args.o, 'compare_mean')
 
     analyze_alignments_py = join_path(sep, args.p, 'analyze_alignments.py')
     detect_mmej_py = join_path(sep, args.p, 'detect_mmej.py')
