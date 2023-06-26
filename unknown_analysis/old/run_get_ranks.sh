@@ -1,8 +1,0 @@
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl244_WT_sgA_R1_sense_noDSB.tsv -r output/collected/yjl244_R1.tsv -o output/ranks/yjl244_R1_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl244_WT_sgB_R2_sense_noDSB.tsv -r output/collected/yjl244_R2.tsv -o output/ranks/yjl244_R2_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl245_WT_sgA_R1_branch_noDSB.tsv -r output/collected/yjl245_R1.tsv -o output/ranks/yjl245_R1_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl245_WT_sgB_R2_branch_noDSB.tsv -r output/collected/yjl245_R2.tsv -o output/ranks/yjl245_R2_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl255_WT_sgA_R1_sense.tsv -r output/collected/yjl255_R1.tsv -o output/ranks/yjl255_R1_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl259_WT_sgA_R1_branch.tsv -r output/collected/yjl259_R1.tsv -o output/ranks/yjl259_R1_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl267_WT_sgB_R2_sense.tsv -r output/collected/yjl267_R2.tsv -o output/ranks/yjl267_R2_ranks.tsv
-python get_ranks.py -i C:/Users/tchan/Code/DSB_Project/RNA-mediated_DSB_repair/NHEJ/data_1_filter_nhej/yjl271_WT_sgB_R2_branch.tsv -r output/collected/yjl271_R2.tsv -o output/ranks/yjl271_R2_ranks.tsv
