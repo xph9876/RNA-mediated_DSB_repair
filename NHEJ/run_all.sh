@@ -1,3 +1,4 @@
+./run_00_make_dirs.sh
 ./run_00_bowtie2_align.sh
 ./run_01_process_nhej.sh
 ./run_02_combine_repeat.sh
