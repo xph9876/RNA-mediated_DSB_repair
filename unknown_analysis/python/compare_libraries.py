@@ -33,7 +33,7 @@ if __name__ == '__main__':
     df_list = []
     total = (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'total')
     for i in range(len(inputs)):
-      df = pd.read_csv(os.path.join(inputs[i], fn +'.csv'))
+      df = pd.read_csv(os.path.join(inputs[i], fn + '.csv'))
       if not total:
         df = df.set_index(col_info['cols'])
       if len(keep_cols) > 0:
@@ -45,4 +45,4 @@ if __name__ == '__main__':
       df = df.sort_values(by=df.columns[0], ascending=False)
     if not total:
       df = df.reset_index()
-    df.to_csv(os.path.join(output, fn +'.csv'), index=False)
+    df.to_csv(os.path.join(output, fn + '.csv'), index=False)

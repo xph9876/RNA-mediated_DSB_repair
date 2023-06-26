@@ -70,13 +70,18 @@ if __name__ == '__main__':
   for group in GROUP_COLUMNS[mode]:
     total = (len(group['cols']) == 1) and (group['cols'][0] == 'total')
     if total:
-      df2 = df.groupby([1] * df.shape[0])
+      df2 = df.assign(temp=1).groupby('temp') # Add a dummy column to group by.
     else:
       df2 = df.groupby(group['cols'])
     df2 = df2[cols]
-    df2 = df2.sum().reset_index(drop=total)
-    if total and (df2.shape[0] == 0):
-      df2 = pd.DataFrame([[0] * len(cols)], columns=cols)
+    df2 = df2.sum().reset_index(drop=total) # Drop the dummy column for total.
+    if df2.shape[0] == 0:
+      if total:
+        # Add a row of zeros if there are no rows in the dataframe.
+        df2 = pd.DataFrame([[0] * len(cols)], columns=cols)
+      else:
+        # Make an empty dataframe with the correct columns.
+        df2 = pd.DataFrame(columns=group['cols'] + cols)
     if group['sort']:
       df2 = df2.sort_values(cols, ascending=False)
     df2.to_csv(os.path.join(args.o, mode + '_' + '_'.join(group['cols']) + '.csv'), index=False)
