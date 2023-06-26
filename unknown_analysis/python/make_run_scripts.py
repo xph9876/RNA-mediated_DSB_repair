@@ -24,7 +24,6 @@ if __name__ == '__main__':
   parser.add_argument('-i', type=str, required=True,
                       help='Input info directory (with library_info.tsv, dsb_pos.tsv, and total_reads.tsv)')
   parser.add_argument('-o', type=str, required=True, help='Output directory for Python scripts')
-  parser.add_argument('-f', type=str, required=True, help='Input FASTQ directory')
   parser.add_argument('-n', type=str, required=True, help='Input filter NHEJ directory') 
   parser.add_argument('-r', type=str, required=True, help='Output directory to write run scripts to')
   parser.add_argument('-p', type=str, required=True, help='Python script directory')
@@ -68,7 +67,6 @@ if __name__ == '__main__':
   for ext in ['.sh', '.ps1']:
     sep = '\\' if ext == '.ps1' else '/'
 
-    fastq_dir = join_path(sep, args.f)
     filter_nhej_dir = join_path(sep, args.n)
     alignment_dir = join_path(sep, args.o, 'alignment')
     full_dir = join_path(sep, args.o, 'full')
@@ -128,24 +126,36 @@ if __name__ == '__main__':
 
     # Make the compare output script
     with open(os.path.join(args.r, 'run_compare_libraries' + ext), 'w') as out:
-      for mode in ['mmej', 'unknown', 'nhej_mmej']:
+      for subset in ['all', 'not_control', 'no_dsb']:
+        if subset == 'all':
+          lib_info_sub = library_info
+        elif subset == 'not_control':
+          lib_info_sub = [x for x in library_info if (x['control_type'] == 'notControl')]
+        elif subset == 'no_dsb':
+          lib_info_sub = [x for x in library_info if (x['control_type'] == 'noDSB')]
+        else:
+          raise Exception('Impossible.')
         i = ' '.join([
           join_path(
             sep,
             summary_dir,
             get_lib_name_long(info)
           )
-          for info in library_info
+          for info in lib_info_sub
         ])
-        o = join_path(sep, compare_dir)
-        tables = ' '.join([get_lib_name_long(info) for info in library_info])
-        out.write(
-          f'python {compare_libraries_py} -i {i} -o {o} -t {tables} -k freq -m {mode}\n'
-        )
+        o = join_path(sep, compare_dir, subset)
+        tables = ' '.join([get_lib_name_long(info) for info in lib_info_sub])
+        for mode in ['mmej', 'unknown', 'nhej_mmej']:
+          out.write(
+            f'python {compare_libraries_py} -i {i} -o {o} -t {tables} -k freq -m {mode}\n'
+          )
 
     # Make the mean tables script
     with open(os.path.join(args.r, 'run_mean_tables' + ext), 'w') as out:
-      for mode in ['mmej', 'unknown', 'nhej_mmej']:
-        out.write(
-          f'python {mean_tables_py} -i {compare_dir} -o {mean_dir} -m {mode}\n'
-        )
+      for subset in ['all', 'not_control', 'no_dsb']:
+        i = join_path(sep, compare_dir, subset)
+        o = join_path(sep, mean_dir, subset)
+        for mode in ['mmej', 'unknown', 'nhej_mmej']:
+          out.write(
+            f'python {mean_tables_py} -i {i} -o {o} -m {mode}\n'
+          )
