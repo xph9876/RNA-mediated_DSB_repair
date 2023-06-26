@@ -11,14 +11,14 @@ python ./python/make_run_scripts.py \
   -n ../NHEJ/data_1_filter_nhej \
   -r ./run
 
-./run/run_analyze_alignments.ps1
+./run/run_analyze_alignments.sh
 
-./run/run_nhej_mmej.ps1
+./run/run_nhej_mmej.sh
 
-./run/run_full_output.ps1
+./run/run_full_output.sh
 
-./run/run_summary_output.ps1
+./run/run_summary_output.sh
 
-./run/run_compare_libraries.ps1
+./run/run_compare_libraries.sh
 
-./run/run_mean_tables.ps1
+./run/run_mean_tables.sh
