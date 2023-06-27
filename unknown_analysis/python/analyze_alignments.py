@@ -160,6 +160,7 @@ def alignment_analyze(
   construct,
   total_reads,
   max_reads,
+  ig_sub,
   output,
 ):
   search_data = load_search_data(breaks, strand, construct)
@@ -221,7 +222,7 @@ def alignment_analyze(
         num_var = num_var_lg
 
     search = search_seq(search_data, read)
-    if search is None:
+    if (search is None) and ig_sub:
       # try again with the substitutions removed
       search = search_seq(search_data, read_no_sub)
 
@@ -333,6 +334,8 @@ if __name__ == '__main__':
   parser.add_argument('-t', required=True, type=int, help='Total reads')
   parser.add_argument('-m', required=True, type=int, default=0,
                       help='Max number of reads to process (0 to process all).')
+  parser.add_argument('-ig_sub', action='store_true', default=False,
+                      help='Try ignoring substitutions when searching for MMEJ and other signatures.')
   
   args = parser.parse_args()
 
@@ -352,5 +355,6 @@ if __name__ == '__main__':
     construct = args.c,
     total_reads = args.t,
     max_reads = args.m,
-    output = args.o
+    ig_sub = args.ig_sub,
+    output = args.o,
   )
