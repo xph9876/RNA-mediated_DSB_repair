@@ -3,6 +3,34 @@ import pandas as pd
 import os
 import argparse
 
+# These regions are 0-based, inclusive start, exclusive end
+REGIONS = {
+  'R1': {
+    'sense': {
+      'Exon1': [0, 72],
+      'Intron': [72, 183],
+      'Exon2': [183, 229],  
+    },
+    'branch': {
+      'Exon1': [0, 72],
+      'Intron': [72, 183 - 55], # subtract for 55 bp branch sequence in Intron
+      'Exon2': [183 - 55, 229 - 55], # subtract for 55 bp branch sequence in Intron
+    }
+  },
+  'R2': {
+    'sense': {
+      'Exon2': [0, 46],
+      'Intron': [46, 157],
+      'Exon1': [157, 229],
+    },
+    'branch': {
+      'Exon2': [0, 46],
+      'Intron': [46, 157 - 55], # subtract for 55 bp branch sequence in Intron
+      'Exon1': [157 - 55, 229 - 55], # subtract for 55 bp branch sequence in Intron   
+    }
+  }
+}
+
 def load_search_data(
   breaks,
   strand,
@@ -18,17 +46,19 @@ def load_search_data(
   if construct == 'cmv':
     construct = 'sense' # sense and cmv have the same search sequences
   for file in file_list:
-    df = pd.read_csv(os.path.join('input/search', file))
-    df = df.loc[(df.Breaks == breaks) & (df.Strand == strand) & (df.Construct == construct)]
-    df = df.to_dict('records')
+    data = pd.read_csv(os.path.join('input/search', file))
+    data = data.loc[(data.Breaks == breaks) & (data.Strand == strand) & (data.Construct == construct)]
+    data = data.to_dict('records')
     if file == 'microhomologies.csv':
-      df = sorted(df, key=lambda y: len(y['Pattern']), reverse=True)
-    search += df
+      data = sorted(data, key=lambda y: len(y['Pattern']), reverse=True)
+    search += data
   return search
 
-def search_seq(search_data, read):
+def search_in_data(search_data, read, read_no_sub):
   for x in search_data:
     if x['Sequence'] in read:
+      return x
+    if (x['Category'] != 'mmej') and (x['Sequence'] in read_no_sub):
       return x
   return None
 
@@ -47,6 +77,37 @@ def get_max_match(ref, del_s, del_e):
     del_s_2 += 1
     del_e_2 += 1
   return ref[del_s_1 : del_s_2]
+
+# Classify regions as Exon1, Exon2, and Intron
+# Start is 0-based, end is 1-based
+def classify_region(strand, construct, del_s, del_e):
+  if strand == 'R1':
+    left_exon = 'Exon1'
+    right_exon = 'Exon2'
+  elif strand == 'R2':
+    left_exon = 'Exon2'
+    right_exon = 'Exon1'
+  else:
+    raise Exception(f'Invalid strand: {strand}')
+  if (
+    (del_s >= REGIONS[strand][construct][left_exon][0]) and
+    (del_s <= REGIONS[strand][construct][left_exon][1])
+  ):
+    region_s = left_exon
+  elif region_s >= (REGIONS[strand][construct]['Intron'][0] + 1):
+    region_s = 'Intron'
+  else:
+    raise Exception(f'Invalid deletion start: {del_s}')
+  if (
+    (del_e >= REGIONS[strand][construct][right_exon][0]) and
+    (del_e <= REGIONS[strand][construct][right_exon][1])
+  ):
+    region_e = right_exon
+  elif del_e <= (REGIONS[strand][construct]['Intron'][1] - 1):
+    region_e = 'Intron'
+  else:
+    raise Exception(f'Invalid deletion end: {del_e}')
+  return region_s, region_e
 
 # no_end_gaps: if True, don't count gaps at the beginning or end of the alignment
 def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
@@ -111,7 +172,8 @@ def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
     ref_repr,
     ins,
     dels,
-    subs
+    subs,
+    len(ins) + len(dels) + len(subs),
   )
 
 def get_general_aligner():
@@ -160,7 +222,6 @@ def alignment_analyze(
   construct,
   total_reads,
   max_reads,
-  ig_sub,
   output,
 ):
   search_data = load_search_data(breaks, strand, construct)
@@ -180,10 +241,8 @@ def alignment_analyze(
     read_length = len(read)
 
     # Do the general alignment
-    alignments = aligner.align(read, ref)
-    if len(alignments) == 0:
-      raise Exception('No alignments found')
-    alignment = alignments[0] # Arbitrarily choose the first alignment
+    alignment = aligner.align(read, ref)[0] # Arbitrarily choose the first alignment
+    alignment_lg = aligner_lg.align(read, ref)[0] # Arbitrarily choose the first alignment
 
     (
       read_no_sub,
@@ -192,43 +251,45 @@ def alignment_analyze(
       ins,
       dels,
       subs,
+      num_var,
     ) = get_alignment_info(alignment.coordinates, read, ref, dsb_pos)
 
-    num_var = len(ins) + len(dels) + len(subs)
+    (
+      read_no_sub_lg,
+      read_repr_lg,
+      ref_repr_lg,
+      ins_lg,
+      dels_lg,
+      subs_lg,
+      num_var_lg,
+    ) = get_alignment_info(alignment_lg.coordinates, read, ref, dsb_pos)
 
-    # If there are too many variations try to align again
-    # with the large gap aligner to reduce the number of variations
-    if num_var > 10:
-      alignments = aligner_lg.align(read, ref)
-      if len(alignments) == 0:
-        raise Exception('No alignments found')
-      alignment = alignments[0] # Arbitrarily choose the first alignment
-      (
-        read_no_sub_lg,
-        read_repr_lg,
-        ref_repr_lg,
-        ins_lg,
-        dels_lg,
-        subs_lg,
-      ) = get_alignment_info(alignment.coordinates, read, ref, dsb_pos)
-      num_var_lg = len(ins_lg) + len(dels_lg) + len(subs_lg)
-      if num_var_lg < num_var:
-        read_no_sub = read_no_sub_lg
-        read_repr = read_repr_lg
-        ref_repr = ref_repr_lg
-        ins = ins_lg
-        dels = dels_lg
-        subs = subs_lg
-        num_var = num_var_lg
+    if num_var_lg < num_var:
+      read_no_sub = read_no_sub_lg
+      read_repr = read_repr_lg
+      ref_repr = ref_repr_lg
+      ins = ins_lg
+      dels = dels_lg
+      subs = subs_lg
+      num_var = num_var_lg
 
-    search = search_seq(search_data, read)
-    if (search is None) and ig_sub:
-      # try again with the substitutions removed
-      search = search_seq(search_data, read_no_sub)
+    # set to None by default
+    name = None
+    match = None
+    match_len = None
+    search_seq = None
+    region_s, region_e = None, None
+    dsb_dist = None
+    
+    search = search_in_data(search_data, read, read_no_sub)
 
     if search is not None:
       cat = search['Category']
-      match = None
+      name = search['Name']
+      search_seq = search['Sequence']
+      if cat == 'mmej':
+        match = search['Pattern']
+        match_len = len(search['Pattern'])
     else:
       only_del = (len(dels) > 0) and (len(ins) == 0) and (len(subs) <= 3)
       only_ins = (len(dels) == 0) and (len(ins) > 0) and (len(subs) <= 3)
@@ -250,11 +311,6 @@ def alignment_analyze(
       else:
         del_sh1_1 = one_del and (dels[0][1] == (dsb_pos - 1))
 
-      # check max match length
-      if one_del and (dels[0][0] <= dsb_pos) and (dsb_pos <= dels[0][1]):
-        match = get_max_match(ref, dels[0][0], dels[0][1])
-      else:
-        match = None
       if del_sh1_1:
         cat = 'del_sh_1'
       elif ins_sh_1:
@@ -264,7 +320,21 @@ def alignment_analyze(
       elif one_nt_ins:
         cat = '1_nt_ins'
       elif one_del:
-        cat = '1_lg_del'
+        if (dels[0][0] <= dsb_pos) and (dsb_pos <= dels[0][1]):
+          dsb_dist = 0
+        else:
+          dsb_dist = min(abs(dsb_pos - dels[0][0]), abs(dsb_pos - dels[0][1]))
+        if dsb_dist == 0:
+          dsb_dist = 0
+          match = get_max_match(ref, dels[0][0], dels[0][1])  # check max match length
+          match_len = len(match)
+          region_s, region_e = classify_region(strand, construct, dels[0][0], dels[0][1])
+          cat = '1_lg_del_1'
+        elif dsb_dist <= 5:
+          cat = '1_lg_del_2'
+        else:
+          dsb_dist = min(abs(dsb_pos - dels[0][0]), abs(dsb_pos - dels[0][1]))
+          cat = '1_lg_del_3'
       elif one_ins:
         cat = '1_lg_ins'
       elif only_del:
@@ -290,25 +360,15 @@ def alignment_analyze(
       'num_var': num_var,
       'num_ins': len(ins),
       'num_del': len(dels),
-      'num_sub': len(subs)
+      'num_sub': len(subs),
+      'match_len': match_len,
+      'match': match,
+      'name': name,
+      'search': search_seq,
+      'region_s': region_s,
+      'region_e': region_e,
+      'dsb_dist': dsb_dist,
     }
-    if cat == 'mmej':
-      data.update({
-        'match_len': len(search['Pattern']),
-        'match': search['Pattern'],
-        'name': search['Name'],
-        'search': search['Sequence']
-      })
-    elif search is not None:
-      data.update({
-        'name': search['Name'],
-        'search': search['Sequence']
-      })
-    if match is not None:
-      data.update({
-        'match_len': len(match),
-        'match': match
-      })
     data_list_out.append(data)
   
   if len(data_list_out) == 0:
@@ -334,8 +394,6 @@ if __name__ == '__main__':
   parser.add_argument('-t', required=True, type=int, help='Total reads')
   parser.add_argument('-m', required=True, type=int, default=0,
                       help='Max number of reads to process (0 to process all).')
-  parser.add_argument('-ig_sub', action='store_true', default=False,
-                      help='Try ignoring substitutions when searching for MMEJ and other signatures.')
   
   args = parser.parse_args()
 
@@ -355,6 +413,5 @@ if __name__ == '__main__':
     construct = args.c,
     total_reads = args.t,
     max_reads = args.m,
-    ig_sub = args.ig_sub,
     output = args.o,
   )

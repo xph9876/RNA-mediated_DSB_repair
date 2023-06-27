@@ -23,7 +23,7 @@ FORMAT = {
   ],
   'unknown': [
     [
-      ['cat', 'cat', '10s'],
+      ['cat', 'cat', '12s'],
       ['rank', 'rank', '8d'],
       ['count', 'count', '8d'],
       ['freq', 'freq', '08.6f'],
@@ -37,6 +37,9 @@ FORMAT = {
       ['search', 'search', 's'],
       ['match_len', 'match_len', '.0f'],
       ['match', 'match', 's'],
+      ['dsb_dist', 'dsb_dist', '3.0f'],
+      ['region_s', 'region_s', '6s'],
+      ['region_e', 'region_e', '6s'],
     ],
     [['read_repr', 'read', 's']],
     [['ref_repr', 'ref ', 's']], # exra space in 'ref ' to align with 'read'
