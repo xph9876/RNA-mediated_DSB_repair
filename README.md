@@ -6,7 +6,7 @@ Contains the code for the computational analysis presented in the [publication](
 
 ## Citation
 
-Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022). *In submission*.
+Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022). bioRxiv. https://doi.org/10.1101/2022.11.01.514688.
 
 ## Files/Directories
 
@@ -38,9 +38,11 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 * `demo`: Demonstrations of the various analyses and pipelines with example data.
 
+* `unknown_analysis`: Python3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
+
 ## Dependencies
 
-For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [permutation test](#permutation-test), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
+For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [test ratios](#test-ratios), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
 
 ```bash
 # After conda installation, run in repository folder
@@ -49,7 +51,7 @@ conda env create -f MMEJ/mmej_environment.yml
 conda activate microhomology
 ```
 
-For stage [NHEJ pipeline](#nhej-pipeline), please see `NHEJ/README.md`.
+For stage [NHEJ pipeline](#nhej-pipeline), please see `NHEJ/README.md`. The [unknown analysis](#unknown-analysis) also requires the Python package BioPython 1.80.
 
 ## Installation
 After installing all dependencies, just clone the repository to install.
@@ -96,6 +98,10 @@ The input frequencies used in the publication are included in the `test_ratios/i
 ### NHEJ pipeline
 
 The non-homologous end joining (NHEJ) analysis pipeline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms. See `NHEJ/README.md` for more details.
+
+### Unknown analysis
+
+An analysis pipline for examining the unclassified reads of the 1-DSB experiments. To run the analysis use the `unknown_analysis/run_all.sh` script. Note that the NHEJ pipeline must already have been run (particularly, the tables in `NHEJ/1_data_filter_nhej` must have been generated). The output tables will be written to `unknown_analysis/output`.
 
 ## Contact
 

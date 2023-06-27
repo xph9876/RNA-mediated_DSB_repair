@@ -10,7 +10,7 @@ Tested OS: Windows 11 Home.
 
 * Software:
     * Python 3.11.0
-    * Bowtie2 2.5.0
+    * Bowtie 2 2.5.0
 * Python packages:
     * Kaleido 0.1.0.post1 (must be exactly this version)
     * Matplotlib 3.6.2
@@ -27,11 +27,11 @@ Tested OS: Windows 11 Home.
 
 The full output of ```pip freeze``` is given in `python_packages.txt`. For PNG image output from the [Plotly](https://plotly.com/) library, a package known as [Kaleido](https://github.com/plotly/Kaleido) is used. Only Kaleido version 0.1.0.post1 has been found to work correctly with these scripts, and can be installed with `pip install kaleido==0.1.0.post1`.
 
-To [reproduce the analyses](#reproducing-analyses) or run the [demo](#demonstration), the software [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) must be installed on the PATH. On Windows, the commands `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available . On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
+To [reproduce the analyses](#reproducing-analyses) or run the [demo](#demonstration), the software [Bowtie 2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) must be installed on the PATH. On Windows, the commands `bowtie2-build-s.exe` and `bowtie2-align-s.exe` must be available . On Unix, the commands `bowtie2-build` and `bowtie2` must be available.
 
 ## Citation
 
-Jeon Y. *et al.* RNA-mediated double-strand break repair in human cells. (2022). *In submission*.
+Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022). bioRxiv. https://doi.org/10.1101/2022.11.01.514688.
 
 ## Reproducing Analyses
 
@@ -41,7 +41,7 @@ To reproduce the NHEJ analyses of the [publication](#citation), the scripts with
 
 This is a demo on running the NHEJ pipeline stages. For more in-depth descriptions of each stage see [Pipeline Stages](#pipeline-stages). To run the demo script, the working directory of the terminal must be the `demo` subdirectory. The FASTQ files in `demo/data_fastq` are examples of trimmed FASTQ files with DNA-sequencing data, which are the input for the pipeline. To run the demo, use the PowerShell script `demo/run.ps1` on Windows, or the bash script `demo/run.sh` on Unix. These scripts also serve as examples of running the individual stages of the pipeline. The final output from the pipeline will be written to the following directories:
 
-1. (a) Bowtie2 indexes: `demo/data_bowtie2_build`. (b) Bowtie2 alignments: `demo/data_0_sam`.
+1. (a) Bowtie 2 indexes: `demo/data_bowtie2_build`. (b) Bowtie 2 alignments: `demo/data_0_sam`.
 2. NHEJ filtered reads: `demo/data_1_filtering`.
 3. Repeat libraries combined: `demo/data_2_combine_repeat`.
 4. Extracted DSB-sequence windows: `demo/data_3_window`.
@@ -54,7 +54,7 @@ This is a demo on running the NHEJ pipeline stages. For more in-depth descriptio
 
 ### Alignment
 
-The raw input for the NHEJ pipeline are the trimmed FASTQ files from the trimming stage (see parent directory). The trimmed FASTQ files must be alignment against the appropriate reference sequence in the directory `ref_seq`. Bowtie2 should be used with the default settings:
+The raw input for the NHEJ pipeline are the trimmed FASTQ files from the trimming stage (see parent directory). The trimmed FASTQ files must be alignment against the appropriate reference sequence in the directory `ref_seq`. Bowtie 2 should be used with the default settings:
 
 ```
   bowtie2-build <ref_name>.fa <ref_name>
@@ -79,9 +79,11 @@ Arguments:
 
 * `--ref_seq_file`: FASTA file with the reference sequence used to align the input `SAM_FILE`. Should contain a single nucleotide sequence in FASTA format.
 
-* `--sam_file`: Aligned SAM input file. Must be created with [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (specific flags from Bowtie2 are used). Every read must be aligned with exactly the same reference sequence.
+* `--sam_file`: Aligned SAM input file. Must be created with [Bowtie 2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (specific flags from Bowtie 2 are used). Every read must be aligned with exactly the same reference sequence.
 
-* `--output`: Output file. The result is a tab-separated file with columns: `Sequence`: nucleotide sequence of the read; `CIGAR`: CIGAR string for the alignment produced by Bowtie2 (see [Bowtie2 documentation](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)); `Count`: number of reads with the same sequence; `Num_Subst`: number of substitutions (AKA mismatches) in the alignment. If multiple reads with identical nucleotide sequences and different CIGARs occur in `SAM_FILE`, then they will be a single row in the output representing the sequence with the `Count` column as the number of such reads and the `CIGAR` column arbitrarily selected from one of the CIGARs.
+* `--output`: Output file. A tab-separated table with information about the reads accepted by the NHEJ filter and their alignments with the reference sequence.
+
+* `--output_rejected`: Rejected output file. A tab-separated table with information about the reads rejected by the NHEJ filter.
 
 * `--min_length`: Minimum length of a read to pass filtering. Reads shorter than this are discarded.
 
@@ -95,9 +97,9 @@ Combines multiple tables of biological repeats into a single file. Uses as input
 
 Arguments:
 
-* `--input`: List of TSV files output from script [`filter_nhej.py`](#filternhejpy). Must have columns: `Sequence`, `CIGAR`, `Count`, `Num_Subst`. The files names must be of the form `<name>_*.tsv`, where `<name>` is the name of the library. 
+* `--input`: List of TSV files output from script [`filter_nhej.py`](#filternhejpy). The files names must be of the form `<name>_*.tsv`, where `<name>` is the name of the library. 
 
-* `--output`: Output TSV file. The output `Count` columns will be of the form `Count_<name>` where `<name>` is the name of the library (see `INPUT`).
+* `--output`: Output TSV file.
 
 * `--quiet`: If present, do not output extra log messages.
 
@@ -111,7 +113,7 @@ Extract DSB-sequence for the NHEJ variation-distance graphs while discarding seq
 
 Arguments:
 
-* `--input`: TSV file output of [`combine_repeat.py`](#combinerepeatpy). The columns must be: `Sequence`, `CIGAR`, `Count_<X1>`, `Count_<X2>`, etc. All the columns after `CIGAR` should be the counts for each repeat where `<Xi>` denotes the name of the library.
+* `--input`: TSV file output of [`combine_repeat.py`](#combinerepeatpy).
 
 * `--ref_seq_file`: Reference sequence FASTA. Should contain a single nucleotide sequence in FASTA format.
 
