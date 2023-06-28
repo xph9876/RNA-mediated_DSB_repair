@@ -351,10 +351,3 @@ USE_LAYOUT = LAYOUT_UNIVERSAL
 
 GRAPH_HEIGHT_PX = 1800
 GRAPH_WIDTH_PX = 2400
-
-# Temporary code to limit analysis to 1DSB
-LIBRARY_INFO = LIBRARY_INFO.loc[
-  (LIBRARY_INFO['dsb_type'] == '1DSB') &
-  (LIBRARY_INFO['control_type'].isin(['notControl', 'noDSB']))
-].reset_index(drop=True)
-# End temporary code

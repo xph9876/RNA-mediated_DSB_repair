@@ -56,11 +56,15 @@ def load_search_data(
     search += data
   return search
 
-def search_in_data(search_data, read, read_no_sub):
+def search_in_data(search_data, read, read_no_sub=None):
   for x in search_data:
     if x['Sequence'] in read:
       return x
-    if (x['Category'] != 'mmej') and (x['Sequence'] in read_no_sub):
+    if (
+      (read_no_sub is not None) and
+      (x['Category'] != 'mmej') and
+      (x['Sequence'] in read_no_sub)
+    ):
       return x
   return None
 
