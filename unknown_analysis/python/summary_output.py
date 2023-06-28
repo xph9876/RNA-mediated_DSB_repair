@@ -76,7 +76,7 @@ if __name__ == '__main__':
     if total:
       df2 = df.assign(temp=1).groupby('temp') # Add a dummy column to group by.
     else:
-      df2 = df.groupby(group['cols'], dropna=False)
+      df2 = df.groupby(group['cols'])
     df2 = df2[cols]
     df2 = df2.sum().reset_index(drop=total) # Drop the dummy column for total.
     if df2.shape[0] == 0:
