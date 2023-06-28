@@ -40,4 +40,3 @@ if __name__== '__main__':
     if len(id_cols) > 0:
       df = pd.concat([pd.DataFrame(id_cols), df], axis='columns')
     df.to_csv(os.path.join(args.o, fn), index=False)
-    

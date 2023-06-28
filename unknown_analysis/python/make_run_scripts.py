@@ -68,12 +68,13 @@ if __name__ == '__main__':
     sep = '\\' if ext == '.ps1' else '/'
 
     filter_nhej_dir = join_path(sep, args.n)
-    alignment_dir = join_path(sep, args.o, 'alignment')
-    full_dir = join_path(sep, args.o, 'full')
-    nhej_mmej_dir = join_path(sep, args.o, 'nhej_mmej')
-    summary_dir = join_path(sep, args.o, 'summary')
-    compare_dir = join_path(sep, args.o, 'compare')
-    mean_dir = join_path(sep, args.o, 'compare_mean')
+    nhej_mmej_dir = join_path(sep, args.o, '0_nhej_mmej')
+    alignment_dir = join_path(sep, args.o, '1_alignment')
+    full_dir = join_path(sep, args.o, '2_full_output')
+    summary_dir = join_path(sep, args.o, '3_summary_output')
+    compare_dir = join_path(sep, args.o, '4_compare_libraries')
+    mean_dir = join_path(sep, args.o, '5_compare_means')
+    pretty_dir = join_path(sep, args.o, '6_compare_pretty')
 
     analyze_alignments_py = join_path(sep, args.p, 'analyze_alignments.py')
     detect_mmej_py = join_path(sep, args.p, 'detect_mmej.py')
@@ -81,6 +82,18 @@ if __name__ == '__main__':
     summary_output_py = join_path(sep, args.p, 'summary_output.py')
     compare_libraries_py = join_path(sep, args.p, 'compare_libraries.py')
     mean_tables_py = join_path(sep, args.p, 'mean_tables.py')
+    pretty_tables_py = join_path(sep, args.p, 'pretty_tables.py')
+
+    # Make the detect NHEJ and MMEJ overlap script
+    with open(os.path.join(args.r, 'run_nhej_mmej' + ext), 'w') as out:
+      for info in library_info:
+        i = join_path(sep, filter_nhej_dir, get_lib_name_long(info) + '.tsv')
+        o = join_path(sep, nhej_mmej_dir, get_lib_name_long(info) + '.csv')
+        c = info['construct']
+        b = info['guide_rna']
+        s = info['strand']
+        t = info['total_reads']
+        out.write(f'python {detect_mmej_py} -i {i} -o {o} -c {c} -b {b} -s {s} -t {t}\n')
 
     # Make analyze alignments script
     with open(os.path.join(args.r, 'run_analyze_alignments' + ext), 'w') as out:
@@ -94,17 +107,6 @@ if __name__ == '__main__':
         t = info['total_reads']
         r = join_path(sep, 'input', 'ref_seq', f'{info["dsb_type"]}_{s}_{c}.fa')
         out.write(f'python {analyze_alignments_py} -i {i} -o {o} -d {d} -c {c} -b {b} -s {s} -t {t} -r {r} -m 0\n')
-
-    # Make the detect NHEJ and MMEJ overlap script
-    with open(os.path.join(args.r, 'run_nhej_mmej' + ext), 'w') as out:
-      for info in library_info:
-        i = join_path(sep, filter_nhej_dir, get_lib_name_long(info) + '.tsv')
-        o = join_path(sep, nhej_mmej_dir, get_lib_name_long(info) + '.csv')
-        c = info['construct']
-        b = info['guide_rna']
-        s = info['strand']
-        t = info['total_reads']
-        out.write(f'python {detect_mmej_py} -i {i} -o {o} -c {c} -b {b} -s {s} -t {t}\n')
 
     # Make the full alignment output script
     with open(os.path.join(args.r, 'run_full_output' + ext), 'w') as out:
@@ -156,6 +158,12 @@ if __name__ == '__main__':
         i = join_path(sep, compare_dir, subset)
         o = join_path(sep, mean_dir, subset)
         for mode in ['mmej', 'unknown', 'nhej_mmej']:
-          out.write(
-            f'python {mean_tables_py} -i {i} -o {o} -m {mode}\n'
-          )
+          out.write(f'python {mean_tables_py} -i {i} -o {o} -m {mode}\n')
+
+    # Make the pretty tables script
+    with open(os.path.join(args.r, 'run_pretty_tables' + ext), 'w') as out:
+      for subset in ['all', 'not_control', 'no_dsb']:
+        i = join_path(sep, mean_dir, subset)
+        o = join_path(sep, pretty_dir, subset)
+        for mode in ['mmej', 'unknown', 'nhej_mmej']:
+          out.write(f'python {pretty_tables_py} -i {i} -o {o} -m {mode}\n')
