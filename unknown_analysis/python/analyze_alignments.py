@@ -9,7 +9,8 @@ REGIONS = {
     'sense': {
       'Exon1': [0, 72],
       'Intron': [72, 183],
-      'Exon2': [183, 229],  
+      'Branch': [118, 173],
+      'Exon2': [183, 229],
     },
     'branch': {
       'Exon1': [0, 72],
@@ -21,6 +22,7 @@ REGIONS = {
     'sense': {
       'Exon2': [0, 46],
       'Intron': [46, 157],
+      'Branch': [56, 111],
       'Exon1': [157, 229],
     },
     'branch': {
@@ -93,21 +95,35 @@ def classify_region(strand, construct, del_s, del_e):
     (del_s >= REGIONS[strand][construct][left_exon][0]) and
     (del_s <= REGIONS[strand][construct][left_exon][1])
   ):
-    region_s = left_exon
-  elif region_s >= (REGIONS[strand][construct]['Intron'][0] + 1):
-    region_s = 'Intron'
+    region_l = left_exon
+  elif del_s >= (REGIONS[strand][construct]['Intron'][0] + 1):
+    if (
+      (construct == 'sense') and
+      (del_s >= (REGIONS[strand][construct]['Branch'][0] + 1)) and
+      (del_s <= (REGIONS[strand][construct]['Branch'][1] - 1))
+    ):
+      region_l = 'Branch'
+    else:
+      region_l = 'Intron'
   else:
     raise Exception(f'Invalid deletion start: {del_s}')
   if (
     (del_e >= REGIONS[strand][construct][right_exon][0]) and
     (del_e <= REGIONS[strand][construct][right_exon][1])
   ):
-    region_e = right_exon
+    region_r = right_exon
   elif del_e <= (REGIONS[strand][construct]['Intron'][1] - 1):
-    region_e = 'Intron'
+    if (
+      (construct == 'sense') and
+      (del_e >= (REGIONS[strand][construct]['Branch'][0] + 1)) and
+      (del_e <= (REGIONS[strand][construct]['Branch'][1] - 1))
+    ):
+      region_r = 'Branch'
+    else:
+      region_r = 'Intron'
   else:
     raise Exception(f'Invalid deletion end: {del_e}')
-  return region_s, region_e
+  return region_l[0] + region_r[0]
 
 # no_end_gaps: if True, don't count gaps at the beginning or end of the alignment
 def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
@@ -278,7 +294,7 @@ def alignment_analyze(
     match = None
     match_len = None
     search_seq = None
-    region_s, region_e = None, None
+    region = None
     dsb_dist = None
     
     search = search_in_data(search_data, read, read_no_sub)
@@ -328,7 +344,7 @@ def alignment_analyze(
           dsb_dist = 0
           match = get_max_match(ref, dels[0][0], dels[0][1])  # check max match length
           match_len = len(match)
-          region_s, region_e = classify_region(strand, construct, dels[0][0], dels[0][1])
+          region = classify_region(strand, construct, dels[0][0], dels[0][1])
           cat = '1_lg_del_1'
         elif dsb_dist <= 5:
           cat = '1_lg_del_2'
@@ -365,9 +381,8 @@ def alignment_analyze(
       'match': match,
       'name': name,
       'search': search_seq,
-      'region_s': region_s,
-      'region_e': region_e,
       'dsb_dist': dsb_dist,
+      'region': region,
     }
     data_list_out.append(data)
   

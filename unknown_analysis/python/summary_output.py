@@ -26,6 +26,8 @@ GROUP_COLUMNS = {
     {'cols': ['num_del'], 'sort': False},
     {'cols': ['num_sub'], 'sort': False},
     {'cols': ['len'], 'sort': False},
+    {'cols': ['dsb_dist'],  'sort': False},
+    {'cols': ['region'],  'sort': False},
   ],
   'nhej_mmej': [
     {'cols': ['name'], 'sort': True},
@@ -40,7 +42,9 @@ def get_cat_2(cat):
     'ins_sh_1': 'indel_sh_1',
     '1_nt_del': 'other',
     '1_nt_ins': 'other',
-    '1_lg_del': '1_lg_del',
+    '1_lg_del_1': '1_lg_del',
+    '1_lg_del_2': '1_lg_del',
+    '1_lg_del_3': 'other',
     '1_lg_ins': 'other',
     'multi_del': 'other',
     'multi_ins': 'other',
@@ -72,7 +76,7 @@ if __name__ == '__main__':
     if total:
       df2 = df.assign(temp=1).groupby('temp') # Add a dummy column to group by.
     else:
-      df2 = df.groupby(group['cols'])
+      df2 = df.groupby(group['cols'], dropna=False)
     df2 = df2[cols]
     df2 = df2.sum().reset_index(drop=total) # Drop the dummy column for total.
     if df2.shape[0] == 0:
