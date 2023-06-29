@@ -21,3 +21,5 @@ python .\python\make_run_scripts.py `
 .\run\run_compare_libraries.ps1
 
 .\run\run_mean_tables.ps1
+
+.\run\run_pretty_tables.ps1

@@ -21,3 +21,5 @@ python ./python/make_run_scripts.py \
 ./run/run_compare_libraries.sh
 
 ./run/run_mean_tables.sh
+
+./run/run_pretty_tables.sh
