@@ -86,13 +86,16 @@ if __name__== '__main__':
     df = df.pivot(index=index_cols, columns=pivot_cols, values='value')
     df = df.sort_index(axis='index')
     df = df.sort_index(axis='columns')
-    if total:
-      df.columns = [x.upper() if (x == "sd") else x for x in df.columns]
-    else:
-      df.columns = [
-        str(x[0]) + ' (' + (x[1].upper() if (x[1] == "sd") else x[1]) + ')'
-        for x in df.columns
-      ]
+    if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+      df = df.rename(
+        columns = {
+          'other': 'Unclassified in No-DSB control',
+          'indel_sh_1': 'In/dels shifted 1-nt from the DSB site',
+          '1_lg_del': 'MMEJ-like deletion',
+        },
+        level = 'cat_2',
+      )
+    df = df.rename(columns={'mean': 'Mean', 'sd': 'SD'}, level='stat')
     df = df.reset_index(
       level = ['no_dsb', 'cell', 'breaks', 'strand', 'construct'],
       drop = True,
@@ -105,13 +108,5 @@ if __name__== '__main__':
       axis = 'index',
     )
     df = df.reset_index()
-    if (len(col_info['cols']) == 1) and (col_info['cols'] == ['cat_2']):
-      df = df.rename(
-        {
-          'other': 'Unclassified in No-DSB control',
-          'indel_sh_1': 'In/dels shifted 1-nt from the DSB site',
-          '1_lg_deletion': 'MMEJ-like deletion',
-        },
-        axis = 'columns',
-      )
+
     df.to_csv(os.path.join(args.o, fn), index=False)
