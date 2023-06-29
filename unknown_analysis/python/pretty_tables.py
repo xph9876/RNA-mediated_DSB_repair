@@ -23,11 +23,11 @@ def get_pretty_name(rec):
     'sgB': ' sgRNA B',
   }[rec['breaks']]
   if rec['no_dsb']:
-    no_dsb = ', No-DSB control for ' + breaks
+    no_dsb = ' No-DSB control for' + breaks
     breaks = ''
   else:
     no_dsb = ''
-  return construct + breaks + no_dsb
+  return construct + ',' + breaks + no_dsb
 
 if __name__== '__main__':
   parser = argparse.ArgumentParser(
