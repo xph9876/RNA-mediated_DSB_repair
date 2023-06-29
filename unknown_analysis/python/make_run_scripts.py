@@ -39,20 +39,20 @@ if __name__ == '__main__':
     (library_info['control_type'].isin(['noDSB', 'notControl']))
   ]
   # Temporary code for testing
-  library_info = library_info.loc[
-    (library_info['library'] + '_' + library_info['strand']).isin(
-      [
-        'yjl244_R1',
-        'yjl244_R2',
-        'yjl245_R1',
-        'yjl245_R2',
-        'yjl255_R1',
-        'yjl259_R1',
-        'yjl267_R2',
-        'yjl271_R2',
-      ]
-    )
-  ]
+  # library_info = library_info.loc[
+  #   (library_info['library'] + '_' + library_info['strand']).isin(
+  #     [
+  #       'yjl244_R1',
+  #       'yjl244_R2',
+  #       'yjl245_R1',
+  #       'yjl245_R2',
+  #       'yjl255_R1',
+  #       'yjl259_R1',
+  #       'yjl267_R2',
+  #       'yjl271_R2',
+  #     ]
+  #   )
+  # ]
   # End temporary code for testing
   library_info['cell_line'] = pd.Categorical(library_info['cell_line'], categories=['WT', 'KO'], ordered=True)
   library_info['guide_rna'] = pd.Categorical(library_info['guide_rna'], categories=['sgA', 'sgB'], ordered=True)
