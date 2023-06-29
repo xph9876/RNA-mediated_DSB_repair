@@ -87,6 +87,8 @@ def get_max_match(ref, del_s, del_e):
 # Classify regions as Exon1, Exon2, and Intron
 # Start is 0-based, end is 1-based
 def classify_region(strand, construct, del_s, del_e):
+  if construct == 'cmv':
+    construct = 'sense' # sense and cmv have the same regions
   if strand == 'R1':
     left_exon = 'Exon1'
     right_exon = 'Exon2'
