@@ -17,6 +17,7 @@ FORMAT = {
       ['match_len', 'match_len', '.0f'],
       ['match', 'match', '8s'],
       ['name', 'name', '10s'],
+      ['del_size', 'del_size', '3.0f'],
     ],
     [['read_repr', 'read', 's']],
     [['ref_repr', 'ref ', 's']], # exra space in 'ref ' to align with 'read'
@@ -39,6 +40,8 @@ FORMAT = {
       ['match', 'match', 's'],
       ['dsb_dist', 'dsb_dist', '3.0f'],
       ['region', 'region', '2s'],
+      ['del_size', 'del_size', '3.0f'],
+      ['ins_size', 'ins_size', '3.0f'],
     ],
     [['read_repr', 'read', 's']],
     [['ref_repr', 'ref ', 's']], # exra space in 'ref ' to align with 'read'

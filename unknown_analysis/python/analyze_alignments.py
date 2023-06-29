@@ -302,6 +302,8 @@ def alignment_analyze(
     search_seq = None
     region = None
     dsb_dist = None
+    del_size = None
+    ins_size = None
     
     search = search_in_data(search_data, read, read_no_sub)
 
@@ -312,14 +314,13 @@ def alignment_analyze(
       if cat == 'mmej':
         match = search['Pattern']
         match_len = len(search['Pattern'])
+        del_size = search['Right'] - search['Left']
     else:
       only_del = (len(dels) > 0) and (len(ins) == 0) and (len(subs) <= 3)
       only_ins = (len(dels) == 0) and (len(ins) > 0) and (len(subs) <= 3)
       only_sub = (len(dels) == 0) and (len(ins) == 0) and (len(subs) > 0)
       one_del = only_del and (len(dels) == 1)
       one_ins = only_ins and (len(ins) == 1)
-      one_nt_del = one_del and (dels[0][-1] == 1)
-      one_nt_ins = one_ins and (ins[0][-1] == 1)
       
       # check shifted ins
       if strand == 'R1':
@@ -337,10 +338,6 @@ def alignment_analyze(
         cat = 'del_sh_1'
       elif ins_sh_1:
         cat = 'ins_sh_1'
-      elif one_nt_del:
-        cat = '1_nt_del'
-      elif one_nt_ins:
-        cat = '1_nt_ins'
       elif one_del:
         if (dels[0][0] <= dsb_pos) and (dsb_pos <= dels[0][1]):
           dsb_dist = 0
@@ -351,14 +348,20 @@ def alignment_analyze(
           match = get_max_match(ref, dels[0][0], dels[0][1])  # check max match length
           match_len = len(match)
           region = classify_region(strand, construct, dels[0][0], dels[0][1])
-          cat = '1_lg_del_1'
+          cat = '1_del_1'
         elif dsb_dist <= 5:
-          cat = '1_lg_del_2'
+          cat = '1_del_2'
         else:
           dsb_dist = min(abs(dsb_pos - dels[0][0]), abs(dsb_pos - dels[0][1]))
-          cat = '1_lg_del_3'
+          cat = '1_del_3'
+        del_size = dels[0][-1]
       elif one_ins:
-        cat = '1_lg_ins'
+        dsb_dist = abs(dsb_pos - ins[0][0])
+        if dsb_dist <= 5:
+          cat = '1_ins_1'
+        else:
+          cat = '1_ins_2'
+        ins_size = ins[0][-1]
       elif only_del:
         cat = 'multi_del'
       elif only_ins:
@@ -389,6 +392,8 @@ def alignment_analyze(
       'search': search_seq,
       'dsb_dist': dsb_dist,
       'region': region,
+      'del_size': del_size,
+      'ins_size': ins_size,
     }
     data_list_out.append(data)
   
