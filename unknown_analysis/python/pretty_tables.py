@@ -90,8 +90,8 @@ if __name__== '__main__':
       df = df.rename(
         columns = {
           'other': 'Unclassified in No-DSB control',
-          'indel_sh_1': 'In/dels shifted 1-nt from the DSB site',
-          '1_lg_del': 'MMEJ-like deletion',
+          'indel_sh': 'In/dels shifted <= 3-nt from the DSB site',
+          '1_del_mj': 'MMEJ-like deletion',
         },
         level = 'cat_2',
       )

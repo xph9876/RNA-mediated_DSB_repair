@@ -243,6 +243,7 @@ def alignment_analyze(
   strand,
   construct,
   total_reads,
+  shift,
   max_reads,
   output,
 ):
@@ -321,24 +322,8 @@ def alignment_analyze(
       only_sub = (len(dels) == 0) and (len(ins) == 0) and (len(subs) > 0)
       one_del = only_del and (len(dels) == 1)
       one_ins = only_ins and (len(ins) == 1)
-      
-      # check shifted ins
-      if strand == 'R1':
-        ins_sh_1 = one_ins and (ins[0][0] == (dsb_pos + 1))
-      else:
-        ins_sh_1 = one_ins and (ins[0][0] == (dsb_pos - 1))
-      
-      # check shifted del
-      if strand == 'R1':
-        del_sh1_1 = one_del and (dels[0][0] == (dsb_pos + 1))
-      else:
-        del_sh1_1 = one_del and (dels[0][1] == (dsb_pos - 1))
 
-      if del_sh1_1:
-        cat = 'del_sh_1'
-      elif ins_sh_1:
-        cat = 'ins_sh_1'
-      elif one_del:
+      if one_del:
         if (dels[0][0] <= dsb_pos) and (dsb_pos <= dels[0][1]):
           dsb_dist = 0
         else:
@@ -348,19 +333,19 @@ def alignment_analyze(
           match = get_max_match(ref, dels[0][0], dels[0][1])  # check max match length
           match_len = len(match)
           region = classify_region(strand, construct, dels[0][0], dels[0][1])
-          cat = '1_del_1'
-        elif dsb_dist <= 5:
-          cat = '1_del_2'
+          cat = '1_del_mj'
+        elif dsb_dist <= shift:
+          cat = '1_del_sh'
         else:
           dsb_dist = min(abs(dsb_pos - dels[0][0]), abs(dsb_pos - dels[0][1]))
-          cat = '1_del_3'
+          cat = '1_del_x'
         del_size = dels[0][-1]
       elif one_ins:
         dsb_dist = abs(dsb_pos - ins[0][0])
-        if dsb_dist <= 5:
-          cat = '1_ins_1'
+        if dsb_dist <= shift:
+          cat = '1_ins_sh'
         else:
-          cat = '1_ins_2'
+          cat = '1_ins_x'
         ins_size = ins[0][-1]
       elif only_del:
         cat = 'multi_del'
@@ -420,6 +405,8 @@ if __name__ == '__main__':
   parser.add_argument('-t', required=True, type=int, help='Total reads')
   parser.add_argument('-m', required=True, type=int, default=0,
                       help='Max number of reads to process (0 to process all).')
+  parser.add_argument('-sh', required=False, type=int, default=3,
+                      help='Maximum number of nucleotides to be considered part of the in/del shifted category.')
   
   args = parser.parse_args()
 
@@ -438,6 +425,7 @@ if __name__ == '__main__':
     strand = args.s,
     construct = args.c,
     total_reads = args.t,
+    shift = args.sh,
     max_reads = args.m,
     output = args.o,
   )

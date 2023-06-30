@@ -41,13 +41,11 @@ GROUP_COLUMNS = {
 
 def get_cat_2(cat):
   return {
-    'del_sh_1': 'indel_sh_1',
-    'ins_sh_1': 'indel_sh_1',
-    '1_del_1': '1_del',
-    '1_del_2': '1_del',
-    '1_del_3': 'other',
-    '1_ins_1': '1_ins',
-    '1_ins_2': 'other',
+    '1_del_sh': 'indel_sh',
+    '1_del_mj': '1_del_mj',
+    '1_del_x': 'other',
+    '1_ins_sh': 'indel_sh',
+    '1_ins_x': 'other',
     'multi_del': 'other',
     'multi_ins': 'other',
     'multi_sub': 'other',

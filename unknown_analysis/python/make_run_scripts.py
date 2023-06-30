@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import argparse
 
+SHIFT = 3 # Max nuleotide shift to classify as "shifted in/del" (NHEJ-like)
+
 def join_path(sep, *path):
   path = sep.join(path)
   path = path.replace('\\', sep)
@@ -106,7 +108,10 @@ if __name__ == '__main__':
         s = info['strand']
         t = info['total_reads']
         r = join_path(sep, 'input', 'ref_seq', f'{info["dsb_type"]}_{s}_{c}.fa')
-        out.write(f'python {analyze_alignments_py} -i {i} -o {o} -d {d} -c {c} -b {b} -s {s} -t {t} -r {r} -m 0\n')
+        out.write(
+          f'python {analyze_alignments_py} -i {i} -o {o} -d {d} -c {c} -b {b}' +
+          f' -s {s} -t {t} -r {r} -sh {SHIFT} -m 0\n'
+        )
 
     # Make the full alignment output script
     with open(os.path.join(args.r, 'run_full_output' + ext), 'w') as out:
