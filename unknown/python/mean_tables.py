@@ -26,15 +26,17 @@ if __name__== '__main__':
     for col in df.columns:
       new_col = col
       if col.startswith('yjl'):
-        new_col = col.split('_', 1)[1] + '_mean'
+        new_col = col.split('_', 1)[1]
         new_data[new_col].append(df[col])
       else:
         id_cols[col] = df[col]
+    new_data_2 = {}
     for col in new_data:
       # get the means
-      new_data[col] = reduce(lambda a, b: a + b, new_data[col]) / len(new_data[col])
-    df = pd.DataFrame(new_data)
+      col_data = pd.concat(new_data[col], axis='columns')
+      new_data_2[col + '_mean'] = col_data.mean(axis='columns')
+      new_data_2[col + '_sd'] = col_data.std(axis='columns')
+    df = pd.DataFrame(new_data_2)
     if len(id_cols) > 0:
       df = pd.concat([pd.DataFrame(id_cols), df], axis='columns')
     df.to_csv(os.path.join(args.o, fn), index=False)
-    

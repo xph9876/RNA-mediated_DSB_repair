@@ -13,6 +13,7 @@ GROUP_COLUMNS = {
     {'cols': ['num_del'], 'sort': False},
     {'cols': ['num_sub'], 'sort': False},
     {'cols': ['len'], 'sort': False},
+    {'cols': ['del_size'], 'sort': False},
   ],
   'unknown': [
     {'cols': ['cat'], 'sort': True},
@@ -26,6 +27,10 @@ GROUP_COLUMNS = {
     {'cols': ['num_del'], 'sort': False},
     {'cols': ['num_sub'], 'sort': False},
     {'cols': ['len'], 'sort': False},
+    {'cols': ['dsb_dist'],  'sort': False},
+    {'cols': ['region'],  'sort': False},
+    {'cols': ['del_size'],  'sort': False},
+    {'cols': ['ins_size'],  'sort': False},
   ],
   'nhej_mmej': [
     {'cols': ['name'], 'sort': True},
@@ -36,12 +41,11 @@ GROUP_COLUMNS = {
 
 def get_cat_2(cat):
   return {
-    'del_sh_1': 'indel_sh_1',
-    'ins_sh_1': 'indel_sh_1',
-    '1_nt_del': 'other',
-    '1_nt_ins': 'other',
-    '1_lg_del': '1_lg_del',
-    '1_lg_ins': 'other',
+    '1_del_sh': 'indel_sh',
+    '1_del_mj': '1_del_mj',
+    '1_del_x': 'other',
+    '1_ins_sh': 'indel_sh',
+    '1_ins_x': 'other',
     'multi_del': 'other',
     'multi_ins': 'other',
     'multi_sub': 'other',

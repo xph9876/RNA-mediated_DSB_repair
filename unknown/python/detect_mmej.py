@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import argparse
 
-from analyze_alignments import load_search_data, search_seq
+from analyze_alignments import load_search_data, search_in_data
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
@@ -25,10 +25,10 @@ if __name__ == '__main__':
   total_reads = args.t
 
   data = pd.read_csv(args.i, sep='\t')[['Rank', 'Count', 'Sequence']]
-  data = data.to_records(index=False)
+  data = data.to_dict('records')
   data_out = []
   for rec in data:
-    search = search_seq(search_data, rec['Sequence'])
+    search = search_in_data(search_data, rec['Sequence'])
     if search is not None:
       data_out.append({
         'rank': rec['Rank'],
