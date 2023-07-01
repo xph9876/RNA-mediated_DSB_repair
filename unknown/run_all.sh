@@ -10,9 +10,9 @@ python ./python/make_run_scripts.py \
   -n ../NHEJ/data_1_filter_nhej \
   -r ./run
 
-./run/run_analyze_alignments.sh
-
 ./run/run_nhej_mmej.sh
+
+./run/run_analyze_alignments.sh
 
 ./run/run_full_output.sh
 
@@ -21,3 +21,5 @@ python ./python/make_run_scripts.py \
 ./run/run_compare_libraries.sh
 
 ./run/run_mean_tables.sh
+
+./run/run_pretty_tables.sh
