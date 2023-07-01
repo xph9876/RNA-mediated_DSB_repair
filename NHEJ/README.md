@@ -2,7 +2,7 @@
 
 ## Description
 
-This folder contains the processing pipeline for the NHEJ (non-homologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The `run*.sh` and `run*.ps` scripts in the main directory are for reproducing the computations with data sets used in the [publication](#citation). Note, `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
+This folder contains the processing pipeline for the NHEJ (non-homologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The `run*.sh` and `run*.ps1` scripts in the main directory are for reproducing the computations with data sets used in the [publication](#citation). Note, `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
 
 ## Dependencies
 

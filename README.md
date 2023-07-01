@@ -38,7 +38,7 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 * `demo`: Demonstrations of the various analyses and pipelines with example data.
 
-* `unknown_analysis`: Python3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
+* `unknown`: Python3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
 
 ## Dependencies
 
@@ -101,7 +101,7 @@ The non-homologous end joining (NHEJ) analysis pipeline. Extracts DSB-sequence w
 
 ### Unknown analysis
 
-An analysis pipline for examining the unclassified reads of the 1-DSB experiments. To run the analysis use the `unknown_analysis/run_all.sh` script. Note that the NHEJ pipeline must already have been run (particularly, the tables in `NHEJ/1_data_filter_nhej` must have been generated). The output tables will be written to `unknown_analysis/output`.
+An analysis pipline for examining the unclassified reads of the 1-DSB experiments. To run the analysis use the `unknown/run_all.sh` or `unknown/run_all.ps1` script. Note that the NHEJ pipeline must already have been run (particularly, the tables in `NHEJ/1_data_filter_nhej` must have been generated). Some of the input to this pipline in `unknown/input` has been derived from other pipelines such as `MMEJ`. The output tables will be written to `unknown/output`.
 
 ## Contact
 
