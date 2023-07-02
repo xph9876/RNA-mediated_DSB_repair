@@ -10,17 +10,19 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 ## Files/Directories
 
-* `trimming`: Python3 scripts for the [trimming](#trimming) stage.
+* `trimming`: Python 3 scripts for the [trimming](#trimming) stage.
 
-* `flipped_intron`: Python3 scripts for the [frequency of flipped intron](#frequency-of-flipped-intron) stage.
+* `flipped_intron`: Python 3 scripts for the [frequency of flipped intron](#frequency-of-flipped-intron) stage.
 
-* `intron`: Python3 scripts for the [frequency of intron](#frequency-of-intron) stage.
+* `intron`: Python 3 scripts for the [frequency of intron](#frequency-of-intron) stage.
 
-* `RTDR`: Python3 scripts for the [frequency of R-TDR](#frequency-of-rtdr) stage.
+* `intron_yeast`: Python 3 scripts for the [frequency of intron](#frequency-of-intron) stage (for yeast data).
 
-* `RNA_seq`: Python3 scripts for the [categorization of RNA-seq](#categorization-of-rna-seq) stage.
+* `RTDR`: Python 3 scripts for the [frequency of R-TDR](#frequency-of-rtdr) stage.
 
-* `MMEJ`: Python3 scripts for the [MMEJ pipeline](#mmej-pipeline).
+* `RNA_seq`: Python 3 scripts for the [categorization of RNA-seq](#categorization-of-rna-seq) stage.
+
+* `MMEJ`: Python 3 scripts for the [MMEJ pipeline](#mmej-pipeline).
 
 * `refseq`: Reference sequences for [MMEJ pipeline](#mmej-pipeline).
 
@@ -32,13 +34,13 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 
 * `libinfo_antisense.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
 
-* `test_ratios`: Python3 scripts for the [test ratios](#test-ratios) stage.
+* `test_ratios`: Python 3 scripts for the [test ratios](#test-ratios) stage.
 
-* `NHEJ`: Python3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
+* `NHEJ`: Python 3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
 
 * `demo`: Demonstrations of the various analyses and pipelines with example data.
 
-* `unknown`: Python3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
+* `unknown`: Python 3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
 
 ## Dependencies
 
@@ -67,7 +69,9 @@ Trimming must be performed on all raw reads, DNA-seq and RNA-seq, before the oth
 
 ### Frequency of intron
 
-The script `intron/freq_intron.py` calculates the frequency of reads with the intron. The input should be the trimmed FASTQ files from [trimming](#trimming).
+The script `intron/freq_intron.py` calculates the frequency of reads with the intron. The input should be the trimmed FASTQ files from [trimming](#trimming). 
+
+For the yeast data a different method of detection is used, which are implemented in `intron_yeast/freq_intron_with_seq_F.py` and `intron_yeast/freq_intron_with_seq_R.py`. These scripts should be run as in `intron_yeast/run.sh`.
 
 ### Frequency of flipped intron
 
