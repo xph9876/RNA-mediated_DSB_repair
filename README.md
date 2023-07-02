@@ -89,9 +89,9 @@ The scripts `RNA_seq/*.py` categorize RNA-seq reads which have been aligned with
 
 Pipeline for the microhomology-mediated end joining (MMEJ) analysis. Computes microhomology pairs on the references sequences, calculates MMEJ frequencies in trimmed reads, and generates figures.
 
-1) Place the FASTQ files into the appropriate directory with the appropriate name (see comments in `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`).
-
-2) Run `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`.
+1. Place the FASTQ files into the appropriate directory with the appropriate name (see comments in `analyze_MMEJ.sh`, `analyze_MMEJ_antisense.sh`, and `analyze_MMEJ_OX.sh`).
+2. Set the variables in `analyze_MMEJ.sh`, `analyze_MMEJ_antisense.sh`, and `analyze_MMEJ_OX.sh` (e.g., the input and output directories).
+3. Run `analyze_MMEJ.sh`, `analyze_MMEJ_antisense.sh`, and `analyze_MMEJ_OX.sh`.
 
 ### Test ratios
 
