@@ -11,40 +11,26 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 ## Files/Directories
 
 * `trimming`: Python 3 scripts for the [trimming](#trimming) stage.
-
 * `flipped_intron`: Python 3 scripts for the [frequency of flipped intron](#frequency-of-flipped-intron) stage.
-
 * `intron`: Python 3 scripts for the [frequency of intron](#frequency-of-intron) stage.
-
 * `intron_yeast`: Python 3 scripts for the [frequency of intron](#frequency-of-intron) stage (for yeast data).
-
-* `RTDR`: Python 3 scripts for the [frequency of R-TDR](#frequency-of-rtdr) stage.
-
 * `RNA_seq`: Python 3 scripts for the [categorization of RNA-seq](#categorization-of-rna-seq) stage.
-
 * `MMEJ`: Python 3 scripts for the [MMEJ pipeline](#mmej-pipeline).
-
 * `refseq`: Reference sequences for [MMEJ pipeline](#mmej-pipeline).
-
 * `analyze_MMEJ.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for sense libraries.
-
 * `analyze_MMEJ_antisense.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
-
+* `analyze_MMEJ_OX.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression libraries.
 * `libinfo.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for sense libraries.
-
 * `libinfo_antisense.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
-
+* `libinfo_OX.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression libraries.
 * `test_ratios`: Python 3 scripts for the [test ratios](#test-ratios) stage.
-
 * `NHEJ`: Python 3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
-
 * `demo`: Demonstrations of the various analyses and pipelines with example data.
-
 * `unknown`: Python 3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
 
 ## Dependencies
 
-For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [test ratios](#test-ratios), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
+For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [categorization of RNA-seq](#categorization-of-rna-seq), [test ratios](#test-ratios), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
 
 ```bash
 # After conda installation, run in repository folder
@@ -53,7 +39,7 @@ conda env create -f MMEJ/mmej_environment.yml
 conda activate microhomology
 ```
 
-For stage [NHEJ pipeline](#nhej-pipeline), please see `NHEJ/README.md`. The [unknown analysis](#unknown-analysis) also requires the Python package BioPython 1.80.
+For stage [NHEJ pipeline](#nhej-pipeline) and [unknown analysis](#unknown-analysis), please see `NHEJ/README.md`. The unknown analysis additionally requires the Python package BioPython 1.80.
 
 ## Installation
 After installing all dependencies, just clone the repository to install.
@@ -76,10 +62,6 @@ For the yeast data a different method of detection is used, which are implemente
 ### Frequency of flipped intron
 
 The scripts `flipped_intron/flipped_intron*.py` calculate the frequency of the reads with the flipped intron in the `sense` and `antisense` constructs, for forward (`F`) and reverse (`R`) reads. The input should be the trimmed FASTQ files from [trimming](#trimming).
-
-### Frequency of RTDR
-
-The scripts `RTDR/RTDR_*.py` calculate the frequency of the reads with RNA-templated DNA repair (RTDR) for forward (`F`) and reverse (`R`) strand reads. The input should be the trimmed FASTQ files from [trimming](#trimming).
 
 ### Categorization of RNA-seq
 
