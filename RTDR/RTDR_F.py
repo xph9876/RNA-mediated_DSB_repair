@@ -47,11 +47,17 @@ def main():
 	parser = argparse.ArgumentParser(description='Calculate frequency of R-TDR from R1 fastq files (forward strand)')
 	parser.add_argument('directory', type=pathlib.Path, help='directory of fastq files')
 	parser.add_argument('-o', type=argparse.FileType('w'), default=sys.stdout, help='output tsv file')
+	parser.add_argument('--yeast', action='store_true', default=False, help='Search for R-TDR in yeast')
 	args = parser.parse_args()
 
 	os.chdir(args.directory)
 
-	result = auto_search_seq(search_seq, args.directory, 'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCTGCAGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC')
+	if args.yeast:
+		search_seq = 'CGACCAGCCGGAATGCTTGGCCAGAGCATGTATCATATGG'
+	else:
+		search_seq = 'TTCAAGTGGGAGCGCGTGATGAACTTCGAGGACGGCGGCGTGGCGACCGTGACCCAGGACTCCTCCCTGCAGGACGGCTGCTTCATCTACAAGGTGAAGTTCATCGGCGTGAACTTCC'
+
+	result = auto_search_seq(search_seq, args.directory, search_seq)
 
 	# output
 	with args.o as fw:
