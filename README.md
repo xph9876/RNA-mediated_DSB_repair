@@ -20,10 +20,10 @@ Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022).
 * `refseq`: Reference sequences for [MMEJ pipeline](#mmej-pipeline).
 * `analyze_MMEJ.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for sense libraries.
 * `analyze_MMEJ_antisense.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
-* `analyze_MMEJ_OX.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression libraries.
+* `analyze_MMEJ_OX.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression/control libraries.
 * `libinfo.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for sense libraries.
 * `libinfo_antisense.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
-* `libinfo_OX.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression libraries.
+* `libinfo_OX.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression/control libraries.
 * `test_ratios`: Python 3 scripts for the [test ratios](#test-ratios) stage.
 * `NHEJ`: Python 3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
 * `demo`: Demonstrations of the various analyses and pipelines with example data.
