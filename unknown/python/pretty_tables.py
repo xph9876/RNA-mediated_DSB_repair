@@ -55,8 +55,7 @@ if __name__== '__main__':
       Mean = ('freq', 'mean'),
       SD = ('freq', 'std'),
       freq_list = ('freq', list),
-    )
-    df = df.reset_index()
+    ).reset_index()
     df['expr'] = df['expr'].apply(lambda x: x.replace('_freq', ''))
     df = df.to_dict('records')
 
@@ -76,7 +75,7 @@ if __name__== '__main__':
       U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
       rec['P-Value'] = p
       if p < 0.05:
-        if U > 0:
+        if U > len(freq_list_1) * len(freq_list_2) / 2:
           rec['Conclusion'] = '* ' + con_1[0].upper()
         else:
           rec['Conclusion'] = '* B'
