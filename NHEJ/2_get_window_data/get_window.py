@@ -23,12 +23,7 @@ def parse_args():
   parser.add_argument(
     '--input',
     type = argparse.FileType(mode='r'),
-    help = (
-      'Table of sequences produced with combine_repeat.py.' +
-      ' Column format: Sequence, CIGAR, Count_<X1>, Count_<X2>, ..., etc.' +
-      ' All the columns after CIGAR should be the counts for each repeat where' +
-      ' <Xi> denotes the name of the library.'
-    ),
+    help = 'Table of sequences produced with combine_repeat.py.',
     required = True,
   )
   parser.add_argument(

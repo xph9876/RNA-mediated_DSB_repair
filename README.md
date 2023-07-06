@@ -6,41 +6,32 @@ Contains the code for the computational analysis presented in the [publication](
 
 ## Citation
 
-Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022). *In submission*.
+Jeon Y. *et al*. RNA-mediated double-strand break repair in human cells. (2022). bioRxiv. https://doi.org/10.1101/2022.11.01.514688.
 
 ## Files/Directories
 
-* `trimming`: Python3 scripts for the [trimming](#trimming) stage.
-
-* `flipped_intron`: Python3 scripts for the [frequency of flipped intron](#frequency-of-flipped-intron) stage.
-
-* `intron`: Python3 scripts for the [frequency of intron](#frequency-of-intron) stage.
-
+* `trimming`: Python 3 scripts for the [trimming](#trimming) stage.
+* `flipped_intron`: Python 3 scripts for the [frequency of flipped intron](#frequency-of-flipped-intron) stage.
+* `intron`: Python 3 scripts for the [frequency of intron](#frequency-of-intron) stage.
+* `intron_yeast`: Python 3 scripts for the [frequency of intron](#frequency-of-intron) stage (for yeast data).
 * `RTDR`: Python3 scripts for the [frequency of R-TDR](#frequency-of-rtdr) stage.
-
-* `RNA_seq`: Python3 scripts for the [categorization of RNA-seq](#categorization-of-rna-seq) stage.
-
-* `MMEJ`: Python3 scripts for the [MMEJ pipeline](#mmej-pipeline).
-
+* `RNA_seq`: Python 3 scripts for the [categorization of RNA-seq](#categorization-of-rna-seq) stage.
+* `MMEJ`: Python 3 scripts for the [MMEJ pipeline](#mmej-pipeline).
 * `refseq`: Reference sequences for [MMEJ pipeline](#mmej-pipeline).
-
 * `analyze_MMEJ.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for sense libraries.
-
 * `analyze_MMEJ_antisense.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
-
+* `analyze_MMEJ_OX.sh`: Main script for running the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression/control libraries.
 * `libinfo.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for sense libraries.
-
 * `libinfo_antisense.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for antisense libraries.
-
-* `test_ratios`: Python3 scripts for the [test ratios](#test-ratios) stage.
-
-* `NHEJ`: Python3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
-
+* `libinfo_OX.tsv`: Library metadata for the [MMEJ pipeline](#mmej-pipeline) for RNase H1 overexpression/control libraries.
+* `test_ratios`: Python 3 scripts for the [test ratios](#test-ratios) stage.
+* `NHEJ`: Python 3 scripts for the [NHEJ pipeline](#nhej-pipeline). See `NHEJ/README.md` for more details.
 * `demo`: Demonstrations of the various analyses and pipelines with example data.
+* `unknown`: Python 3 scripts for analyzing the unclassified sequences in 1-DSB experiments.
 
 ## Dependencies
 
-For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron), [frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [permutation test](#permutation-test), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
+For stages [trimming](#trimming), [frequency of intron](#frequency-of-intron), [frequency of flipped intron](#frequency-of-flipped-intron),[frequency of RTDR](#frequency-of-rtdr), [categorization of RNA-seq](#categorization-of-rna-seq), [test ratios](#test-ratios), [MMEJ pipeline](#mmej-pipeline), please use `MMEJ/mmej_environment.yml` to create the conda environment.
 
 ```bash
 # After conda installation, run in repository folder
@@ -49,7 +40,7 @@ conda env create -f MMEJ/mmej_environment.yml
 conda activate microhomology
 ```
 
-For stage [NHEJ pipeline](#nhej-pipeline), please see `NHEJ/README.md`.
+For stage [NHEJ pipeline](#nhej-pipeline) and [unknown analysis](#unknown-analysis), please see `NHEJ/README.md`. The unknown analysis additionally requires the Python package BioPython 1.80.
 
 ## Installation
 After installing all dependencies, just clone the repository to install.
@@ -65,7 +56,9 @@ Trimming must be performed on all raw reads, DNA-seq and RNA-seq, before the oth
 
 ### Frequency of intron
 
-The script `intron/freq_intron.py` calculates the frequency of reads with the intron. The input should be the trimmed FASTQ files from [trimming](#trimming).
+The script `intron/freq_intron.py` calculates the frequency of reads with the intron. The input should be the trimmed FASTQ files from [trimming](#trimming). 
+
+For the yeast data a different method of detection is used, which are implemented in `intron_yeast/freq_intron_with_seq_F.py` and `intron_yeast/freq_intron_with_seq_R.py`. These scripts should be run as in `intron_yeast/run.sh`.
 
 ### Frequency of flipped intron
 
@@ -83,9 +76,9 @@ The scripts `RNA_seq/*.py` categorize RNA-seq reads which have been aligned with
 
 Pipeline for the microhomology-mediated end joining (MMEJ) analysis. Computes microhomology pairs on the references sequences, calculates MMEJ frequencies in trimmed reads, and generates figures.
 
-1) Place the FASTQ files into the appropriate directory with the appropriate name (see comments in `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`).
-
-2) Run `analyze_MMEJ.sh` and `analyze_MMEJ_antisense.sh`.
+1. Place the FASTQ files into the appropriate directory with the appropriate name (see comments in `analyze_MMEJ.sh`, `analyze_MMEJ_antisense.sh`, and `analyze_MMEJ_OX.sh`).
+2. Set the variables in `analyze_MMEJ.sh`, `analyze_MMEJ_antisense.sh`, and `analyze_MMEJ_OX.sh` (e.g., the input and output directories).
+3. Run `analyze_MMEJ.sh`, `analyze_MMEJ_antisense.sh`, and `analyze_MMEJ_OX.sh`.
 
 ### Test ratios
 
@@ -96,6 +89,10 @@ The input frequencies used in the publication are included in the `test_ratios/i
 ### NHEJ pipeline
 
 The non-homologous end joining (NHEJ) analysis pipeline. Extracts DSB-sequence windows from aligned reads, and plots variation-distance graphs and variation-position histograms. See `NHEJ/README.md` for more details.
+
+### Unknown analysis
+
+An analysis pipline for examining the unclassified reads of the 1-DSB experiments. To run the analysis use the `unknown/run_all.sh` or `unknown/run_all.ps1` script. Note that the NHEJ pipeline must already have been run (particularly, the tables in `NHEJ/1_data_filter_nhej` must have been generated). Some of the input to this pipline in `unknown/input` has been derived from other pipelines such as `MMEJ`. The output tables will be written to `unknown/output`.
 
 ## Contact
 

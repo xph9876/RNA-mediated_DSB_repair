@@ -21,7 +21,6 @@ def main():
     type = argparse.FileType('r'),
     help = (
       'TSV files output from script "filter_nhej.py".' +
-      ' Must have columns: Sequence, CIGAR, Count, Num_Subst.' +
       ' The files names must be of the form "<name>_XXX",' +
       ' where <name> is the name of the library and will be' +
       ' used to name the columns of the combined output.'
