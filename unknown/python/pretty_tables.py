@@ -1,8 +1,8 @@
 import os
 import argparse
 import pandas as pd
-from functools import reduce
-from collections import defaultdict
+from scipy.stats import mannwhitneyu
+import numpy as np
 
 from summary_output import GROUP_COLUMNS
 
@@ -45,23 +45,58 @@ if __name__== '__main__':
     fn = mode + '_' + '_'.join(col_info['cols']) + '.csv'
     df = pd.read_csv(os.path.join(args.i, fn))
     total = (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'total')
-    if not total:
-      df = df.set_index(col_info['cols'])
-    df = df.rename_axis(columns='expr')\
-      .unstack()\
-      .rename('value')\
-      .reset_index()
+
+    # Convert to long format, get experiment column, get means/SDs
+    id_cols = df.columns[~df.columns.str.startswith('yjl')]
+    df = df.melt(id_vars=id_cols, var_name='lib', value_name='freq')
+    df['expr'] = df['lib'].str.split('_', n=1, expand=True)[1]
+    df['freq'] = df['freq'].fillna(0)
+    df = df.groupby(['expr'] + list(id_cols)).agg(
+      Mean = ('freq', 'mean'),
+      SD = ('freq', 'std'),
+      freq_list = ('freq', list),
+    )
+    df = df.reset_index()
+    df['expr'] = df['expr'].apply(lambda x: x.replace('_freq', ''))
+    df = df.to_dict('records')
+
+    # Do the Mann-Whitney U test
+    for rec in df:
+      if 'sense' in rec['expr']:
+        con_1 = 'sense'
+      elif 'cmv' in rec['expr']:
+        con_1 = 'cmv'
+      else:
+        rec['P-Value'] = np.nan
+        rec['Conclusion'] = None
+        continue
+      freq_list_1 = rec['freq_list']
+      expr_2 = rec['expr'].replace(con_1, 'branch')
+      freq_list_2 = next(x['freq_list'] for x in df if x['expr'] == expr_2)
+      U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
+      rec['P-Value'] = p
+      if p < 0.05:
+        if U > 0:
+          rec['Conclusion'] = '* ' + con_1[0].upper()
+        else:
+          rec['Conclusion'] = '* B'
+      else:
+        rec['Conclusion'] = 'NS'
+
+    # Get pretty names and metadata
     new_data = []
-    for rec in df.to_dict('records'):
+    for rec in df:
       fields = rec['expr'].split('_')
       new_rec = {
         'cell': fields[0],
         'breaks': fields[1],
         'strand': fields[2],
         'construct': fields[3],
-        'no_dsb': fields[4] == 'noDSB',
-        'stat': fields[-1],
-        'value': rec['value']
+        'no_dsb': (len(fields) >= 5) and (fields[4] == 'noDSB'),
+        'Mean': rec['Mean'],
+        'SD': rec['SD'],
+        'P-Value': rec['P-Value'],
+        'Conclusion': rec['Conclusion'],
       }
       if not total:
         for col in col_info['cols']:
@@ -70,43 +105,45 @@ if __name__== '__main__':
       new_rec['pretty_name'] = get_pretty_name(new_rec)
       new_data.append(new_rec)
     df = pd.DataFrame.from_records(new_data)
+
+    # Pretty formatting
     df['cell'] = pd.Categorical(df['cell'], categories=['WT', 'KO'])
     df['breaks'] = pd.Categorical(df['breaks'], categories=['sgA', 'sgB'])
     df['strand'] = pd.Categorical(df['strand'], categories=['R1', 'R2'])
     df['construct'] = pd.Categorical(df['construct'], categories=['sense', 'branch', 'cmv'])
-    df['stat'] = pd.Categorical(df['stat'], categories=['mean', 'sd'])
     df['no_dsb'] = pd.Categorical(df['no_dsb'], categories=[True, False])
-    df = df.sort_values(['no_dsb', 'cell', 'breaks', 'strand', 'construct', 'stat'])
-    index_cols = ['no_dsb', 'cell', 'breaks', 'strand', 'construct', 'pretty_cell', 'pretty_name']
-    if total:
-      pivot_cols = ['stat']
-    else:
-      pivot_cols = col_info['cols'] + ['stat']
-    df = df[index_cols + pivot_cols + ['value']]
-    df = df.pivot(index=index_cols, columns=pivot_cols, values='value')
-    df = df.sort_index(axis='index')
-    df = df.sort_index(axis='columns')
-    if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
-      df = df.rename(
-        columns = {
-          'other': 'Unclassified in No-DSB control',
-          'indel_sh': 'In/dels shifted <= 3-nt from the DSB site',
-          '1_del_mj': 'MMEJ-like deletion',
-        },
-        level = 'cat_2',
+    sort_cols = ['no_dsb', 'cell', 'breaks', 'strand', 'construct']
+    if (len(col_info['cols']) == 1) and (col_info['cols'] == 'region'):
+      df['region'] = pd.Categorical(df['region'], categories=['EE', 'EI', 'EB'])
+    elif (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+      df['cat_2'] = pd.Categorical(
+        df['cat_2'],
+        categories = ['1_del_mj_ee', '1_del_mj_ei', '1_del_mj_eb', 'indel_sh', 'other'],
       )
-    df = df.rename(columns={'mean': 'Mean', 'sd': 'SD'}, level='stat')
-    df = df.reset_index(
-      level = ['no_dsb', 'cell', 'breaks', 'strand', 'construct'],
-      drop = True,
-    )
-    df = df.rename_axis(
-      index = {
+    if not total:
+      sort_cols += col_info['cols']
+    df = df.sort_values(sort_cols)
+    if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+      df['cat_2'] = df['cat_2'].apply(
+        lambda x: {
+          '1_del_mj_ee': 'MMEJ-like deletion (exon-exon)',
+          '1_del_mj_ei': 'MMEJ-like deletion (exon-intron)',
+          '1_del_mj_eb': 'MMEJ-like deletion (exon-branch)',
+          'indel_sh': 'In/dels shifted <= 3 nt from the DSB site',
+          'other': 'Unclassified in No-DSB control',
+        }[x]
+      )
+    if total:
+      df = df[['pretty_cell', 'pretty_name'] + ['Mean', 'SD', 'P-Value', 'Conclusion']]
+    else:
+      df = df[['pretty_cell', 'pretty_name'] + col_info['cols'] + ['Mean', 'SD', 'P-Value', 'Conclusion']]
+    df = df.rename(
+      columns = {
         'pretty_cell': 'Cell type',
         'pretty_name': 'Construct, DSB',
-      },
-      axis = 'index',
+      }
     )
-    df = df.reset_index()
+    if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+      df = df.rename(columns={'cat_2': 'Category'})
 
     df.to_csv(os.path.join(args.o, fn), index=False)

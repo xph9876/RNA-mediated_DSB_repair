@@ -21,22 +21,11 @@ if __name__== '__main__':
   for col_info in GROUP_COLUMNS[mode]:
     fn = mode + '_' + '_'.join(col_info['cols']) + '.csv'
     df = pd.read_csv(os.path.join(args.i, fn))
-    id_cols = {}
-    new_data = defaultdict(lambda: list())
-    for col in df.columns:
-      new_col = col
-      if col.startswith('yjl'):
-        new_col = col.split('_', 1)[1]
-        new_data[new_col].append(df[col])
-      else:
-        id_cols[col] = df[col]
-    new_data_2 = {}
-    for col in new_data:
-      # get the means
-      col_data = pd.concat(new_data[col], axis='columns')
-      new_data_2[col + '_mean'] = col_data.mean(axis='columns')
-      new_data_2[col + '_sd'] = col_data.std(axis='columns')
-    df = pd.DataFrame(new_data_2)
-    if len(id_cols) > 0:
-      df = pd.concat([pd.DataFrame(id_cols), df], axis='columns')
+    id_cols = df.columns[~df.columns.str.startswith('yjl')]
+    df = df.melt(id_vars=id_cols, var_name='lib', value_name='freq')
+    df['expr'] = df['lib'].str.split('_', n=1, expand=True)[1]
+    df = df.groupby(['expr'] + list(id_cols)).agg({'freq': ['mean', 'std']})
+    df.columns = ['_'.join(col) for col in df.columns]
+    df = df.reset_index()
+    df['expr'] = df['expr'].apply(lambda x: x.replace('_freq', ''))
     df.to_csv(os.path.join(args.o, fn), index=False)

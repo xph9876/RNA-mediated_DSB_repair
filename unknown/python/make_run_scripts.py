@@ -168,7 +168,7 @@ if __name__ == '__main__':
     # Make the pretty tables script
     with open(os.path.join(args.r, 'run_pretty_tables' + ext), 'w') as out:
       for subset in ['all', 'not_control', 'no_dsb']:
-        i = join_path(sep, mean_dir, subset)
+        i = join_path(sep, compare_dir, subset)
         o = join_path(sep, pretty_dir, subset)
         for mode in ['mmej', 'unknown', 'nhej_mmej']:
           out.write(f'python {pretty_tables_py} -i {i} -o {o} -m {mode}\n')
