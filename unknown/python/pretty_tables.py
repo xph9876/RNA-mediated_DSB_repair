@@ -6,23 +6,23 @@ import numpy as np
 
 from summary_output import GROUP_COLUMNS
 
-def get_pretty_cell(x):
+def get_pretty_cell(row):
   return {
     'WT': 'Wild type',
     'KO': 'RNase H2A KO',
-  }[x]
+  }[row['cell']]
 
-def get_pretty_name(rec):
+def get_pretty_name(row):
   construct = {
     'sense': 'Sense',
     'branch': 'BranchD',
     'cmv': 'pCMVD',
-  }[rec['construct']]
+  }[row['construct']]
   breaks = {
     'sgA': ' sgRNA A',
     'sgB': ' sgRNA B',
-  }[rec['breaks']]
-  if rec['no_dsb']:
+  }[row['breaks']]
+  if row['no_dsb']:
     no_dsb = ' No-DSB control for' + breaks
     breaks = ''
   else:
@@ -34,7 +34,8 @@ if __name__== '__main__':
     description='Make the comparison tables with pretty formatting.')
   parser.add_argument('-i', type=str, required=True, help='Input directory.')
   parser.add_argument('-o', type=str, required=True, help='Output directory.')
-  parser.add_argument('-m', type=str, required=True, choices=['mmej', 'unknown', 'nhej_mmej'], help='Mode.')
+  parser.add_argument('-m', type=str, required=True,
+                      choices=['mmej', 'unknown', 'nhej_mmej'], help='Mode.')
 
   args = parser.parse_args()
   mode = args.m
@@ -47,54 +48,21 @@ if __name__== '__main__':
     total = (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'total')
 
     # Convert to long format, get experiment column, get means/SDs
-    id_cols = df.columns[~df.columns.str.startswith('yjl')]
+    if total:
+      id_cols = []
+    else:
+      id_cols = col_info['cols']
     df = df.melt(id_vars=id_cols, var_name='lib', value_name='freq')
-    df['expr'] = df['lib'].str.split('_', n=1, expand=True)[1]
+    df['expr'] = df['lib'].str.split('_', n=1, expand=True)[1].str.replace('_freq', '')
     df['freq'] = df['freq'].fillna(0)
-    df = df.groupby(['expr'] + list(id_cols)).agg(
+    df = df.groupby(['expr'] + id_cols).agg(
       Mean = ('freq', 'mean'),
       SD = ('freq', 'std'),
       freq_list = ('freq', list),
     ).reset_index()
-    df['expr'] = df['expr'].apply(lambda x: x.replace('_freq', ''))
     df = df.to_dict('records')
 
-    # Do the Mann-Whitney U test
-    for rec in df:
-      expr_1 = rec['expr']
-      if ('branch' in expr_1) or ('noDSB' in expr_1):
-        rec['P-Value'] = np.nan
-        rec['Conclusion'] = None
-        continue
-      if 'sense' in expr_1:
-        con_1 = 'sense'
-        con_2 = 'branch'
-      elif 'cmv' in expr_1:
-        con_1 = 'cmv'
-        con_2 = 'branch'
-      else:
-        raise Exception('Impossible')
-      freq_list_1 = rec['freq_list']
-      expr_2 = expr_1.replace(con_1, con_2)
-      freq_list_2 = next(x['freq_list'] for x in df if x['expr'] == expr_2)
-      if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
-        print(rec['cat_2'])
-        print(expr_1, ':', freq_list_1)
-        print(expr_2, ':', freq_list_2)
-      U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
-      if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
-        print(U, p)
-        print()
-      rec['P-Value'] = p
-      if p < 0.05:
-        if U > (len(freq_list_1) * len(freq_list_2) / 2):
-          rec['Conclusion'] = '* ' + con_1[0].upper()
-        else:
-          rec['Conclusion'] = '* ' + con_2[0].upper()
-      else:
-        rec['Conclusion'] = 'NS'
-
-    # Get pretty names and metadata
+    # Split experiment names into metadata
     new_data = []
     for rec in df:
       fields = rec['expr'].split('_')
@@ -106,18 +74,55 @@ if __name__== '__main__':
         'no_dsb': (len(fields) >= 5) and (fields[4] == 'noDSB'),
         'Mean': rec['Mean'],
         'SD': rec['SD'],
-        'P-Value': rec['P-Value'],
-        'Conclusion': rec['Conclusion'],
+        'freq_list': rec['freq_list'],
       }
       if not total:
         for col in col_info['cols']:
           new_rec[col] = rec[col]
-      new_rec['pretty_cell'] = get_pretty_cell(new_rec['cell'])
-      new_rec['pretty_name'] = get_pretty_name(new_rec)
       new_data.append(new_rec)
     df = pd.DataFrame.from_records(new_data)
 
+    # Do the Mann-Whitney U test
+    index_cols = ['cell', 'breaks', 'strand', 'no_dsb'] + id_cols
+    constructs = set(df['construct'])
+    df = df.pivot(
+      index =  index_cols,
+      columns = ['construct'],
+      values = ['Mean', 'SD', 'freq_list'],
+    )
+    df = df.to_dict('index')
+    new_data = []
+    for key, val in df.items():
+      for con_1 in constructs:
+        new_rec = dict(zip(index_cols, key))
+        if con_1 not in constructs:
+          continue
+        new_rec['construct'] = con_1
+        new_rec['Mean'] = val['Mean', con_1]
+        new_rec['SD'] = val['SD', con_1]
+        if (con_1 == 'branch') or new_rec['no_dsb']:
+          new_rec['P-Value'] = np.nan
+          new_rec['Conclusion'] = None
+          new_data.append(new_rec)
+          continue
+        con_2 = 'branch'
+        freq_list_1 = val['freq_list', con_1]
+        freq_list_2 = val['freq_list', con_2]
+        U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
+        new_rec['P-Value'] = p
+        if p < 0.05:
+          if U > (len(freq_list_1) * len(freq_list_2) / 2):
+            new_rec['Conclusion'] = '* ' + con_1[0].upper()
+          else:
+            new_rec['Conclusion'] = '* ' + con_2[0].upper()
+        else:
+          new_rec['Conclusion'] = 'NS'
+        new_data.append(new_rec)
+    df = pd.DataFrame.from_records(new_data)
+
     # Pretty formatting
+    df['pretty_name'] = df.apply(get_pretty_name, axis='columns')
+    df['pretty_cell'] = df.apply(get_pretty_cell, axis='columns')
     df['cell'] = pd.Categorical(df['cell'], categories=['WT', 'KO'])
     df['breaks'] = pd.Categorical(df['breaks'], categories=['sgA', 'sgB'])
     df['strand'] = pd.Categorical(df['strand'], categories=['R1', 'R2'])
@@ -145,9 +150,11 @@ if __name__== '__main__':
         }[x]
       )
     if total:
-      df = df[['pretty_cell', 'pretty_name'] + ['Mean', 'SD', 'P-Value', 'Conclusion']]
+      df = df[['pretty_cell', 'pretty_name'] +
+              ['Mean', 'SD', 'P-Value', 'Conclusion']]
     else:
-      df = df[['pretty_cell', 'pretty_name'] + col_info['cols'] + ['Mean', 'SD', 'P-Value', 'Conclusion']]
+      df = df[['pretty_cell', 'pretty_name'] + col_info['cols'] +
+              ['Mean', 'SD', 'P-Value', 'Conclusion']]
     df = df.rename(
       columns = {
         'pretty_cell': 'Cell type',
