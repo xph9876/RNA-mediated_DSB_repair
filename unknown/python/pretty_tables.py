@@ -61,24 +61,31 @@ if __name__== '__main__':
 
     # Do the Mann-Whitney U test
     for rec in df:
-      if 'sense' in rec['expr']:
+      expr_1 = rec['expr']
+      if 'sense' in expr_1:
         con_1 = 'sense'
-      elif 'cmv' in rec['expr']:
+        con_2 = 'branch'
+      elif 'cmv' in expr_1:
         con_1 = 'cmv'
+        con_2 = 'branch'
       else:
         rec['P-Value'] = np.nan
         rec['Conclusion'] = None
         continue
       freq_list_1 = rec['freq_list']
-      expr_2 = rec['expr'].replace(con_1, 'branch')
+      expr_2 = expr_1.replace(con_1, con_2)
       freq_list_2 = next(x['freq_list'] for x in df if x['expr'] == expr_2)
+      print(expr_1, ':', freq_list_1)
+      print(expr_2, ':', freq_list_2)
       U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
+      print(U, p)
+      print()
       rec['P-Value'] = p
       if p < 0.05:
-        if U > len(freq_list_1) * len(freq_list_2) / 2:
+        if U > (len(freq_list_1) * len(freq_list_2) / 2):
           rec['Conclusion'] = '* ' + con_1[0].upper()
         else:
-          rec['Conclusion'] = '* B'
+          rec['Conclusion'] = '* ' + con_2[0].upper()
       else:
         rec['Conclusion'] = 'NS'
 
