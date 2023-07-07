@@ -62,6 +62,10 @@ if __name__== '__main__':
     # Do the Mann-Whitney U test
     for rec in df:
       expr_1 = rec['expr']
+      if ('branch' in expr_1) or ('noDSB' in expr_1):
+        rec['P-Value'] = np.nan
+        rec['Conclusion'] = None
+        continue
       if 'sense' in expr_1:
         con_1 = 'sense'
         con_2 = 'branch'
@@ -69,9 +73,7 @@ if __name__== '__main__':
         con_1 = 'cmv'
         con_2 = 'branch'
       else:
-        rec['P-Value'] = np.nan
-        rec['Conclusion'] = None
-        continue
+        raise Exception('Impossible')
       freq_list_1 = rec['freq_list']
       expr_2 = expr_1.replace(con_1, con_2)
       freq_list_2 = next(x['freq_list'] for x in df if x['expr'] == expr_2)
