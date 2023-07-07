@@ -75,11 +75,13 @@ if __name__== '__main__':
       freq_list_1 = rec['freq_list']
       expr_2 = expr_1.replace(con_1, con_2)
       freq_list_2 = next(x['freq_list'] for x in df if x['expr'] == expr_2)
-      print(expr_1, ':', freq_list_1)
-      print(expr_2, ':', freq_list_2)
+      if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+        print(expr_1, ':', freq_list_1)
+        print(expr_2, ':', freq_list_2)
       U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
-      print(U, p)
-      print()
+      if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+        print(U, p)
+        print()
       rec['P-Value'] = p
       if p < 0.05:
         if U > (len(freq_list_1) * len(freq_list_2) / 2):
