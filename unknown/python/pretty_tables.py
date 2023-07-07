@@ -15,8 +15,8 @@ def get_pretty_cell(row):
 def get_pretty_name(row):
   construct = {
     'sense': 'Sense',
-    'branch': 'BranchD',
-    'cmv': 'pCMVD',
+    'branch': 'BranchΔ',
+    'cmv': 'pCMVΔ',
   }[row['construct']]
   breaks = {
     'sgA': ' sgRNA A',
@@ -149,7 +149,7 @@ if __name__== '__main__':
           '1_del_mj_ee': 'MMEJ-like deletion (exon-exon)',
           '1_del_mj_ei': 'MMEJ-like deletion (exon-intron)',
           '1_del_mj_eb': 'MMEJ-like deletion (exon-branch)',
-          'indel_sh': 'In/dels shifted <= 3 nt from the DSB site',
+          'indel_sh': 'In/dels shifted ≤ 3 nt from the DSB site',
           'other': 'Unclassified in No-DSB control',
         }[x]
       )
