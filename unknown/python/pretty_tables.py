@@ -78,6 +78,7 @@ if __name__== '__main__':
       expr_2 = expr_1.replace(con_1, con_2)
       freq_list_2 = next(x['freq_list'] for x in df if x['expr'] == expr_2)
       if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+        print(rec['cat_2'])
         print(expr_1, ':', freq_list_1)
         print(expr_2, ':', freq_list_2)
       U, p = mannwhitneyu(freq_list_1, freq_list_2, alternative='two-sided')
