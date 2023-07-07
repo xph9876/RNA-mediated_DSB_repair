@@ -46,6 +46,8 @@ if __name__== '__main__':
     fn = mode + '_' + '_'.join(col_info['cols']) + '.csv'
     df = pd.read_csv(os.path.join(args.i, fn))
     total = (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'total')
+    cat_2 = (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2')
+    region = (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'region')
 
     # Convert to long format, get experiment column, get means/SDs
     if total:
@@ -100,7 +102,9 @@ if __name__== '__main__':
         new_rec['construct'] = con_1
         new_rec['Mean'] = val['Mean', con_1]
         new_rec['SD'] = val['SD', con_1]
-        if (con_1 == 'branch') or new_rec['no_dsb']:
+        # Don't do tests for BranchD construct, no-DSB experiments, or
+        # with the exon-branch MMEJ-like deletion category
+        if (con_1 == 'branch') or new_rec['no_dsb'] or (cat_2 and (new_rec['cat_2'] == '1_del_mj_eb')):
           new_rec['P-Value'] = np.nan
           new_rec['Conclusion'] = None
           new_data.append(new_rec)
@@ -129,9 +133,9 @@ if __name__== '__main__':
     df['construct'] = pd.Categorical(df['construct'], categories=['sense', 'branch', 'cmv'])
     df['no_dsb'] = pd.Categorical(df['no_dsb'], categories=[True, False])
     sort_cols = ['no_dsb', 'cell', 'breaks', 'strand', 'construct']
-    if (len(col_info['cols']) == 1) and (col_info['cols'] == 'region'):
+    if region:
       df['region'] = pd.Categorical(df['region'], categories=['EE', 'EI', 'EB'])
-    elif (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+    elif cat_2:
       df['cat_2'] = pd.Categorical(
         df['cat_2'],
         categories = ['1_del_mj_ee', '1_del_mj_ei', '1_del_mj_eb', 'indel_sh', 'other'],
@@ -139,7 +143,7 @@ if __name__== '__main__':
     if not total:
       sort_cols += col_info['cols']
     df = df.sort_values(sort_cols)
-    if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+    if cat_2:
       df['cat_2'] = df['cat_2'].apply(
         lambda x: {
           '1_del_mj_ee': 'MMEJ-like deletion (exon-exon)',
