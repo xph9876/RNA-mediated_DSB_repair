@@ -33,14 +33,19 @@ if __name__== '__main__':
   parser = argparse.ArgumentParser(
     description='Make the comparison tables with pretty formatting.')
   parser.add_argument('-i', type=str, required=True, help='Input directory.')
-  parser.add_argument('-o', type=str, required=True, help='Output directory.')
+  parser.add_argument('-o', type=str, nargs=2, required=True,
+                      help = (
+                        '(1) Output directory for compare constructs.' +
+                        '(2) Output directory for final tables.'
+                      ))
   parser.add_argument('-m', type=str, required=True,
                       choices=['mmej', 'unknown', 'nhej_mmej'], help='Mode.')
 
   args = parser.parse_args()
   mode = args.m
 
-  os.makedirs(args.o, exist_ok=True)
+  os.makedirs(args.o[0], exist_ok=True)
+  os.makedirs(args.o[1], exist_ok=True)
 
   for col_info in GROUP_COLUMNS[mode]:
     fn = mode + '_' + '_'.join(col_info['cols']) + '.csv'
@@ -165,7 +170,27 @@ if __name__== '__main__':
         'pretty_name': 'Construct, DSB',
       }
     )
-    if (len(col_info['cols']) == 1) and (col_info['cols'][0] == 'cat_2'):
+    if cat_2:
       df = df.rename(columns={'cat_2': 'Category'})
 
-    df.to_csv(os.path.join(args.o, fn), index=False)
+    # Write the final tables
+    df.to_csv(os.path.join(args.o[1], fn), index=False)
+
+    # Make the construct comparison tables
+    df['Construct'] = df['Construct, DSB'].apply(lambda x: x.split(', ')[0])
+    df['Construct'] = pd.Categorical(df['Construct'], categories=['Sense', 'BranchΔ', 'pCMVΔ'])
+    df['DSB'] = df['Construct, DSB'].apply(lambda x: x.split(', ')[1])
+    df = df.drop(columns=['Construct, DSB'])
+    if total:
+      index_cols = ['Cell type', 'DSB']
+    elif cat_2:
+      index_cols = ['Cell type', 'DSB', 'Category']
+    else:
+      index_cols = ['Cell type', 'DSB'] + col_info['cols']
+    df = df.pivot(
+      index = index_cols,
+      columns = ['Construct'],
+      values = ['Mean', 'SD'],
+    )
+    df.columns = [' '.join(x) for x in df.columns.swaplevel()]
+    df.to_csv(os.path.join(args.o[0], fn), index=True)

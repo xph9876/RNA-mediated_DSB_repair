@@ -1,9 +1,9 @@
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/all -o ./output/6_compare_pretty/all -m mmej
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/all -o ./output/6_compare_pretty/all -m unknown
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/all -o ./output/6_compare_pretty/all -m nhej_mmej
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/not_control -o ./output/6_compare_pretty/not_control -m mmej
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/not_control -o ./output/6_compare_pretty/not_control -m unknown
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/not_control -o ./output/6_compare_pretty/not_control -m nhej_mmej
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/6_compare_pretty/no_dsb -m mmej
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/6_compare_pretty/no_dsb -m unknown
-python ./python/pretty_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/6_compare_pretty/no_dsb -m nhej_mmej
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/all -o ./output/5_compare_constructs/all ./output/6_final_tables/all -m mmej
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/all -o ./output/5_compare_constructs/all ./output/6_final_tables/all -m unknown
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/all -o ./output/5_compare_constructs/all ./output/6_final_tables/all -m nhej_mmej
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/not_control -o ./output/5_compare_constructs/not_control ./output/6_final_tables/not_control -m mmej
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/not_control -o ./output/5_compare_constructs/not_control ./output/6_final_tables/not_control -m unknown
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/not_control -o ./output/5_compare_constructs/not_control ./output/6_final_tables/not_control -m nhej_mmej
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/5_compare_constructs/no_dsb ./output/6_final_tables/no_dsb -m mmej
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/5_compare_constructs/no_dsb ./output/6_final_tables/no_dsb -m unknown
+python ./python/pretty_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/5_compare_constructs/no_dsb ./output/6_final_tables/no_dsb -m nhej_mmej
