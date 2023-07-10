@@ -35,30 +35,30 @@ bowtie2-align-s.exe -x data_bowtie2_build/2DSB_R1_sense data_fastq/sense4_R1.fq 
 bowtie2-align-s.exe -x data_bowtie2_build/2DSB_R2_sense data_fastq/sense4_R2.fq -S data_0_sam/sense4_R2.sam
 
 # 2. NHEJ filtering.
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db1_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db1_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db1_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db1_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db2_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db2_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db2_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db2_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db3_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db3_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db3_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db3_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db4_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db4_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db4_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db4_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv1_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv1_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv1_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv1_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv2_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv2_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv2_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv2_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv3_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv3_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv3_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv3_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv4_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv4_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv4_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv4_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense1_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense1_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense1_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense1_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense2_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense2_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense2_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense2_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense3_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense3_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense3_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense3_R2.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense4_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense4_R1.tsv --min_length 50 --dsb_pos 50 --quiet
-python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense4_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense4_R2.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db1_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db1_R1.tsv --output_rejected data_1_filter_nhej/db1_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db1_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db1_R2.tsv --output_rejected data_1_filter_nhej/db1_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db2_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db2_R1.tsv --output_rejected data_1_filter_nhej/db2_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db2_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db2_R2.tsv --output_rejected data_1_filter_nhej/db2_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db3_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db3_R1.tsv --output_rejected data_1_filter_nhej/db3_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db3_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db3_R2.tsv --output_rejected data_1_filter_nhej/db3_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db4_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_branch.fa --output data_1_filter_nhej/db4_R1.tsv --output_rejected data_1_filter_nhej/db4_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/db4_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_branch.fa --output data_1_filter_nhej/db4_R2.tsv --output_rejected data_1_filter_nhej/db4_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv1_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv1_R1.tsv --output_rejected data_1_filter_nhej/dcmv1_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv1_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv1_R2.tsv --output_rejected data_1_filter_nhej/dcmv1_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv2_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv2_R1.tsv --output_rejected data_1_filter_nhej/dcmv2_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv2_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv2_R2.tsv --output_rejected data_1_filter_nhej/dcmv2_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv3_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv3_R1.tsv --output_rejected data_1_filter_nhej/dcmv3_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv3_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv3_R2.tsv --output_rejected data_1_filter_nhej/dcmv3_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv4_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_cmv.fa --output data_1_filter_nhej/dcmv4_R1.tsv --output_rejected data_1_filter_nhej/dcmv4_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/dcmv4_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_cmv.fa --output data_1_filter_nhej/dcmv4_R2.tsv --output_rejected data_1_filter_nhej/dcmv4_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense1_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense1_R1.tsv --output_rejected data_1_filter_nhej/sense1_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense1_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense1_R2.tsv --output_rejected data_1_filter_nhej/sense1_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense2_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense2_R1.tsv --output_rejected data_1_filter_nhej/sense2_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense2_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense2_R2.tsv --output_rejected data_1_filter_nhej/sense2_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense3_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense3_R1.tsv --output_rejected data_1_filter_nhej/sense3_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense3_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense3_R2.tsv --output_rejected data_1_filter_nhej/sense3_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense4_R1.sam --ref_seq_file ../ref_seq/2DSB_R1_sense.fa --output data_1_filter_nhej/sense4_R1.tsv --output_rejected data_1_filter_nhej/sense4_R1_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
+python ../1_process_nhej/filter_nhej.py --sam_file data_0_sam/sense4_R2.sam --ref_seq_file ../ref_seq/2DSB_R2_sense.fa --output data_1_filter_nhej/sense4_R2.tsv --output_rejected data_1_filter_nhej/sense4_R2_rejected.tsv --min_length 50 --dsb_pos 50 --quiet
 
 # 3. Combine repeats.
 python ../1_process_nhej/combine_repeat.py --input data_1_filter_nhej/db1_R1.tsv data_1_filter_nhej/db2_R1.tsv data_1_filter_nhej/db3_R1.tsv data_1_filter_nhej/db4_R1.tsv --output data_2_combine_repeat/db_R1.tsv --quiet
@@ -111,18 +111,18 @@ python ../3_get_graph_data/get_graph_data.py --input data_3_window/sense_R2 --ou
 python ../3_get_graph_data/get_graph_data.py --input data_3_window/sense_R2 --output data_4_graph/sense_R2 --subst_type withoutSubst
 
 # 7. Get histogram data.
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/db_R1 --output data_5_histogram/db_R1 --subst_type withSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/db_R1 --output data_5_histogram/db_R1 --subst_type withoutSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/db_R2 --output data_5_histogram/db_R2 --subst_type withSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/db_R2 --output data_5_histogram/db_R2 --subst_type withoutSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/dcmv_R1 --output data_5_histogram/dcmv_R1 --subst_type withSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/dcmv_R1 --output data_5_histogram/dcmv_R1 --subst_type withoutSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/dcmv_R2 --output data_5_histogram/dcmv_R2 --subst_type withSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/dcmv_R2 --output data_5_histogram/dcmv_R2 --subst_type withoutSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/sense_R1 --output data_5_histogram/sense_R1 --subst_type withSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/sense_R1 --output data_5_histogram/sense_R1 --subst_type withoutSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/sense_R2 --output data_5_histogram/sense_R2 --subst_type withSubst
-python ../4_get_histogram_data/get_histogram_data.py --input data_4_graph/sense_R2 --output data_5_histogram/sense_R2 --subst_type withoutSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/db_R1 --output data_5_histogram/db_R1 --subst_type withSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/db_R1 --output data_5_histogram/db_R1 --subst_type withoutSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/db_R2 --output data_5_histogram/db_R2 --subst_type withSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/db_R2 --output data_5_histogram/db_R2 --subst_type withoutSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/dcmv_R1 --output data_5_histogram/dcmv_R1 --subst_type withSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/dcmv_R1 --output data_5_histogram/dcmv_R1 --subst_type withoutSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/dcmv_R2 --output data_5_histogram/dcmv_R2 --subst_type withSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/dcmv_R2 --output data_5_histogram/dcmv_R2 --subst_type withoutSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/sense_R1 --output data_5_histogram/sense_R1 --subst_type withSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/sense_R1 --output data_5_histogram/sense_R1 --subst_type withoutSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/sense_R2 --output data_5_histogram/sense_R2 --subst_type withSubst
+python ../4_get_histogram_data/get_histogram_data.py --input data_3_window/sense_R2 --output data_5_histogram/sense_R2 --subst_type withoutSubst
 
 # 8. Plot variation-distance graphs.
 python ../5_plot_graph/plot_graph.py --input data_4_graph/db_R1 --output plot/graph --ext png --layout universal  --width 2400 --height 1800 --range_x -12 13 --range_y -23 20 --universal_layout_y_axis_x_pos 12 --universal_layout_y_axis_y_range -20.5 18.5 --universal_layout_y_axis_insertion_max_tick 6 --universal_layout_y_axis_deletion_max_tick 19
