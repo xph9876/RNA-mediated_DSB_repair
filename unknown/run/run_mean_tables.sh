@@ -1,9 +1,0 @@
-python ./python/mean_tables.py -i ./output/4_compare_libraries/all -o ./output/5_compare_means/all -m mmej
-python ./python/mean_tables.py -i ./output/4_compare_libraries/all -o ./output/5_compare_means/all -m unknown
-python ./python/mean_tables.py -i ./output/4_compare_libraries/all -o ./output/5_compare_means/all -m nhej_mmej
-python ./python/mean_tables.py -i ./output/4_compare_libraries/not_control -o ./output/5_compare_means/not_control -m mmej
-python ./python/mean_tables.py -i ./output/4_compare_libraries/not_control -o ./output/5_compare_means/not_control -m unknown
-python ./python/mean_tables.py -i ./output/4_compare_libraries/not_control -o ./output/5_compare_means/not_control -m nhej_mmej
-python ./python/mean_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/5_compare_means/no_dsb -m mmej
-python ./python/mean_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/5_compare_means/no_dsb -m unknown
-python ./python/mean_tables.py -i ./output/4_compare_libraries/no_dsb -o ./output/5_compare_means/no_dsb -m nhej_mmej

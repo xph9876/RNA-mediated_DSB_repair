@@ -49,7 +49,11 @@ def load_search_data(
     construct = 'sense' # sense and cmv have the same search sequences
   for file in file_list:
     data = pd.read_csv(os.path.join('input/search', file))
-    data = data.loc[(data.Breaks == breaks) & (data.Strand == strand) & (data.Construct == construct)]
+    data = data.loc[
+      (data['Breaks'] == breaks) &
+      (data['Strand'] == strand) &
+      (data['Construct'] == construct)
+    ]
     data = data.to_dict('records')
     if file == 'microhomologies.csv':
       data = sorted(data, key=lambda y: len(y['Pattern']), reverse=True)
@@ -333,7 +337,11 @@ def alignment_analyze(
           match = get_max_match(ref, dels[0][0], dels[0][1])  # check max match length
           match_len = len(match)
           region = classify_region(strand, construct, dels[0][0], dels[0][1])
-          cat = '1_del_mj'
+          cat = {
+            'EE': '1_del_mj_ee',
+            'EI': '1_del_mj_ei',
+            'EB': '1_del_mj_eb',
+          }[region]
         elif dsb_dist <= shift:
           cat = '1_del_sh'
         else:

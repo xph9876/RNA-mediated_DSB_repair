@@ -35,7 +35,7 @@ VARIATION_TYPES = [
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(
-      file = 'run_10_pptx_histogram' + os.extsep + ext,
+      file = os.path.join('run', 'run_10_pptx_histogram' + os.extsep + ext),
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[ext],
     ) as file_out:

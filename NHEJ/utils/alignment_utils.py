@@ -1,5 +1,4 @@
 import cigar_utils
-import re
 
 def get_alignment(ref_seq, read_seq, ref_pos, cigar):
   """
@@ -86,7 +85,6 @@ def count_variations(ref_align, read_align):
         # both ref and read are nucleotides but not equal
         num_subst += 1
   return num_ins, num_del, num_subst
-      
 
 def get_variation_pos(ref_align, read_align):
   if len(ref_align) != len(read_align):
@@ -179,7 +177,7 @@ def get_variation_info(ref_align, read_align):
   for i in range(len(ref_align)):
     if ref_align[i] != read_align[i]:
       if (ref_align[i] != '-') and (read_align[i] != '-'):
-        variation_info.append((ref_i, 'substitution', read_align[i]))
+        variation_info.append((ref_i, 'substitution', '{}>{}'.format(ref_align[i], read_align[i])))
       elif ref_align[i] == '-':
         variation_info.append((ref_i - 1, 'insertion', read_align[i]))
       elif read_align[i] == '-':

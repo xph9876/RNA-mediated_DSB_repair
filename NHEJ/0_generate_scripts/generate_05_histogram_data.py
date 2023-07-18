@@ -5,10 +5,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../util
 import log_utils
 import generate_constants
 import library_constants
-import generate_04_graph_data
+import generate_03_get_window
 
 def get_input_dir(name):
-  return generate_04_graph_data.get_output_dir(name)
+  return generate_03_get_window.get_output_dir(name)
 
 def get_output_dir(name):
   return generate_constants.join_path(
@@ -21,7 +21,7 @@ def get_output_dir(name):
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(
-      file = os.path.join('run_05_histogram_data' + os.path.extsep + ext),
+      file = os.path.join('run', 'run_05_histogram_data' + os.path.extsep + ext),
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[ext],
     ) as file_out:

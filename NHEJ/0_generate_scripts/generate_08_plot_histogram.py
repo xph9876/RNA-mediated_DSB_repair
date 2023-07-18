@@ -21,7 +21,7 @@ def get_output_dir(subst_type):
 if __name__ == '__main__':
   for script_ext in ['sh', 'ps1']:
     with open(
-      file = os.path.join('run_08_plot_histogram' + os.path.extsep + script_ext),
+      file = os.path.join('run', 'run_08_plot_histogram' + os.path.extsep + script_ext),
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[script_ext],
     ) as file_out:

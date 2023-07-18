@@ -74,9 +74,9 @@ if __name__ == '__main__':
     alignment_dir = join_path(sep, args.o, '1_alignment')
     full_dir = join_path(sep, args.o, '2_full_output')
     summary_dir = join_path(sep, args.o, '3_summary_output')
-    compare_dir = join_path(sep, args.o, '4_compare_libraries')
-    mean_dir = join_path(sep, args.o, '5_compare_means')
-    pretty_dir = join_path(sep, args.o, '6_compare_pretty')
+    compare_libraries_dir = join_path(sep, args.o, '4_compare_libraries')
+    compare_constructs_dir = join_path(sep, args.o, '5_compare_constructs')
+    final_dir = join_path(sep, args.o, '6_final_tables')
 
     analyze_alignments_py = join_path(sep, args.p, 'analyze_alignments.py')
     detect_mmej_py = join_path(sep, args.p, 'detect_mmej.py')
@@ -150,25 +150,20 @@ if __name__ == '__main__':
           )
           for info in lib_info_sub
         ])
-        o = join_path(sep, compare_dir, subset)
+        o = join_path(sep, compare_libraries_dir, subset)
         tables = ' '.join([get_lib_name_long(info) for info in lib_info_sub])
         for mode in ['mmej', 'unknown', 'nhej_mmej']:
           out.write(
             f'python {compare_libraries_py} -i {i} -o {o} -t {tables} -k freq -m {mode}\n'
           )
 
-    # Make the mean tables script
-    with open(os.path.join(args.r, 'run_mean_tables' + ext), 'w') as out:
-      for subset in ['all', 'not_control', 'no_dsb']:
-        i = join_path(sep, compare_dir, subset)
-        o = join_path(sep, mean_dir, subset)
-        for mode in ['mmej', 'unknown', 'nhej_mmej']:
-          out.write(f'python {mean_tables_py} -i {i} -o {o} -m {mode}\n')
-
     # Make the pretty tables script
     with open(os.path.join(args.r, 'run_pretty_tables' + ext), 'w') as out:
       for subset in ['all', 'not_control', 'no_dsb']:
-        i = join_path(sep, mean_dir, subset)
-        o = join_path(sep, pretty_dir, subset)
+        i = join_path(sep, compare_libraries_dir, subset)
+        o = (
+          join_path(sep, compare_constructs_dir, subset) + ' ' +
+          join_path(sep, final_dir, subset)
+        )
         for mode in ['mmej', 'unknown', 'nhej_mmej']:
           out.write(f'python {pretty_tables_py} -i {i} -o {o} -m {mode}\n')
