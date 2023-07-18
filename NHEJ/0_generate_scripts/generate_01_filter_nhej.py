@@ -23,7 +23,7 @@ def get_output_file(name, rejected=False):
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(
-      file = os.path.join('run_01_process_nhej' + os.path.extsep + ext),
+      file = os.path.join('run', 'run_01_process_nhej' + os.path.extsep + ext),
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[ext],
     ) as file_out:

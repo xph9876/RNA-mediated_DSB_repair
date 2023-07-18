@@ -22,7 +22,7 @@ def get_output_dir(layout_name, layout_group):
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(
-      file = os.path.join('run_06_precomputed_layout' + os.path.extsep + ext),
+      file = os.path.join('run', 'run_06_precomputed_layout' + os.path.extsep + ext),
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[ext],
     ) as file_out:

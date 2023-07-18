@@ -31,7 +31,7 @@ def get_bowtie2_build_file(ref_seq_file):
 if __name__ == '__main__':
   for ext in ['sh', 'ps1']:
     with open(
-      file = os.path.join('run_00_bowtie2_align' + os.path.extsep + ext),
+      file = os.path.join('run', 'run_00_bowtie2_align' + os.path.extsep + ext),
       mode = 'w',
       encoding = generate_constants.OUTPUT_ENCODING[ext],
     ) as file_out:
