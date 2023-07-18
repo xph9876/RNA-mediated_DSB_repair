@@ -266,8 +266,6 @@ def main():
       rejected_repeat += 1
       continue
 
-    read_cigar[read_seq] = cigar
-
     if int(mandatory['FLAG']) & 4: # the read did not align at all
       rejected_no_alignment += 1
       read_count_rejected[read_seq] = 1
@@ -363,6 +361,7 @@ def main():
     else:
       accepted_other += 1
     read_count_accepted[read_seq] = 1
+    read_cigar[read_seq] = cigar
     read_num_subst[read_seq] = num_subst
 
   if len(read_count_accepted) == 0:
