@@ -2,7 +2,7 @@
 
 ## Description
 
-This folder contains the processing pipeline for the NHEJ (non-homologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python3. The `run*.sh` and `run*.ps1` scripts in the main directory are for reproducing the computations with data sets used in the [publication](#citation). Note, `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
+This folder contains the processing pipeline for the NHEJ (non-homologous end joining) DNA repair. The main functionality such as filtering and plotting is implemented in Python 3. The `run*.sh` and `run*.ps1` scripts in the main directory are for reproducing the computations with data sets used in the [publication](#citation). Note, `*.sh` scripts are intended to be run with Unix bash, while `*.ps1` scripts are intended to be run with Windows PowerShell (although there is no difference is how the Python scripts are called from either file type).
 
 ## Dependencies
 
@@ -386,3 +386,15 @@ Arguments:
 * `--legends`: Which legends to draw in the file. These legends include the vertex size legend, vertex variation type color legend, vertex frequency ratio color legend, and edge legend. The legends are drawn outside the page limits so they will later have to be positioned by hand manually.
 
 * `--template`: The PPTX file to use as a template. Currently, this is only used for determining the page size. The default template should be located at `7_get_pptx/template.pptx`.
+
+### `8_freq_analyze`
+
+Used to keep track of the frequencies of reads discarded in the [`1_process_nhej`](#1_process_nhej) and [`2_get_window_data`](#2_get_window_data) stages of the pipeline.
+
+#### `freq_analyze.py`
+
+Python script for performing the frequency analysis. Loads the tables output from the previous stages of the NHEJ pipeline and computes the frequencies after the [`1_process_nhej`](#1_process_nhej) and [`2_get_window_data`](#2_get_window_data) stages, and the discarded frequency. This script must be run after both those stages are run and the output files must be in the correct directories.
+
+Arguments:
+
+* `--output`: Output directory. The output will be in two files, one for the the individual library frequencies and another for the experiment frequencies (i.e., the mean frequencies of the repeat libraries of the same experiment).
