@@ -162,10 +162,20 @@ if __name__ == '__main__':
     'count_window_no_indel',
     'count_loss_window_no_indel',
   ]]
+  for x in df_out.columns:
+    if x.startswith('count_'):
+      df_out[x] = df_out[x].astype(int)
   log_utils.log('------>')
-  file_out = file_names.freq_analyze(args.output, mean=False)
+  file_out = file_names.freq_analyze(args.output, 'library')
   log_utils.log(file_out)
-  file_utils.write_tsv(df_out, file_out)
+  file_utils.write_tsv(
+    pd.merge(
+      generate_constants.LIBRARY_INFO.rename(columns={'name_experiment': 'experiment'}),
+      df_out,
+      on = ['library', 'experiment'],
+    ),
+    file_out,
+  )
 
   freq_cols = [x for x in df_out.columns if x.startswith('freq_')]
   df_out = df_out.groupby(['experiment'])[freq_cols].mean()
@@ -188,6 +198,19 @@ if __name__ == '__main__':
     'freq_window_no_indel',
     'freq_loss_window_no_indel',
   ]]
-  file_out = file_names.freq_analyze(args.output, mean=True)
+  df_out.columns = [x.replace('freq_', 'freq_mean_') for x in df_out.columns]
+
+  file_out = file_names.freq_analyze(args.output, 'experiment')
   log_utils.log(file_out)
-  file_utils.write_tsv(df_out, file_out)
+  file_utils.write_tsv(
+    pd.merge(
+      (
+        generate_constants.EXPERIMENT_INFO
+        .rename(columns={'name': 'experiment'})
+        .drop(columns=['library_list', 'library_name_list', 'total_reads_list'])
+      ),
+      df_out,
+      on = ['experiment'],
+    ),
+    file_out,
+  )

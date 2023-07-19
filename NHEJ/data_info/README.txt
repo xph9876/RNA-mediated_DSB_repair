@@ -1,0 +1,1 @@
+Run '../0_generate_script/generate_constants.py' to populate this folder with library/experiment metadata.

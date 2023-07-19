@@ -40,8 +40,7 @@ def histogram_3d(data_name, variation_type):
 def graph_figure(data_name, ext='png'):
   return data_name + os.path.extsep  + ext
 
-def freq_analyze(dir, mean=False):
-  if mean:
-    return make_file_name(dir, 'freq_analyze_mean', ext='tsv')
-  else:
-    return make_file_name(dir, 'freq_analyze', ext='tsv')
+def freq_analyze(dir, suffix):
+  if suffix not in ['library', 'experiment']:
+    raise Exception('Unexpected suffix: ' + str(suffix))
+  return make_file_name(dir, 'freq_analyze_' + suffix, ext='tsv')

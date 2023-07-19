@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import file_utils
 
 def check_file(file_name):
   if os.path.exists(file_name):
@@ -18,9 +19,7 @@ def check_dir_output(dir_name):
   return check_dir(dir_name)
 
 def check_file_output(file_name):
-  dir_name = os.path.dirname(file_name)
-  if dir_name != '':
-    os.makedirs(dir_name, exist_ok=True)
+  file_utils.make_parent_dir(file_name)
   return open(file_name, 'w')
 
 def check_comma_separated_values(arg_str, type_func=str):
