@@ -34,11 +34,14 @@ def variation(dir, subst_type):
 def data_info(dir):
   return make_file_name(dir, 'data_info', ext = 'tsv')
 
-def ref(dir):
-  return make_file_name(dir, 'ref', ext='.fa')
-
 def histogram_3d(data_name, variation_type):
   return '_'.join([data_name, variation_type]) + os.path.extsep + 'png'
 
 def graph_figure(data_name, ext='png'):
   return data_name + os.path.extsep  + ext
+
+def freq_analyze(dir, mean=False):
+  if mean:
+    return make_file_name(dir, 'freq_analyze_mean', ext='tsv')
+  else:
+    return make_file_name(dir, 'freq_analyze', ext='tsv')
