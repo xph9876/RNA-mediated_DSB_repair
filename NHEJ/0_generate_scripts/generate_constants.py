@@ -338,9 +338,22 @@ def check_scripts_exits():
       raise Exception('Could not find script: ' + str(x))
 check_scripts_exits()
 
-LIBRARY_INFO.to_excel('library_info.xlsx')
-EXPERIMENT_INFO.to_excel('experiment_info.xlsx')
-EXPERIMENT_INFO_COMPARISON.to_excel('experiment_info_comparison.xlsx')
+file_utils.write_tsv(
+  LIBRARY_INFO,
+  os.path.join('data_info', 'library_info.tsv'),
+)
+file_utils.write_tsv(
+  EXPERIMENT_INFO.assign(
+    library_list = EXPERIMENT_INFO['library_list'].apply(lambda x: ','.join(map(str, x))),
+    library_name_list = EXPERIMENT_INFO['library_name_list'].apply(lambda x: ','.join(map(str, x))),
+    total_reads_list = EXPERIMENT_INFO['total_reads_list'].apply(lambda x: ','.join(map(str, x))),
+  ),
+  os.path.join('data_info', 'experiment_info.tsv'),
+)
+file_utils.write_tsv(
+  EXPERIMENT_INFO_COMPARISON,
+  os.path.join('data_info', 'experiment_info_comparison.tsv'),
+)
 
 USE_PRECOMPUTED_LAYOUT = True
 LAYOUT_UNIVERSAL = 'universal'

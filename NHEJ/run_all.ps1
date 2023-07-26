@@ -12,3 +12,4 @@
 .\run\run_09_pptx_graph.ps1
 .\run\run_10_pptx_histogram.ps1
 .\run\run_11_plot_graph_main_png.ps1
+python .\8_freq_analyze\freq_analyze.py --output .\data_7_freq_analyze\
