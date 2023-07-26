@@ -9,7 +9,7 @@ def get_input_file(library, strand):
   return generate_constants.join_path(
     [
       generate_constants.get_output_dir('fastq'),
-      library + '_' + strand + os.extsep + 'fastq'
+      library + '_' + strand + os.extsep + 'fq'
     ]
   )
 
