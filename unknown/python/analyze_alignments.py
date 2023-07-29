@@ -140,8 +140,8 @@ def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
   read_repr = []
   ref_repr = []
   read_no_sub = []
-  # dels: lists of tuples (start, end, length)
-  # ins: lists of tuples (pos, length)
+  # dels: lists of tuples [(start, end, length)...]
+  # ins: lists of tuples [(pos, length)...]
   # subs: list of positions
   dels = []
   ins = []
@@ -149,7 +149,7 @@ def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
   ref_nucs = 0
   for i in range(align_coords.shape[1] - 1):
     if align_coords[0][i] == align_coords[0][i + 1]:
-      # del
+      # deletions
       read_repr.append('-' * (align_coords[1][i + 1] - align_coords[1][i]))
       ref_repr.append(ref[align_coords[1][i] : align_coords[1][i + 1]])
       end_gap = (i == 0) or (i == (align_coords.shape[1] - 2))
@@ -160,9 +160,9 @@ def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
             align_coords[1][i + 1],
             align_coords[1][i + 1] - align_coords[1][i]
           )
-        ) # inclusive!
+        )
     elif align_coords[1][i] == align_coords[1][i + 1]:
-      # ins
+      # insertions
       read_repr.append(read[align_coords[0][i] : align_coords[0][i + 1]])
       ref_repr.append('-' * (align_coords[0][i + 1] - align_coords[0][i]))
       read_no_sub.append(read_repr[-1])
@@ -175,7 +175,7 @@ def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
           )
         )
     else:
-      # match
+      # matches/substitutions
       read_repr.append(read[align_coords[0][i] : align_coords[0][i + 1]])
       ref_repr.append(ref[align_coords[1][i] : align_coords[1][i + 1]])
       read_no_sub.append(ref_repr[-1])
@@ -184,6 +184,7 @@ def get_alignment_info(align_coords, read, ref, dsb_pos, no_end_gaps=True):
           subs.append(align_coords[1][i] + j)
     seg_len = align_coords[1][i + 1] - align_coords[1][i]
     if (ref_nucs <= dsb_pos) and (ref_nucs + seg_len) > dsb_pos:
+      # mark DSB position
       offset = dsb_pos - ref_nucs
       read_repr[-1] = read_repr[-1][ : offset] + '|' + read_repr[-1][offset : ]
       ref_repr[-1] = ref_repr[-1][ : offset] + '|' + ref_repr[-1][offset : ]
