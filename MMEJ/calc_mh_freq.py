@@ -22,6 +22,8 @@ def read_info(fr, mhname):
     data = {}
     for l in fr:
         ws = l.rstrip('\n').split('\t')
+        if len(ws) < 4:
+            continue
         data[ws[0]] = (ws[1], refs[ws[2]], ws[2], ws[3])
     return data
 
